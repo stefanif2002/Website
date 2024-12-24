@@ -1,0 +1,16 @@
+package com.example.website_backend.client;
+
+import com.example.website_backend.dto.PriceDto;
+import org.springframework.http.MediaType;
+import org.springframework.web.service.annotation.GetExchange;
+import org.springframework.web.service.annotation.HttpExchange;
+
+import java.util.List;
+
+@HttpExchange(
+        url = "/internal",
+        accept = MediaType.APPLICATION_JSON_VALUE)
+public interface PriceClient {
+    @GetExchange("/getAll")
+    public List<PriceDto> getAllPrices();
+}

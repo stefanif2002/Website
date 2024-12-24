@@ -1,5 +1,9 @@
 package com.example.website_backend.config;
 
+import com.example.website_backend.client.BookingClient;
+import com.example.website_backend.client.CarClient;
+import com.example.website_backend.client.CategoryClient;
+import com.example.website_backend.client.PriceClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.loadbalancer.reactive.LoadBalancedExchangeFilterFunction;
 import org.springframework.context.annotation.Bean;
@@ -33,7 +37,7 @@ public class WebClientConfig {
     @Bean
     public WebClient categoryWebClient () {
         return WebClient.builder()
-                .baseUrl("http://category-service")
+                .baseUrl("http://localhost:8080/api/v1/category")
                 .filter(filterFunction)
                 .build();
     }
@@ -50,7 +54,7 @@ public class WebClientConfig {
     @Bean
     public WebClient carWebClient () {
         return WebClient.builder()
-                .baseUrl("http://car-service")
+                .baseUrl("http://localhost:8080/api/v1/car")
                 .filter(filterFunction)
                 .build();
     }
@@ -66,7 +70,7 @@ public class WebClientConfig {
     @Bean
     public WebClient bookingWebClient () {
         return WebClient.builder()
-                .baseUrl("http://booking-service")
+                .baseUrl("http://localhost:8080/api/v1/booking")
                 .filter(filterFunction)
                 .build();
     }

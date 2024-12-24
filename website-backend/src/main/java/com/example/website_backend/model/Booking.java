@@ -18,6 +18,8 @@ public class Booking {
     )
     private Long id;
 
+    @Column(name = "crm_booking_id", nullable = false)
+    private Long crm_booking_id;
     @Column(name = "category_id", nullable = false)
     private Long category_id;
     @Column(name = "user_id", nullable = false)
