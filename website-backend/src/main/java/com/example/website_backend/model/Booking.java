@@ -70,6 +70,8 @@ public class Booking {
         this.status = status;
         this.startLocation = startLocation;
         this.endLocation = endLocation;
+        this.created_at = LocalDateTime.now();
+        this.is_advance_paid = false;
     }
 
     @Override

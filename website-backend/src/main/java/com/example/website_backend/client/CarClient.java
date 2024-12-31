@@ -1,6 +1,6 @@
 package com.example.website_backend.client;
 
-import com.example.website_backend.dto.CarAvailabilityDto;
+import com.example.website_backend.dto.crm.CategoryCarSyncDto;
 import org.springframework.http.MediaType;
 import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
@@ -10,5 +10,5 @@ import org.springframework.web.service.annotation.HttpExchange;
         accept = MediaType.APPLICATION_JSON_VALUE)
 public interface CarClient {
     @GetExchange("/getNumberOfCarsPerCategory")
-    CarAvailabilityDto getNumberOfCarsPerCategory();
+    CategoryCarSyncDto getNumberOfCarsPerCategory();
 }

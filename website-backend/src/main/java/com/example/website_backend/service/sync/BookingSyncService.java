@@ -1,7 +1,7 @@
 package com.example.website_backend.service.sync;
 
 import com.example.website_backend.client.BookingClient;
-import com.example.website_backend.dto.BookingDto;
+import com.example.website_backend.dto.crm.BookingDto;
 import com.example.website_backend.model.Booking;
 import com.example.website_backend.repository.BookingRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +41,6 @@ public class BookingSyncService {
                     for (BookingDto dto : result) {
                         // Check if the booking already exists by website_booking_id
                         if (dto.getWebsite_booking_id() == null) {
-
 
                             // Map the DTO to the Booking entity, excluding website_booking_id
                             Booking booking = makeBooking(dto);

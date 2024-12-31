@@ -1,4 +1,4 @@
-package com.example.website_backend.dto;
+package com.example.website_backend.dto.crm;
 
 import com.example.website_backend.model.BookingStatus;
 import lombok.AllArgsConstructor;

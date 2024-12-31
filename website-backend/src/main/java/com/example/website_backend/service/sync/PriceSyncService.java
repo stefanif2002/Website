@@ -1,7 +1,7 @@
 package com.example.website_backend.service.sync;
 
 import com.example.website_backend.client.PriceClient;
-import com.example.website_backend.dto.PriceDto;
+import com.example.website_backend.dto.crm.PriceDto;
 import com.example.website_backend.model.Price;
 import com.example.website_backend.repository.PriceRepository;
 import lombok.extern.slf4j.Slf4j;

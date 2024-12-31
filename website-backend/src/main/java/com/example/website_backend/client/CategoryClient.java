@@ -1,6 +1,6 @@
 package com.example.website_backend.client;
 
-import com.example.website_backend.dto.CategoryDto;
+import com.example.website_backend.dto.crm.CategoryDto;
 import org.springframework.http.MediaType;
 import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;

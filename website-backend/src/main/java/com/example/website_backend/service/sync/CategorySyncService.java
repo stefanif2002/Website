@@ -2,8 +2,8 @@ package com.example.website_backend.service.sync;
 
 import com.example.website_backend.client.CarClient;
 import com.example.website_backend.client.CategoryClient;
-import com.example.website_backend.dto.CarAvailabilityDto;
-import com.example.website_backend.dto.CategoryDto;
+import com.example.website_backend.dto.crm.CategoryCarSyncDto;
+import com.example.website_backend.dto.crm.CategoryDto;
 import com.example.website_backend.model.Category;
 import com.example.website_backend.repository.CategoryRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +44,7 @@ public class CategorySyncService {
             try {
                 // Fetch all categories from the category service
                 List<CategoryDto> categories = categoryClient.getAllCategories();
-                CarAvailabilityDto result = carClient.getNumberOfCarsPerCategory();
+                CategoryCarSyncDto result = carClient.getNumberOfCarsPerCategory();
 
                 // Update the local category_copy table with the fetched data
                 if (categories != null && result != null) {

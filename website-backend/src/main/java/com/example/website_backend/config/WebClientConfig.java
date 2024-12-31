@@ -1,9 +1,6 @@
 package com.example.website_backend.config;
 
-import com.example.website_backend.client.BookingClient;
-import com.example.website_backend.client.CarClient;
-import com.example.website_backend.client.CategoryClient;
-import com.example.website_backend.client.PriceClient;
+import com.example.website_backend.client.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.loadbalancer.reactive.LoadBalancedExchangeFilterFunction;
 import org.springframework.context.annotation.Bean;
@@ -81,5 +78,21 @@ public class WebClientConfig {
                 .builderFor(WebClientAdapter.create(bookingWebClient()))
                 .build();
         return factory.createClient(BookingClient.class);
+    }
+
+    @Bean
+    public WebClient userWebClient () {
+        return WebClient.builder()
+                .baseUrl("http://localhost:8080/api/v1/user")
+                .filter(filterFunction)
+                .build();
+    }
+
+    @Bean
+    public UserClient userClient() {
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory
+                .builderFor(WebClientAdapter.create(userWebClient()))
+                .build();
+        return factory.createClient(UserClient.class);
     }
 }
