@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -174,4 +175,23 @@ public class BookingService {
         }
     }
 
+    public List<BookingDto> getAll() {
+        List<Booking> bookings = repository.findAll();
+        return bookings.stream()
+                .map(booking -> new BookingDto(
+                        booking.getCrm_booking_id(),
+                        booking.getId(),
+                        booking.getUser_id(),
+                        booking.getCategory_id(),
+                        booking.getDrivers(),
+                        booking.getStart(),
+                        booking.getEnd(),
+                        booking.getPrice(),
+                        booking.getStatus(),
+                        booking.getStartLocation(),
+                        booking.getEndLocation(),
+                        booking.getCreated_at(),
+                        booking.is_advance_paid()))
+                .collect(Collectors.toList());
+    }
 }

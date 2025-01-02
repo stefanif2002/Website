@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/booking")
 @Slf4j
@@ -29,6 +31,12 @@ public class BookingController {
         bookingService.confirmPayment(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("getAll")
+    public ResponseEntity<List<BookingDto>> getAll() {
+        return ResponseEntity.ok(bookingService.getAll());
+    }
+
 
     // Update an existing booking
     @GetMapping("checkUser/{id}")
