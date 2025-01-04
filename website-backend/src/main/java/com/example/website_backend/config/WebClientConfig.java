@@ -1,8 +1,6 @@
 package com.example.website_backend.config;
 
 import com.example.website_backend.client.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.client.loadbalancer.reactive.LoadBalancedExchangeFilterFunction;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -12,14 +10,10 @@ import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 @Configuration
 public class WebClientConfig {
 
-    @Autowired
-    private LoadBalancedExchangeFilterFunction filterFunction;
-
     @Bean
     public WebClient priceWebClient () {
         return WebClient.builder()
                 .baseUrl("http://localhost:8080/api/v1/price")
-                .filter(filterFunction)
                 .build();
     }
 
@@ -35,7 +29,6 @@ public class WebClientConfig {
     public WebClient categoryWebClient () {
         return WebClient.builder()
                 .baseUrl("http://localhost:8080/api/v1/category")
-                .filter(filterFunction)
                 .build();
     }
 
@@ -52,7 +45,6 @@ public class WebClientConfig {
     public WebClient carWebClient () {
         return WebClient.builder()
                 .baseUrl("http://localhost:8080/api/v1/car")
-                .filter(filterFunction)
                 .build();
     }
 
@@ -68,7 +60,6 @@ public class WebClientConfig {
     public WebClient bookingWebClient () {
         return WebClient.builder()
                 .baseUrl("http://localhost:8080/api/v1/booking")
-                .filter(filterFunction)
                 .build();
     }
 
@@ -84,7 +75,6 @@ public class WebClientConfig {
     public WebClient userWebClient () {
         return WebClient.builder()
                 .baseUrl("http://localhost:8080/api/v1/user")
-                .filter(filterFunction)
                 .build();
     }
 

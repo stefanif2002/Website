@@ -47,12 +47,14 @@ public class BookingSyncService {
 
                             newBookings.add(booking); // Add to new bookings list
                         }
+
                     }
 
                     // Save only new bookings
                     repository.saveAll(newBookings);
 
                     log.info("Successfully synchronized bookings. New bookings: {}", newBookings.size());
+
                     break; // Exit the loop if successful
                 }
 

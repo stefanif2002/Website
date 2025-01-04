@@ -20,6 +20,9 @@ public interface BookingClient {
     @GetExchange("/internal/getAll")
     List<BookingDto> getAll();
 
+    @GetExchange("/internal/receiveAll")
+    void receiveAll(@RequestBody List<BookingDto> data);
+
     @GetExchange("/preparation/getAll")
     List<PreparationDto> getAllPreparations();
 
