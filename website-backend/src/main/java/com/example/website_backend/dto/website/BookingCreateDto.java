@@ -12,7 +12,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookingCreateDto {
-    private Long website_booking_id;
 
     private String user_id;
     private UserDto user;

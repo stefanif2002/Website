@@ -22,7 +22,7 @@ public class BookingController {
     @PostMapping("/create")
     public ResponseEntity<Void> createBooking(@RequestBody BookingCreateDto bookingCreateDto) {
         bookingService.createBooking(bookingCreateDto);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
     // Confirm payment for a booking
@@ -37,6 +37,13 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.getAll());
     }
 
+    // Internal method to update the bookings in availability service when it restarts
+    @PostMapping("/receiveAll")
+    public ResponseEntity<Void> receiveAll(@RequestBody List<BookingDto> data) {
+        log.info("Getting all bookings for website");
+        bookingService.receiveAll(data);
+        return ResponseEntity.ok().build();
+    }
 
     // Update an existing booking
     @GetMapping("checkUser/{id}")

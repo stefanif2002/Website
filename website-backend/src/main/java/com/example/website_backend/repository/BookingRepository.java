@@ -30,4 +30,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("SELECT b FROM Booking b WHERE b.end < :threshold")
     List<Booking> findAllByEndBefore(@Param("threshold") LocalDateTime threshold);
 
+    @Query("SELECT b FROM Booking b LEFT JOIN FETCH b.drivers WHERE b.id IN :ids")
+    List<Booking> findAllByIdWithDrivers(@Param("ids") List<Long> ids);
+
+    @Query("SELECT b FROM Booking b WHERE b.crm_booking_id IN :ids")
+    List<Booking> findAllByCRM(@Param("ids") List<Long> ids);
 }

@@ -35,6 +35,8 @@ public class BookingSyncService {
                 // Fetch all bookings from the booking service
                 List<BookingDto> result = bookingClient.getAll();
 
+                List<Long> toSend = new ArrayList<>();
+
                 if (result != null) {
                     List<Booking> newBookings = new ArrayList<>();
 
@@ -46,12 +48,33 @@ public class BookingSyncService {
                             Booking booking = makeBooking(dto);
 
                             newBookings.add(booking); // Add to new bookings list
+
+                            toSend.add(dto.getCrm_booking_id());
+
+                        } /* else {
+
+                            Booking temp = repository.findById(dto.getWebsite_booking_id()).orElse(null);
+
+                            if (temp != null && dto.getCreated_at().isAfter(temp.getCreated_at())) {
+                                newBookings.add(updateBooking(temp, dto));
+                            }
+
                         }
+
+                        */
+
+
 
                     }
 
                     // Save only new bookings
                     repository.saveAll(newBookings);
+
+
+                    // Update Crm
+                    List<Booking> allForUpdate = repository.findAllByCRM(toSend);
+                    bookingClient.receiveAll(allForUpdate.stream().map(this::makeBooking).toList());
+
 
                     log.info("Successfully synchronized bookings. New bookings: {}", newBookings.size());
 
@@ -67,6 +90,10 @@ public class BookingSyncService {
 
     private Booking makeBooking(BookingDto dto) {
         Booking booking = new Booking();
+        return updateBooking(booking, dto);
+    }
+
+    private Booking updateBooking(Booking booking, BookingDto dto) {
         booking.setCrm_booking_id(dto.getCrm_booking_id());
         booking.setCategory_id(dto.getCategory_id());
         booking.setUser_id(dto.getUser_id());
@@ -80,6 +107,13 @@ public class BookingSyncService {
         booking.setCreated_at(dto.getCreated_at());
         booking.set_advance_paid(dto.is_advance_paid());
         return booking;
+    }
+
+    private BookingDto makeBooking(Booking booking) {
+        BookingDto dto = new BookingDto();
+        dto.setWebsite_booking_id(booking.getId());
+        dto.setCrm_booking_id(booking.getCrm_booking_id());
+        return dto;
     }
 
 }

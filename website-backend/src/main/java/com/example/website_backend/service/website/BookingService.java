@@ -78,19 +78,18 @@ public class BookingService {
                 booking.getId(),
                 booking.getUser_id(),
                 booking.getCategory_id(),
-                booking.getDrivers(),
                 booking.getStart(),
                 booking.getEnd(),
+                booking.getDrivers(),
                 booking.getPrice(),
                 booking.getStartLocation(),
                 booking.getEndLocation(),
-                false,
                 booking.getCreated_at(),
                 booking.is_advance_paid()
                 );
 
-        BookingDto bookingResponse = bookingClient.createBooking(bookingDto);
-        booking.setCrm_booking_id(bookingResponse.getCrm_booking_id());
+        Long bookingResponse = bookingClient.createBooking(bookingDto);
+        booking.setCrm_booking_id(bookingResponse);
 
         repository.save(booking);
     }
@@ -194,4 +193,24 @@ public class BookingService {
                         booking.is_advance_paid()))
                 .collect(Collectors.toList());
     }
+
+    public void receiveAll(List<BookingDto> data) {
+        for (BookingDto dto : data) {
+            // Find the existing booking using crm_booking_id (mapped to id)
+            Booking existingBooking = repository.findById(dto.getWebsite_booking_id()).orElse(null);
+
+            if (existingBooking != null) {
+                // Update the website_booking_id for the existing booking
+                existingBooking.setCrm_booking_id(dto.getWebsite_booking_id());
+
+                // Save the updated booking back to the repository
+                repository.save(existingBooking);
+
+                log.info("Updated website_booking_id for booking with crm_booking_id: {}", dto.getCrm_booking_id());
+            } else {
+                log.warn("Booking with crm_booking_id: {} not found. Skipping update.", dto.getCrm_booking_id());
+            }
+        }
+    }
+
 }

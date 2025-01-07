@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
+import org.springframework.web.service.annotation.PostExchange;
 
 import java.util.List;
 
@@ -20,12 +21,12 @@ public interface BookingClient {
     @GetExchange("/internal/getAll")
     List<BookingDto> getAll();
 
-    @GetExchange("/internal/receiveAll")
+    @PostExchange("/internal/receiveAll")
     void receiveAll(@RequestBody List<BookingDto> data);
 
     @GetExchange("/preparation/getAll")
     List<PreparationDto> getAllPreparations();
 
-    @PostMapping("/create")
-    BookingDto createBooking (@RequestBody BookingCreateDtoCrm bookingCreateDto);
+    @PostExchange("/create")
+    Long createBooking (@RequestBody BookingCreateDtoCrm bookingCreateDto);
 }

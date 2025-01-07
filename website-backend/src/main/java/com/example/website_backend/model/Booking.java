@@ -10,7 +10,9 @@ import java.util.List;
 @Entity
 @Setter
 @Getter
-@Table(name = "booking")
+@Table(name = "booking", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"crm_booking_id"})
+})
 public class Booking {
     @Id
     @GeneratedValue(
@@ -18,7 +20,7 @@ public class Booking {
     )
     private Long id;
 
-    @Column(name = "crm_booking_id", nullable = false)
+    @Column(name = "crm_booking_id")
     private Long crm_booking_id;
     @Column(name = "category_id", nullable = false)
     private Long category_id;
