@@ -1,0 +1,7 @@
+.logo {
+    margin-left: 15px;
+    max-width: 80px; /* Adjust the value as per your requirements */
+    height: auto;
+    border-radius: 50%; /* Make the logo round */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add a shadow effect */
+}

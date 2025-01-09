@@ -39,8 +39,8 @@ public class AvailabilityService {
             if (((Integer) result[1]) != 0) {
                 Long category_id = ((Number) result[0]).longValue();
 
-                float average = ((Number) result[2]).floatValue();
-                float total = ((Number) result[3]).floatValue();
+                float average = ((Number) result[3]).floatValue();
+                float total = ((Number) result[2]).floatValue();
 
                 finals.add(new AvailabilityDto(categoryMap.get(category_id), total, average));
             }
