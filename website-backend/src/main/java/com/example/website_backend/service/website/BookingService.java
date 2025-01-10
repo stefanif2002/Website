@@ -39,14 +39,14 @@ public class BookingService {
     }
 
     // Create a new price
-    public void createBooking(BookingCreateDto bookingDto) {
+    public BookingDto createBooking(BookingCreateDto bookingDto) {
         try {
             if (bookingDto.getUser_id() == null || bookingDto.getUser_id().isEmpty())
                 bookingDto.setUser_id(createUser(bookingDto.getUser()));
             else if (!checkUserForBooking(bookingDto.getUser_id()))
                 throw new RuntimeException("User with ID " + bookingDto.getUser_id() + " not found or blocked.");
 
-            repository.save(new Booking(
+            Booking booking = repository.save(new Booking(
                     bookingDto.getCategory_id(),
                     bookingDto.getUser_id(),
                     bookingDto.getDrivers(),
@@ -58,10 +58,28 @@ public class BookingService {
                     bookingDto.getEndLocation()
             ));
 
+            return new BookingDto(
+                    booking.getCrm_booking_id(),
+                    booking.getId(),
+                    booking.getUser_id(),
+                    booking.getCategory_id(),
+                    booking.getDrivers(),
+                    booking.getStart(),
+                    booking.getEnd(),
+                    booking.getPrice(),
+                    booking.getStatus(),
+                    booking.getStartLocation(),
+                    booking.getEndLocation(),
+                    booking.getCreated_at(),
+                    booking.is_advance_paid()
+                    );
+
         } catch (Exception e) {
             log.warn("Category already exists");
             log.error("Error: ", e);
+            throw new RuntimeException(e);
         }
+
     }
 
     public void confirmPayment(Long id) {

@@ -20,9 +20,8 @@ public class BookingController {
 
     // Create a new booking
     @PostMapping("/create")
-    public ResponseEntity<Void> createBooking(@RequestBody BookingCreateDto bookingCreateDto) {
-        bookingService.createBooking(bookingCreateDto);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<BookingDto> createBooking(@RequestBody BookingCreateDto bookingCreateDto) {
+        return ResponseEntity.ok(bookingService.createBooking(bookingCreateDto));
     }
 
     // Confirm payment for a booking

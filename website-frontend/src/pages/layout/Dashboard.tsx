@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import styles from "./Dashboard.module.css";
 import {
     AppstoreOutlined,
@@ -17,16 +17,12 @@ import {featureNotImplemented, url, width} from "../resources/service.ts";
 const { Header, Content, Footer, Sider } = Layout;
 
 const siderStyle: React.CSSProperties = {
-    overflow: 'auto',
+    overflowY: 'auto',
     height: '100vh',
     position: 'fixed',
-    insetInlineStart: 0,
-    top: 0,
-    bottom: 0,
-    scrollbarWidth: 'thin',
-    scrollbarGutter: 'stable',
-    backgroundColor: 'darkcyan', // Set transparent background
-
+    scrollbarWidth: 'none',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)', // Black with 60% transparency
+    zIndex: 2,
 };
 
 const items: MenuProps['items'] = [
@@ -45,6 +41,8 @@ const items: MenuProps['items'] = [
 
 function Dashboard () {
     const [stringImage] = useState<string>("/resources/main.png");
+    const contentRef = useRef<HTMLDivElement>(null); // Reference for the Content area
+
 
     const {
         token: { colorBgContainer, borderRadiusLG },
@@ -94,23 +92,23 @@ function Dashboard () {
         // You can implement the language switching logic here (e.g., update translations)
     };
     return (
-        <>
-            <Layout hasSider>
-                <Sider style={siderStyle} collapsed={true}>
-                    <div >
+            <Layout style={{ height: '100vh', width: '100vw', backgroundColor: 'white'}} hasSider>
+                <Sider trigger={null} style={siderStyle} collapsed={true}>
+                    <div className={styles.logo}>
                         <Image
-                            className={styles.logo}
-                            style={{margin: '28px'}}
-                            src={`${url}${stringImage}`}
+
+                            src={`https://4rent-thessaloniki.com/images/Logo_White.png`}
+                            style={{ maxWidth: '55px', height: 'auto' }} // Ensures responsiveness
+
                         />
                     </div>
                     <Menu mode="inline" items={items} style={{backgroundColor: 'transparent'}}/>
                 </Sider>
-                <Layout>
-                    <Header style={{ padding: 10, background: '#da2828', display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%'  }}>
+                <Layout style={{ overflowY: 'auto'}}>
+                    <Header style={{ padding: 10, background: 'white', display: 'flex', justifyContent: 'center', alignItems: 'center', marginInlineStart: 80 }}>
                         <Row justify="space-between" align="middle" style={{ width: '100%' }}>
                             <Col>
-
+                                <div>Hi</div>
                             </Col>
 
                             <Col style={{ display: 'flex', alignItems: 'center'}}>
@@ -127,34 +125,131 @@ function Dashboard () {
                             </Col>
                         </Row>
                     </Header>
-                    <Content style={{margin: '24px 16px 0', overflow: 'initial'}}>
+                    <Content
+                        ref={contentRef}
+                        style={{
+                            position: 'relative', // Make the content container a relative parent
+                            zIndex: 1, // Ensure the text stays on top
+                            height: '100%',
+                            display: 'flex', // Flexbox for centering
+                            flexGrow: 1,
+                            justifyContent: 'center', // Center horizontally
+                            backgroundColor: 'white',
+                            overflow: 'auto'
+                        }}
+                    >
+                        {/* Background image div */}
                         <div
                             style={{
-                                padding: 24,
-                                textAlign: 'center',
-                                background: colorBgContainer,
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                width: '100%',
+                                height: '100%',
+                                backgroundImage: `
+                linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) 70%),
+                url(https://4rent-thessaloniki.com/images/background.jpg)
+            `,
+                                backgroundSize: 'cover',
+                                backgroundPosition: 'center',
+                                backgroundRepeat: 'no-repeat',
+                                opacity: 0.6, // Apply opacity only to the background
+                                zIndex: -1, // Place it behind the text
+                            }}
+                        ></div>
+
+                        {/* Centered Content */}
+                        <div
+                            style={{
+                                display: 'flex',
+                                flexDirection: 'column', // Stack elements vertically
+                                alignItems: 'center', // Center horizontally
                                 borderRadius: borderRadiusLG,
                             }}
                         >
-                            <p>long content</p>
-                            {
-                                // indicates very long content
-                                Array.from({ length: 100 }, (_, index) => (
-                                    <React.Fragment key={index}>
-                                        {index % 20 === 0 && index ? 'more' : '...'}
-                                        <br />
-                                    </React.Fragment>
-                                ))
-                            }
+                            <h1
+                                style={{
+                                    color: 'red',
+                                    fontSize: '5rem', // Adjust size as needed
+                                    textAlign: 'center', // Center align the text
+                                }}
+                            >
+                                4Rent Ενοικιάσεις<br/>
+                                Αυτοκινήτων<br/>
+                                Θεσσαλονίκη
+                            </h1>
+                            <h2
+                                style={{
+                                    color: 'red',
+                                    textAlign: 'center', // Center align the text
+                                }}
+                            >
+                                Όλα τα αυτοκίνητα ενοικίασης είναι πλήρως ασφαλισμένα με μικτή ασφάλεια χωρίς απαλλαγή.
+                            </h2>
+                            <Button
+                                style={{
+                                    backgroundColor: '#ce0505',
+                                    color: '#fff',
+                                    padding: '10px 20px',
+                                    fontSize: '1.2rem',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    marginTop: '80px', // Add spacing between the subtitle and the button
+                                }}
+                            >
+                                ΚΑΝΤΕ ΚΡΑΤΗΣΗ ΤΩΡΑ
+                            </Button>
+                            <div style={{width: '60%', textAlign: 'start', lineHeight: '1.6', marginTop: '60px'}}>
+                                <h2 style={{fontSize: '2rem'}}>Ενοικιάσεις Αυτοκινήτων Θεσσαλονίκη Αεροδρόμιο</h2>
+
+                                Καλώς ήρθατε στη 4rent!<br/>
+
+                                Η εταιρία με χώρα δραστηριοποίησης την Ελλάδα και βάση τη Θεσσαλονίκη η οποία ασχολείται
+                                με τις ενοικιάσεις αυτοκινήτων σας προσφέρει οχήματα διαφόρων Κατηγοριών (στόλος
+                                αυτοκινήτων), σε προνομιακές τιμές, ώστε να μπορείτε να επιλέξετε εκείνη που ικανοποιεί
+                                πλήρως τις ανάγκες σας.
+                                Επίσης, σας παρέχουμε προσωπική εξυπηρέτηση οποιαδήποτε στιγμή τη χρειάζεστε.<br/><br/>
+
+                                Νοικιάστε το αυτοκίνητο σας στο Αεροδρόμιο Θεσσαλονίκης / SKG
+                                (με δωρεάν υπηρεσία μεταφοράς με shuttle bus προς το γραφείο, μόλις 1,8 χλμ. μακριά από
+                                το Αεροδρόμιο)
+                                ή με παράδοση στο ξενοδοχείο σας στη Θεσσαλονίκη (Ξενοδοχείο ή Airbnb).
+                                Έχετε επίσης τη δυνατότητα να νοικιάσετε το αυτοκίνητό σας στη Χαλκιδική(Κασσάνδρα,
+                                Σιθωνία).<br/><br/>
+
+                                Όλα τα ενοικιαζόμενα αυτοκίνητα μας είναι πλήρως ασφαλισμένα - μικτή χωρίς απαλλαγή
+                                (περιλαμβάνει ζημιά στα ελαστικά, το κάτω μέρος του αυτοκινήτου και την περιοχή
+                                τζαμιού).
+                                Δεν απαιτείται καμία μορφή εγγύησης όπως και δεν υφίσταται όριο στα χιλιόμετρα,
+                                επίσης χωρίς έξτρα χρέωση έχετε τη δυνατότητα να προσθέσετε δεύτερο οδηγό για να είστε
+                                βέβαιοι για την ασφάλεια σας.<br/><br/>
+
+                                Κάντε κράτηση την κατηγορία που επιθυμείτε με μόνο 49,00 € προκαταβολή και τo υπόλοιπο
+                                ποσό κατά την άφιξη σε μετρητά ή κάρτα (πιστωτική, χρεωστική).<br/><br/>
+
+                                Επιπλέον, επιλέγοντας την εξτρά Υπηρεσία Premium (1,00€/ημέρα), έχετε πρόσβαση σε
+                                πρόσθετες υπηρεσίες, όπως δωρεάν ακύρωση, αλλαγές και έκπτωση 10% στην επόμενη κράτησή
+                                σας.<br/><br/>
+
+                                Αν επιθυμείτε να έχετε μία ακόμα πιο ολοκληρωμένη εικόνα σχετικά με τις υπηρεσίες μας
+                                ρίξτε μια ματιά στις Αξιολογήσεις μας ⭐️⭐️⭐️⭐️⭐️.<br/><br/>
+
+                            </div>
+
+                            <Footer style={{textAlign: 'center', backgroundColor: 'rgba(229,230,232,0.8)', width: '100%'}}>
+                            Car Rental CRM ©{new Date().getFullYear()} Created by Stefanos Yfoulis
+                            </Footer>
                         </div>
+
+
+
                     </Content>
-                    <Footer style={{ textAlign: 'center' }}>
-                        Ant Design ©{new Date().getFullYear()} Created by Ant UED
-                    </Footer>
+
+
                 </Layout>
             </Layout>
-        </>
-    );
+    )
+        ;
 }
 
 export default Dashboard;

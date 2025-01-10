@@ -1,7 +1,9 @@
 .logo {
-    margin-left: 15px;
-    max-width: 80px; /* Adjust the value as per your requirements */
-    height: auto;
-    border-radius: 50%; /* Make the logo round */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add a shadow effect */
+    padding: 5px;
+    width: auto; /* Occupies full width of the parent container */
+    height: auto; /* Maintains aspect ratio */
+    max-height: 64px; /* Optional: Limit the height */
+    display: block; /* Ensures it behaves as a block element */
+    object-fit: contain; /* Ensures the image fits without distortion */
+    background-color: #ec4040;
 }
