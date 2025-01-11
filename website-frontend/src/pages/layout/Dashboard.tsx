@@ -5,6 +5,9 @@ import {Layout, Menu, theme, Image} from 'antd';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import MainPage from "../main/MainPage.tsx";
 import MyHeader from "./MyHeader.tsx";
+import MyFooter from "./MyFooter.tsx";
+import {width} from "../resources/service.ts";
+
 
 const {  Content, Footer, Sider } = Layout;
 
@@ -53,6 +56,7 @@ function Dashboard() {
 
     return (
             <Layout style={{ height: '100vh', width: '100vw', backgroundColor: 'white'}} hasSider>
+                {width<3.2 ?
                 <Sider trigger={null} style={siderStyle} collapsed={true}>
                     <div className={styles.logo}>
                         <Image
@@ -64,7 +68,8 @@ function Dashboard() {
                     </div>
                     <Menu mode="inline" items={items} selectedKeys={[]} style={{backgroundColor: 'transparent'}}/>
                 </Sider>
-                <Layout style={{ overflowY: 'auto'}}>
+                    : null }
+                <Layout style={{ overflowY: 'auto', overflowX: 'hidden'}}>
                     <MyHeader/>
                     <Content
                         ref={contentRef}
@@ -89,15 +94,12 @@ function Dashboard() {
                                 flexDirection: 'column', // Stack elements vertically
                                 alignItems: 'center', // Center horizontally
                                 borderRadius: borderRadiusLG,
-                                marginInlineStart: 80
+                                marginInlineStart: width<3.2 ? 80 : 0
                             }}
                         >
                             <MainPage/>
 
-                            <Footer
-                                style={{textAlign: 'center', backgroundColor: 'rgba(229,230,232,0.8)', width: '100%'}}>
-                                Car Rental CRM ©{new Date().getFullYear()} Created by Stefanos Yfoulis
-                            </Footer>
+                            <MyFooter/>
                         </div>
 
 

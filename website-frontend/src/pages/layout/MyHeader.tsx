@@ -1,8 +1,9 @@
-import {Col, Dropdown, Layout, Menu, MenuProps, Row, Select, Space} from "antd";
+import {Col, Dropdown, Image, Layout, Menu, MenuProps, Row, Select, Space} from "antd";
 import React, {useState} from "react";
-import {featureNotImplemented} from "../resources/service.ts";
+import {featureNotImplemented, width} from "../resources/service.ts";
 import {DownOutlined, SmileOutlined} from "@ant-design/icons";
-import { mainMenuItems } from "./menuData.tsx"; // <-- import the big array from above
+import { mainMenuItems } from "./menuData.tsx";
+import styles from "./Dashboard.module.css"; // <-- import the big array from above
 
 const menuItems: MenuProps['items'] = mainMenuItems;
 
@@ -91,12 +92,20 @@ function MyHeader () {
     ];
 
     return (
-        <Header style={{ padding: 10, background: 'white', display: 'flex', justifyContent: 'center', alignItems: 'center', marginInlineStart: 80  }}>
+        <Header style={{ padding: 10, background: 'white', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
             <Row justify="space-between" align="middle" style={{ width: '100%', marginInlineEnd: 17 }}>
-                <Col>
+                {width<3.2 ? <Col/> : <Col xs={3} >
+                    <div className={styles.logo}>
+                        <Image
 
-                </Col>
-                <Col >
+                            src={`https://4rent-thessaloniki.com/images/Logo_White.png`}
+                            style={{maxWidth: '55px', height: 'auto'}} // Ensures responsiveness
+
+                        />
+                    </div>
+                </Col> }
+
+                <Col span={12}>
                     <Menu
                         mode="horizontal"
                         items={menuItems}

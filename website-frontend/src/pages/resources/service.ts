@@ -22,7 +22,7 @@ export const url = `http://localhost:8084/api/v1`;
 export const url = `http://testforrent.duckdns.org/api/v1`;
  */
 
-export const width = 1920/(window.innerWidth - 200);
+export const width = 1920/window.innerWidth;
 
 export const height = 1080/(window.innerHeight);
 
