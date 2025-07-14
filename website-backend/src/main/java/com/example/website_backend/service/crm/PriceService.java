@@ -1,8 +1,6 @@
 package com.example.website_backend.service.crm;
 
 import com.example.website_backend.dto.crm.PriceDto;
-import com.example.website_backend.model.Price;
-import com.example.website_backend.repository.PriceRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

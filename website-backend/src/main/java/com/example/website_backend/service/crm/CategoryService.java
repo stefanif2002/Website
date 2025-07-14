@@ -2,8 +2,6 @@ package com.example.website_backend.service.crm;
 
 import com.example.website_backend.dto.crm.CategoryCarDto;
 import com.example.website_backend.dto.crm.CategoryDto;
-import com.example.website_backend.model.Category;
-import com.example.website_backend.repository.CategoryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;

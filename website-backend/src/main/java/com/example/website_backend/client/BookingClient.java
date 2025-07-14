@@ -18,15 +18,6 @@ import java.util.List;
         url = "",
         accept = MediaType.APPLICATION_JSON_VALUE)
 public interface BookingClient {
-    @GetExchange("/internal/getAll")
-    List<BookingDto> getAll();
-
-    @PostExchange("/internal/receiveAll")
-    void receiveAll(@RequestBody List<BookingDto> data);
-
-    @GetExchange("/preparation/getAll")
-    List<PreparationDto> getAllPreparations();
-
     @PostExchange("/create")
     Long createBooking (@RequestBody BookingCreateDtoCrm bookingCreateDto);
 }

@@ -2,8 +2,6 @@ package com.example.website_backend.service.sync;
 
 import com.example.website_backend.client.BookingClient;
 import com.example.website_backend.dto.crm.BookingDto;
-import com.example.website_backend.model.Booking;
-import com.example.website_backend.repository.BookingRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
