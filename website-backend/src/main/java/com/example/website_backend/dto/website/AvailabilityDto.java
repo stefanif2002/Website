@@ -1,6 +1,5 @@
 package com.example.website_backend.dto.website;
 
-import com.example.website_backend.dto.crm.CategoryDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,7 +8,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AvailabilityDto {
-    private CategoryDto category;
+    private Long categoryId;
+    private String categoryName;
+    private String type;
+    private String fuel;
+    private boolean automatic;
+    private int numOfSeats;
+    private float pricePerDay;
+    private String description;
+    private String imageUrl;
+    private String color;
+
     private float totalPrice;
     private float averagePricePerDay;
 }
