@@ -1,6 +1,6 @@
 package com.example.website_backend.controller.website;
 
-import com.example.website_backend.dto.crm.AvailabilityWebsiteDto;
+import com.example.website_backend.dto.crm.AvailabilityWebsiteUpdateDto;
 import com.example.website_backend.dto.website.AvailabilityDto;
 import com.example.website_backend.service.website.AvailabilityService;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +35,7 @@ public class AvailabilityController {
     }
 
     @PostMapping("/alter")
-    public ResponseEntity<?> addAvailability(@RequestBody AvailabilityWebsiteDto availabilityDto) {
+    public ResponseEntity<?> addAvailability(@RequestBody List<AvailabilityWebsiteUpdateDto> availabilityDto) {
         log.info("Adding availability: {}", availabilityDto);
         service.alterAvailability(availabilityDto);
         return ResponseEntity.ok().build();
