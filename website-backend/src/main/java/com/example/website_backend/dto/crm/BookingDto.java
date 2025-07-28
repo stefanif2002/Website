@@ -11,7 +11,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookingDto {
-    private String id;
+    private Long crm_booking_id;
+    private Long website_booking_id;
+
 
     private String user_id;
     private Long category_id;
@@ -23,6 +25,7 @@ public class BookingDto {
     private LocalDateTime end;
 
     private float price;
+    private BookingStatus status;
 
     private String startLocation;
     private String endLocation;
@@ -34,19 +37,20 @@ public class BookingDto {
 
     @Override
     public String toString() {
-        return "BookingDto{" +
-                "id='" + id + '\'' +
+        return "WebsiteBookingDto{" +
+                "crm_booking_id=" + crm_booking_id +
+                ", website_booking_id=" + website_booking_id +
                 ", user_id='" + user_id + '\'' +
                 ", category_id=" + category_id +
                 ", drivers=" + drivers +
                 ", start=" + start +
                 ", end=" + end +
                 ", price=" + price +
+                ", status=" + status +
                 ", startLocation='" + startLocation + '\'' +
                 ", endLocation='" + endLocation + '\'' +
                 ", created_at=" + created_at +
                 ", is_advance_paid=" + is_advance_paid +
                 '}';
     }
-
 }

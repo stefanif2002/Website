@@ -12,6 +12,8 @@ import java.util.List;
         url = "",
         accept = MediaType.APPLICATION_JSON_VALUE)
 public interface AvailabilityClient {
+    @GetExchange("/preparation/getAll")
+    List<PreparationDto> getAllPreparations();
 
     @GetExchange("/getAll")
     List<AvailabilityWebsiteDto> getAll();

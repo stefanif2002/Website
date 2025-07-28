@@ -1,12 +1,10 @@
 package com.example.website_backend.service.website;
 
-import com.example.website_backend.dto.crm.AvailabilityWebsiteUpdateDto;
+import com.example.website_backend.dto.crm.AvailabilityWebsiteDto;
 import com.example.website_backend.dto.website.AvailabilityDto;
 import com.example.website_backend.model.Availability;
-import com.example.website_backend.repository.AvailabilityRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -24,9 +22,6 @@ import java.util.stream.Collectors;
 public class AvailabilityService {
 
     private final MongoTemplate mongoTemplate;
-
-    @Autowired
-    private AvailabilityRepository repository;
 
     public List<AvailabilityDto> searchAvailability(
             String name,
@@ -191,20 +186,31 @@ public class AvailabilityService {
         return days;
     }
 
-    public void alterAvailability(List<AvailabilityWebsiteUpdateDto> dto) {
+    public void alterAvailability(AvailabilityWebsiteDto dto) {
+        String id = Availability.buildId(dto.getCategoryId(), dto.getTime());
+        boolean exists = mongoTemplate.exists(
+                Query.query(Criteria.where("_id").is(id)),
+                Availability.class
+        );
 
-        for (AvailabilityWebsiteUpdateDto updateDto : dto) {
-            String id = Availability.buildId(updateDto.getCategoryId(), updateDto.getTime());
-            Availability availability = repository.findById(id).orElseThrow();
-            switch (updateDto.getEventType()) {
-                case "AvailabilityCreated" -> availability.setNumOfAvailableVehicles(availability.getNumOfAvailableVehicles() - 1);
-                case "AvailabilityDeleted" -> availability.setNumOfAvailableVehicles(availability.getNumOfAvailableVehicles() + 1);
-                default ->
-                        log.warn("Unknown event type: {}", updateDto.getEventType());
-            }
-            mongoTemplate.save(availability);
-        }
+        Availability availability = new Availability(
+                id,
+                dto.getTime(),
+                dto.getCategoryId(),
+                dto.getCategoryName(),
+                dto.getType(),
+                dto.getFuel(),
+                dto.isAutomatic(),
+                dto.getNumOfSeats(),
+                dto.getPricePerDay(),
+                dto.getDescription(),
+                dto.getImageUrl(),
+                dto.getColor(),
+                dto.getNumOfAvailableVehicles()
+        );
 
+        mongoTemplate.save(availability);
+        log.info("{} availability: {}", exists ? "Updated" : "Created", availability);
     }
 
 }

@@ -39,20 +39,4 @@ public class WebClientConfig {
                 .build();
         return factory.createClient(BookingClient.class);
     }
-
-    @Bean
-    public WebClient userWebClient () {
-        return WebClient.builder()
-                .baseUrl("http://localhost:8080/api/v1/user")
-                .build();
-    }
-
-    @Bean
-    public UserClient userClient() {
-        HttpServiceProxyFactory factory = HttpServiceProxyFactory
-                .builderFor(WebClientAdapter.create(userWebClient()))
-                .build();
-        return factory.createClient(UserClient.class);
-    }
-
 }

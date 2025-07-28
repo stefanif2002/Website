@@ -19,5 +19,5 @@ import java.util.List;
         accept = MediaType.APPLICATION_JSON_VALUE)
 public interface BookingClient {
     @PostExchange("/create")
-    void createBooking (@RequestBody BookingCreateDtoCrm bookingCreateDto);
+    Long createBooking (@RequestBody BookingCreateDtoCrm bookingCreateDto);
 }

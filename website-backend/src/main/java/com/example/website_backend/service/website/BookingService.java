@@ -1,16 +1,11 @@
 package com.example.website_backend.service.website;
 
 import com.example.website_backend.client.BookingClient;
-import com.example.website_backend.client.UserClient;
 import com.example.website_backend.dto.crm.BookingCreateDtoCrm;
 import com.example.website_backend.dto.crm.BookingDto;
-import com.example.website_backend.dto.crm.UserForWebsiteDto;
+import com.example.website_backend.dto.crm.UserForBookingDto;
 import com.example.website_backend.dto.website.BookingCreateDto;
 import com.example.website_backend.dto.website.UserDto;
-import com.example.website_backend.flags.BitMask;
-import com.example.website_backend.flags.UserFlags;
-import com.example.website_backend.model.Booking;
-import com.example.website_backend.repository.BookingRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -29,20 +24,23 @@ public class BookingService {
     private BookingRepository repository;
 
     @Autowired
-    private BookingClient bookingClient;
-
-    @Autowired
     private UserClient userClient;
 
     @Autowired
-    private UserClientService userClientService;
+    private BookingClient bookingClient;
 
+
+    public boolean checkUser(String telephone) {
+        return userClient.existsUser(telephone);
+    }
 
     // Create a new price
     public BookingDto createBooking(BookingCreateDto bookingDto) {
         try {
             if (bookingDto.getUser_id() == null || bookingDto.getUser_id().isEmpty())
-                throw new Exception("User id is empty");
+                bookingDto.setUser_id(createUser(bookingDto.getUser()));
+            else if (!checkUserForBooking(bookingDto.getUser_id()))
+                throw new RuntimeException("User with ID " + bookingDto.getUser_id() + " not found or blocked.");
 
             Booking booking = repository.save(new Booking(
                     bookingDto.getCategory_id(),
@@ -51,11 +49,13 @@ public class BookingService {
                     bookingDto.getStart(),
                     bookingDto.getEnd(),
                     bookingDto.getPrice(),
+                    BookingStatus.ACCEPTED,
                     bookingDto.getStartLocation(),
                     bookingDto.getEndLocation()
             ));
 
             return new BookingDto(
+                    booking.getCrm_booking_id(),
                     booking.getId(),
                     booking.getUser_id(),
                     booking.getCategory_id(),
@@ -63,6 +63,7 @@ public class BookingService {
                     booking.getStart(),
                     booking.getEnd(),
                     booking.getPrice(),
+                    booking.getStatus(),
                     booking.getStartLocation(),
                     booking.getEndLocation(),
                     booking.getCreated_at(),
@@ -77,7 +78,7 @@ public class BookingService {
 
     }
 
-    public void confirmPayment(String id) {
+    public void confirmPayment(Long id) {
         Optional<Booking> existing = repository.findById(id);
         if (existing.isEmpty()) {
             throw new RuntimeException("Booking with ID " + id + " not found.");
@@ -101,13 +102,14 @@ public class BookingService {
                 booking.is_advance_paid()
                 );
 
-        bookingClient.createBooking(bookingDto);
+        Long bookingResponse = bookingClient.createBooking(bookingDto);
+        booking.setCrm_booking_id(bookingResponse);
 
         repository.save(booking);
     }
 
     // Update an existing price
-    public void updateBooking(String id, BookingDto bookingDto) {
+    public void updateBooking(Long id, BookingDto bookingDto) {
         Optional<Booking> existing = repository.findById(id);
         if (existing.isEmpty()) {
             throw new RuntimeException("Booking with ID " + id + " not found.");
@@ -121,6 +123,7 @@ public class BookingService {
         booking.setStart(bookingDto.getStart());
         booking.setEnd(bookingDto.getEnd());
         booking.setPrice(bookingDto.getPrice());
+        booking.setStatus(bookingDto.getStatus());
         booking.setStartLocation(bookingDto.getStartLocation());
         booking.setEndLocation(bookingDto.getEndLocation());
         booking.set_advance_paid(bookingDto.is_advance_paid());
@@ -133,46 +136,19 @@ public class BookingService {
     }
 
     // Delete a price
-    public void deleteBooking(String id) {
+    public void deleteBooking(Long id) {
         if (!repository.existsById(id)) {
             throw new RuntimeException("Booking with ID " + id + " not found.");
         }
         repository.deleteById(id);
     }
 
-    /**
-     * @return empty list if everything required is present,
-     *         null if user doesn’t exist (caller decides what to do)
-     */
-    public List<String> checkUserForBooking(String telephone) {
-        UserForWebsiteDto u = userClientService.usersForWebsite().stream()
-                .filter(x -> x.getTelephone().equals(telephone))
-                .findFirst()
-                .orElse(null);
-
-        if (u == null) return null;
-
-        int f = u.getFlags();
-        List<String> missing = new java.util.ArrayList<>();
-
-        // define what you actually require for a website booking:
-        if (!BitMask.isSet(f, UserFlags.HAS_NAME))              missing.add("name");
-        if (!BitMask.isSet(f, UserFlags.HAS_LAST_NAME))         missing.add("last_name");
-        if (!BitMask.isSet(f, UserFlags.HAS_EMAIL))             missing.add("email");
-        if (!BitMask.isSet(f, UserFlags.HAS_COUNTRY))           missing.add("country");
-        if (!BitMask.isSet(f, UserFlags.HAS_DRIVER_LICENSE))    missing.add("driver_license");
-
-        // If company flag is on, maybe require VAT/company_name
-        if (BitMask.isSet(f, UserFlags.IS_COMPANY)) {
-            if (!BitMask.isSet(f, UserFlags.HAS_VAT_NUMBER))    missing.add("vat_number");
-            if (!BitMask.isSet(f, UserFlags.HAS_COMPANY_NAME))  missing.add("company_name");
-        }
-
-        return missing;
+    private boolean checkUserForBooking(String telephone) {
+        UserForBookingDto check = userClient.existsUserForBooking(telephone);
+        return check.isExists() && !check.isBlocked();
     }
 
-
-    public String createUser(UserDto user){
+    private String createUser(UserDto user){
         return userClient.createUser(user).getTelephone();
     }
 
@@ -216,6 +192,7 @@ public class BookingService {
         List<Booking> bookings = repository.findAll();
         return bookings.stream()
                 .map(booking -> new BookingDto(
+                        booking.getCrm_booking_id(),
                         booking.getId(),
                         booking.getUser_id(),
                         booking.getCategory_id(),
@@ -223,11 +200,31 @@ public class BookingService {
                         booking.getStart(),
                         booking.getEnd(),
                         booking.getPrice(),
+                        booking.getStatus(),
                         booking.getStartLocation(),
                         booking.getEndLocation(),
                         booking.getCreated_at(),
                         booking.is_advance_paid()))
                 .collect(Collectors.toList());
+    }
+
+    public void receiveAll(List<BookingDto> data) {
+        for (BookingDto dto : data) {
+            // Find the existing booking using crm_booking_id (mapped to id)
+            Booking existingBooking = repository.findById(dto.getWebsite_booking_id()).orElse(null);
+
+            if (existingBooking != null) {
+                // Update the website_booking_id for the existing booking
+                existingBooking.setCrm_booking_id(dto.getWebsite_booking_id());
+
+                // Save the updated booking back to the repository
+                repository.save(existingBooking);
+
+                log.info("Updated website_booking_id for booking with crm_booking_id: {}", dto.getCrm_booking_id());
+            } else {
+                log.warn("Booking with crm_booking_id: {} not found. Skipping update.", dto.getCrm_booking_id());
+            }
+        }
     }
 
 }

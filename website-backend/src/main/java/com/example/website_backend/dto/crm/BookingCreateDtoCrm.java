@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookingCreateDtoCrm {
-    private String website_booking_id;
+    private Long website_booking_id;
 
     private String telephone;
     private Long category_id;
