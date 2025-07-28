@@ -9,8 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -41,55 +41,50 @@ public class AvailabilityService {
             throw new IllegalArgumentException("Invalid date range");
         }
 
-        // Build criteria
-        List<Criteria> and = new ArrayList<>();
-        and.add(Criteria.where("time").gte(start).lte(end));  // inclusive range
+        // Start with date filter
+        Criteria criteria = Criteria.where("time").gte(start).lte(end);
 
         if (name != null && !name.isBlank()) {
-            and.add(Criteria.where("categoryName")
-                    .regex(".*" + escapeRegex(name) + ".*", "i"));
+            criteria = criteria.and("categoryName").regex(".*" + escapeRegex(name) + ".*", "i");
         }
         if (type != null && !type.isBlank()) {
-            and.add(Criteria.where("type").is(type));
+            criteria = criteria.and("type").is(type);
         }
         if (fuel != null && !fuel.isBlank()) {
-            and.add(Criteria.where("fuel").is(fuel));
+            criteria = criteria.and("fuel").is(fuel);
         }
         if (automatic != null) {
-            and.add(Criteria.where("automatic").is(automatic));
+            criteria = criteria.and("automatic").is(automatic);
         }
         if (seats != null) {
-            and.add(Criteria.where("numOfSeats").is(seats));
+            criteria = criteria.and("numOfSeats").is(seats);
         }
 
-        Query query = new Query(new Criteria().andOperator(and.toArray(new Criteria[0])))
-                .with(Sort.by(Sort.Direction.ASC, "categoryId", "time"));
+        Aggregation agg = Aggregation.newAggregation(
+                Aggregation.match(criteria),
+                Aggregation.group("categoryId")
+                        .push("$$ROOT").as("entries")
+                        .max(
+                                ConditionalOperators.when(Criteria.where("numOfAvailableVehicles").lte(0))
+                                        .then(1)
+                                        .otherwise(0)
+                        ).as("hasZero"),
+                Aggregation.match(Criteria.where("hasZero").is(0)),
+                Aggregation.unwind("entries"),
+                Aggregation.replaceRoot("entries"),
+                Aggregation.sort(Sort.by(Sort.Direction.ASC, "categoryId", "time"))
+        );
 
-        // Optionally project only needed fields
-        query.fields()
-                .include("categoryId")
-                .include("categoryName")
-                .include("type")
-                .include("fuel")
-                .include("automatic")
-                .include("numOfSeats")
-                .include("pricePerDay")
-                .include("description")
-                .include("imageUrl")
-                .include("color")
-                .include("time")
-                .include("numOfAvailableVehicles");
-
-        List<Availability> snapshots = mongoTemplate.find(query, Availability.class);
+        List<Availability> snapshots = mongoTemplate
+                .aggregate(agg, "availability", Availability.class)
+                .getMappedResults();
 
         if (snapshots.isEmpty()) {
             return List.of();
         }
 
-        // Build the set of required days (inclusive)
         Set<LocalDate> requiredDays = daysBetween(start.toLocalDate(), end.toLocalDate());
 
-        // Group by category
         Map<Long, List<Availability>> byCategory = snapshots.stream()
                 .collect(Collectors.groupingBy(Availability::getCategoryId));
 
@@ -98,41 +93,29 @@ public class AvailabilityService {
         for (Map.Entry<Long, List<Availability>> entry : byCategory.entrySet()) {
             List<Availability> catList = entry.getValue();
 
-            // Quick skip if any snapshot has zero or negative availability
-            boolean anyUnavailable = catList.stream()
-                    .anyMatch(a -> a.getNumOfAvailableVehicles() <= 0);
-            if (anyUnavailable) {
-                continue;
-            }
-
-            // Group the category’s snapshots by day
             Map<LocalDate, List<Availability>> byDay = catList.stream()
                     .collect(Collectors.groupingBy(a -> a.getTime().toLocalDate()));
 
-            // Enforce presence of every requested day (remove if partial is acceptable)
             if (!requiredDays.stream().allMatch(byDay::containsKey)) {
                 continue;
             }
 
             double totalPrice = 0.0;
             int dayCount = 0;
+            boolean anyUnavailable = false;
 
-            // Compute per-day price (assuming all entries same price; we can just take first)
             for (LocalDate day : requiredDays) {
                 List<Availability> dayEntries = byDay.get(day);
                 if (dayEntries == null || dayEntries.isEmpty()) {
-                    // Missing day (should not happen after allMatch check), skip category
                     anyUnavailable = true;
                     break;
                 }
 
-                // If truly all have the same price you could just use dayEntries.get(0).getPricePerDay()
                 double dayPrice = dayEntries.stream()
                         .mapToDouble(Availability::getPricePerDay)
                         .average()
                         .orElse(0.0);
 
-                // Also ensure availability that day > 0 (use max or min; here max)
                 int maxAvailThisDay = dayEntries.stream()
                         .mapToInt(Availability::getNumOfAvailableVehicles)
                         .max()
@@ -154,7 +137,6 @@ public class AvailabilityService {
             float total = (float) totalPrice;
             float averagePerDay = (float) (totalPrice / dayCount);
 
-            // Use a representative snapshot (first sorted by time)
             Availability first = catList.get(0);
 
             result.add(new AvailabilityDto(
@@ -164,7 +146,7 @@ public class AvailabilityService {
                     first.getFuel(),
                     first.isAutomatic(),
                     first.getNumOfSeats(),
-                    first.getPricePerDay(),   // Keep raw daily price (could choose averagePerDay instead)
+                    first.getPricePerDay(),
                     first.getDescription(),
                     first.getImageUrl(),
                     first.getColor(),
@@ -173,9 +155,7 @@ public class AvailabilityService {
             ));
         }
 
-        // Sort if desired (e.g., by total price ascending)
         result.sort(Comparator.comparing(AvailabilityDto::getTotalPrice));
-
         return result;
     }
 
@@ -192,19 +172,18 @@ public class AvailabilityService {
     }
 
     public void alterAvailability(List<AvailabilityWebsiteUpdateDto> dto) {
-
         for (AvailabilityWebsiteUpdateDto updateDto : dto) {
             String id = Availability.buildId(updateDto.getCategoryId(), updateDto.getTime());
             Availability availability = repository.findById(id).orElseThrow();
             switch (updateDto.getEventType()) {
-                case "AvailabilityCreated" -> availability.setNumOfAvailableVehicles(availability.getNumOfAvailableVehicles() - 1);
-                case "AvailabilityDeleted" -> availability.setNumOfAvailableVehicles(availability.getNumOfAvailableVehicles() + 1);
+                case "AvailabilityCreated" ->
+                        availability.setNumOfAvailableVehicles(availability.getNumOfAvailableVehicles() - 1);
+                case "AvailabilityDeleted" ->
+                        availability.setNumOfAvailableVehicles(availability.getNumOfAvailableVehicles() + 1);
                 default ->
                         log.warn("Unknown event type: {}", updateDto.getEventType());
             }
             mongoTemplate.save(availability);
         }
-
     }
-
 }

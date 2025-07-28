@@ -34,6 +34,7 @@ public class Availability {
     private String imageUrl;
     private String color;
     private int numOfAvailableVehicles;
+    private Long lastSync;
 
     public static String buildId(Long categoryId, LocalDateTime time) {
         // Use an ISO-like format that sorts lexicographically by time
