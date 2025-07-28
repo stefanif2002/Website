@@ -1,13 +1,15 @@
 package com.example.website_backend.controller.website;
 
-import com.example.website_backend.dto.crm.AvailabilityWebsiteDto;
 import com.example.website_backend.dto.website.AvailabilityDto;
 import com.example.website_backend.service.website.AvailabilityService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,13 +34,6 @@ public class AvailabilityController {
 
         log.info("Checking availability with filters: {} - {} - {} - {}, start: {}, end: {}", type, fuel, automatic, seats, start, end);
         return ResponseEntity.ok(service.searchAvailability(name, type, fuel, automatic, seats, start, end));
-    }
-
-    @PostMapping("/alter")
-    public ResponseEntity<?> addAvailability(@RequestBody AvailabilityWebsiteDto availabilityDto) {
-        log.info("Adding availability: {}", availabilityDto);
-        service.alterAvailability(availabilityDto);
-        return ResponseEntity.ok().build();
     }
 
 }

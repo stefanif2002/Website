@@ -18,7 +18,7 @@ public class WebClientConfig {
     }
 
     @Bean
-    public AvailabilityClient availabilityClient () {
+    public AvailabilityClient priceClient () {
         HttpServiceProxyFactory factory = HttpServiceProxyFactory
                 .builderFor(WebClientAdapter.create(availabilityWebClient()))
                 .build();
