@@ -1,11 +1,15 @@
 package com.example.website_backend.service.website;
 
 import com.example.website_backend.client.BookingClient;
+import com.example.website_backend.client.UserClient;
 import com.example.website_backend.dto.crm.BookingCreateDtoCrm;
 import com.example.website_backend.dto.crm.BookingDto;
 import com.example.website_backend.dto.crm.UserForBookingDto;
 import com.example.website_backend.dto.website.BookingCreateDto;
 import com.example.website_backend.dto.website.UserDto;
+import com.example.website_backend.model.Booking;
+import com.example.website_backend.model.BookingStatus;
+import com.example.website_backend.repository.BookingRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;

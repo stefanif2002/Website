@@ -2,6 +2,7 @@ package com.example.website_backend.service.website;
 
 import com.example.website_backend.dto.crm.CategoryDto;
 import com.example.website_backend.dto.website.AvailabilityDto;
+import com.example.website_backend.repository.BookingRepository;
 import com.example.website_backend.service.crm.CategoryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

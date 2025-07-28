@@ -2,9 +2,20 @@
 spring:
     application:
         name: website-backend
-    data:
-        mongodb:
-          uri: mongodb://localhost:27017/website
+    jpa:
+        generate-ddl: 'false'
+        properties:
+            hibernate:
+              format_sql: 'true'
+        show-sql: 'true'
+        hibernate:
+            ddl-auto: update
+
+    datasource:
+        password: root
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        username: root
+        url: jdbc:mysql://localhost:3306/website
 
 
     servlet:

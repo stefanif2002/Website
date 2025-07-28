@@ -11,18 +11,49 @@ import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 public class WebClientConfig {
 
     @Bean
-    public WebClient availabilityWebClient () {
+    public WebClient priceWebClient () {
         return WebClient.builder()
-                .baseUrl("http://localhost:8080/api/v1/availability")
+                .baseUrl("http://localhost:8080/api/v1/price")
                 .build();
     }
 
     @Bean
-    public AvailabilityClient priceClient () {
+    public PriceClient priceClient () {
         HttpServiceProxyFactory factory = HttpServiceProxyFactory
-                .builderFor(WebClientAdapter.create(availabilityWebClient()))
+                .builderFor(WebClientAdapter.create(priceWebClient()))
                 .build();
-        return factory.createClient(AvailabilityClient.class);
+        return factory.createClient(PriceClient.class);
+    }
+
+    @Bean
+    public WebClient categoryWebClient () {
+        return WebClient.builder()
+                .baseUrl("http://localhost:8080/api/v1/category")
+                .build();
+    }
+
+    @Bean
+    public CategoryClient categoryClient() {
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory
+                .builderFor(WebClientAdapter.create(categoryWebClient()))
+                .build();
+        return factory.createClient(CategoryClient.class);
+    }
+
+
+    @Bean
+    public WebClient carWebClient () {
+        return WebClient.builder()
+                .baseUrl("http://localhost:8080/api/v1/car")
+                .build();
+    }
+
+    @Bean
+    public CarClient carClient() {
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory
+                .builderFor(WebClientAdapter.create(carWebClient()))
+                .build();
+        return factory.createClient(CarClient.class);
     }
 
     @Bean
@@ -38,5 +69,20 @@ public class WebClientConfig {
                 .builderFor(WebClientAdapter.create(bookingWebClient()))
                 .build();
         return factory.createClient(BookingClient.class);
+    }
+
+    @Bean
+    public WebClient userWebClient () {
+        return WebClient.builder()
+                .baseUrl("http://localhost:8080/api/v1/user")
+                .build();
+    }
+
+    @Bean
+    public UserClient userClient() {
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory
+                .builderFor(WebClientAdapter.create(userWebClient()))
+                .build();
+        return factory.createClient(UserClient.class);
     }
 }
