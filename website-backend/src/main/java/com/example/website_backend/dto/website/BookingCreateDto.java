@@ -1,6 +1,5 @@
 package com.example.website_backend.dto.website;
 
-import com.example.website_backend.model.BookingStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

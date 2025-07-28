@@ -40,10 +40,6 @@ public class Booking {
     @Column(name = "price", nullable = false)
     private float price;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    private BookingStatus status;
-
     private String startLocation;
     private String endLocation;
 
@@ -59,7 +55,6 @@ public class Booking {
                    LocalDateTime start,
                    LocalDateTime end,
                    float price,
-                   BookingStatus status,
                    String startLocation,
                    String endLocation)
     {
@@ -69,7 +64,6 @@ public class Booking {
         this.start = start;
         this.end = end;
         this.price = price;
-        this.status = status;
         this.startLocation = startLocation;
         this.endLocation = endLocation;
         this.created_at = LocalDateTime.now();

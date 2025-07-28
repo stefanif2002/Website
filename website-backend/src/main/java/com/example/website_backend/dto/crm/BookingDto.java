@@ -1,6 +1,5 @@
 package com.example.website_backend.dto.crm;
 
-import com.example.website_backend.model.BookingStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,7 +25,6 @@ public class BookingDto {
     private LocalDateTime end;
 
     private float price;
-    private BookingStatus status;
 
     private String startLocation;
     private String endLocation;
@@ -47,7 +45,6 @@ public class BookingDto {
                 ", start=" + start +
                 ", end=" + end +
                 ", price=" + price +
-                ", status=" + status +
                 ", startLocation='" + startLocation + '\'' +
                 ", endLocation='" + endLocation + '\'' +
                 ", created_at=" + created_at +

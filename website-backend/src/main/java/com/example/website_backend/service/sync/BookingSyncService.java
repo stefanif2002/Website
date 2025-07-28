@@ -101,7 +101,6 @@ public class BookingSyncService {
         booking.setStart(dto.getStart());
         booking.setEnd(dto.getEnd());
         booking.setPrice(dto.getPrice());
-        booking.setStatus(dto.getStatus());
         booking.setStartLocation(dto.getStartLocation());
         booking.setEndLocation(dto.getEndLocation());
         booking.setCreated_at(dto.getCreated_at());

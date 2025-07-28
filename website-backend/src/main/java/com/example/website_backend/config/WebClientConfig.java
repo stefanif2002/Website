@@ -3,6 +3,12 @@ package com.example.website_backend.config;
 import com.example.website_backend.client.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.client.*;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.support.WebClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
@@ -10,78 +16,140 @@ import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 @Configuration
 public class WebClientConfig {
 
+    //
+    // 1) Fetch & cache client-credentials tokens
+    //
     @Bean
-    public WebClient priceWebClient () {
+    @Primary
+    public OAuth2AuthorizedClientManager authorizedClientManager(
+            ClientRegistrationRepository clientRegistrations,
+            OAuth2AuthorizedClientService clientService
+    ) {
+        // only client-credentials grant
+        OAuth2AuthorizedClientProvider provider = OAuth2AuthorizedClientProviderBuilder.builder()
+                .clientCredentials()
+                .build();
+
+        // this class knows how to use the clientService to save tokens
+        AuthorizedClientServiceOAuth2AuthorizedClientManager manager =
+                new AuthorizedClientServiceOAuth2AuthorizedClientManager(
+                        clientRegistrations, clientService
+                );
+        manager.setAuthorizedClientProvider(provider);
+        return manager;
+    }
+
+    //
+    // 2) Helper to turn the manager into a WebClient filter
+    //
+    private ServletOAuth2AuthorizedClientExchangeFilterFunction oauth2(
+            OAuth2AuthorizedClientManager manager
+    ) {
+        ServletOAuth2AuthorizedClientExchangeFilterFunction oauth2 =
+                new ServletOAuth2AuthorizedClientExchangeFilterFunction(manager);
+        // match the registration in application.yml: spring.security.oauth2.client.registration.crm-client
+        oauth2.setDefaultClientRegistrationId("crm-client");
+        return oauth2;
+    }
+
+    //
+    // 3) One WebClient per downstream CRM service
+    //
+    @Bean
+    public WebClient availabilityWebClient(OAuth2AuthorizedClientManager manager) {
         return WebClient.builder()
-                .baseUrl("http://localhost:8080/api/v1/price")
+                .baseUrl("http://localhost:8081/api/v1/availability")
+                .filter(oauth2(manager))
+                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_NDJSON_VALUE)
+                .build();
+    }
+
+
+    @Bean
+    public WebClient bookingWebClient(OAuth2AuthorizedClientManager manager) {
+        return WebClient.builder()
+                .baseUrl("http://localhost:8081/api/v1/booking")
+                .filter(oauth2(manager))
                 .build();
     }
 
     @Bean
-    public PriceClient priceClient () {
+    public WebClient userWebClient(OAuth2AuthorizedClientManager manager) {
+        return WebClient.builder()
+                .baseUrl("http://localhost:8081/api/v1/user")
+                .filter(oauth2(manager))
+                .build();
+    }
+
+    @Bean
+    public WebClient priceWebClient(OAuth2AuthorizedClientManager manager) {
+        return WebClient.builder()
+                .baseUrl("http://localhost:8081/api/v1/price")
+                .filter(oauth2(manager))
+                .build();
+    }
+
+    @Bean
+    public WebClient categoryWebClient(OAuth2AuthorizedClientManager manager) {
+        return WebClient.builder()
+                .baseUrl("http://localhost:8081/api/v1/category")
+                .filter(oauth2(manager))
+                .build();
+    }
+
+    @Bean
+    public WebClient carWebClient(OAuth2AuthorizedClientManager manager) {
+        return WebClient.builder()
+                .baseUrl("http://localhost:8081/api/v1/category")
+                .filter(oauth2(manager))
+                .build();
+    }
+
+    //
+    // 4) Typed HTTP-service proxies
+    //
+    @Bean
+    public CarClient carClient(WebClient carWebClient) {
         HttpServiceProxyFactory factory = HttpServiceProxyFactory
-                .builderFor(WebClientAdapter.create(priceWebClient()))
+                .builderFor(WebClientAdapter.create(carWebClient))
+                .build();
+        return factory.createClient(CarClient.class);
+    }
+
+    //
+    // 4) Typed HTTP-service proxies
+    //
+    @Bean
+    public CategoryClient categoryClient(WebClient categoryWebClient) {
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory
+                .builderFor(WebClientAdapter.create(categoryWebClient))
+                .build();
+        return factory.createClient(CategoryClient.class);
+    }
+
+    //
+    // 4) Typed HTTP-service proxies
+    //
+    @Bean
+    public PriceClient priceClient(WebClient priceWebClient) {
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory
+                .builderFor(WebClientAdapter.create(priceWebClient))
                 .build();
         return factory.createClient(PriceClient.class);
     }
 
     @Bean
-    public WebClient categoryWebClient () {
-        return WebClient.builder()
-                .baseUrl("http://localhost:8080/api/v1/category")
-                .build();
-    }
-
-    @Bean
-    public CategoryClient categoryClient() {
+    public BookingClient bookingClient(WebClient bookingWebClient) {
         HttpServiceProxyFactory factory = HttpServiceProxyFactory
-                .builderFor(WebClientAdapter.create(categoryWebClient()))
-                .build();
-        return factory.createClient(CategoryClient.class);
-    }
-
-
-    @Bean
-    public WebClient carWebClient () {
-        return WebClient.builder()
-                .baseUrl("http://localhost:8080/api/v1/car")
-                .build();
-    }
-
-    @Bean
-    public CarClient carClient() {
-        HttpServiceProxyFactory factory = HttpServiceProxyFactory
-                .builderFor(WebClientAdapter.create(carWebClient()))
-                .build();
-        return factory.createClient(CarClient.class);
-    }
-
-    @Bean
-    public WebClient bookingWebClient () {
-        return WebClient.builder()
-                .baseUrl("http://localhost:8080/api/v1/booking")
-                .build();
-    }
-
-    @Bean
-    public BookingClient bookingClient() {
-        HttpServiceProxyFactory factory = HttpServiceProxyFactory
-                .builderFor(WebClientAdapter.create(bookingWebClient()))
+                .builderFor(WebClientAdapter.create(bookingWebClient))
                 .build();
         return factory.createClient(BookingClient.class);
     }
 
     @Bean
-    public WebClient userWebClient () {
-        return WebClient.builder()
-                .baseUrl("http://localhost:8080/api/v1/user")
-                .build();
-    }
-
-    @Bean
-    public UserClient userClient() {
+    public UserClient userClient(WebClient userWebClient) {
         HttpServiceProxyFactory factory = HttpServiceProxyFactory
-                .builderFor(WebClientAdapter.create(userWebClient()))
+                .builderFor(WebClientAdapter.create(userWebClient))
                 .build();
         return factory.createClient(UserClient.class);
     }
