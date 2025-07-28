@@ -1,18 +1,19 @@
 package com.example.website_backend.client;
 
 import com.example.website_backend.dto.crm.AvailabilityWebsiteDto;
+import com.example.website_backend.dto.crm.PreparationDto;
 import org.springframework.http.MediaType;
 import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
-import reactor.core.publisher.Flux;
+
+import java.util.List;
 
 @HttpExchange(
-        url    = "",                                // method‐level paths are relative
-        accept = MediaType.APPLICATION_NDJSON_VALUE // only NDJSON
-)
+        url = "",
+        accept = MediaType.APPLICATION_JSON_VALUE)
 public interface AvailabilityClient {
 
     @GetExchange("/getAll")
-    Flux<AvailabilityWebsiteDto> getAll();
+    List<AvailabilityWebsiteDto> getAll();
 
 }

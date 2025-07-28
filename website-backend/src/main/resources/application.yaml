@@ -1,42 +1,53 @@
+
 spring:
-  application:
-    name: website-backend
+    application:
+        name: website-backend
+    data:
+        mongodb:
+          uri: mongodb://localhost:27017/website
 
-  data:
-    mongodb:
-      uri: mongodb://localhost:27017/website
-
-  security:
-    oauth2:
-      client:
-        registration:
-          # must match oauth2.setDefaultClientRegistrationId("crm-client")
-          crm-client:
-            client-id: website-connect
-            client-secret: MbGG11ilaPfjkdlXQEVJi3eC8ludiPgb
-            authorization-grant-type: client_credentials
-            scope: openid
-            provider: crm         # ← link to the provider block below
-        provider:
-          crm:
-            token-uri: http://localhost:8080/realms/4rent_security/protocol/openid-connect/token
 
     servlet:
-      multipart:
-        enabled: true
-        file-size-threshold: 2MB
-        max-file-size: 10MB
-        max-request-size: 10MB
+        multipart:
+          enabled: true
+          file-size-threshold: 2MB
+          max-file-size: 10MB
+          max-request-size: 10MB
+
 
 server:
-  port: 8084
-  error:
-    include-binding-errors: always
-    include-message: always
+    port: 8084
+    error:
+        include-binding-errors: always
+        include-message: always
 
 logging:
   level:
-    com.netflix.discovery: DEBUG
-    org.springframework.cloud.netflix.eureka: DEBUG
+    com.netflix.discovery: 'DEBUG'
+    org.springframework.cloud.netflix.eureka: 'DEBUG'
 
-# … rest of your resilience4j config …
+
+#Resilinece4j Properties
+resilience4j:
+  circuitbreaker:
+    instances:
+      user-service:
+        automaticTransitionFromOpenToHalfOpenEnabled: 'true'
+        failureRateThreshold: '50'
+        slidingWindowType: COUNT_BASED
+        event-consumer-buffer-size: '10'
+        registerHealthIndicator: 'true'
+        waitDurationInOpenState: 5s
+        permittedNumberOfCallsInHalfOpenState: '3'
+        slidingWindowSize: '5'
+
+  timelimiter:
+    instances:
+      price-service:
+        timeout-duration: 5s
+
+  retry:
+    instances:
+      price-service:
+        wait-duration: 5s
+        max-attempts: '3'

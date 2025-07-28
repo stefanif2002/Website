@@ -1,4 +1,4 @@
-package com.example.website_backend.controller;
+package com.example.website_backend.controller.website;
 
 import com.example.website_backend.dto.crm.BookingDto;
 import com.example.website_backend.dto.website.BookingCreateDto;
