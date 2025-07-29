@@ -1,0 +1,185 @@
+MongoDB + pre computed data every 15 minutes:
+
+PS C:\Users\Dell i7> ab -n 1000 -c 1000 "http://localhost:8084/api/v1/availability/search?start=2025-08-04T10:00:00&end=2025-08-09T09:00:00"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking localhost (be patient)
+Completed 100 requests
+Completed 200 requests
+Completed 300 requests
+Completed 400 requests
+Completed 500 requests
+Completed 600 requests
+Completed 700 requests
+Completed 800 requests
+Completed 900 requests
+Completed 1000 requests
+Finished 1000 requests
+
+
+Server Software:
+Server Hostname:        localhost
+Server Port:            8084
+
+Document Path:          /api/v1/availability/search?start=2025-08-04T10:00:00&end=2025-08-09T09:00:00
+Document Length:        3361 bytes
+
+Concurrency Level:      1000
+Time taken for tests:   46.552 seconds
+Complete requests:      1000
+Failed requests:        0
+Total transferred:      3636000 bytes
+HTML transferred:       3361000 bytes
+Requests per second:    21.48 [#/sec] (mean)
+Time per request:       46551.642 [ms] (mean)
+Time per request:       46.552 [ms] (mean, across all concurrent requests)
+Transfer rate:          76.28 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    1  16.1      0     508
+Processing:  1431 25257 12842.6  24050   45105
+Waiting:      504 25250 12846.8  24049   45105
+Total:       1431 25258 12842.6  24050   45105
+
+Percentage of the requests served within a certain time (ms)
+  50%  24050
+  66%  33468
+  75%  35075
+  80%  36743
+  90%  44148
+  95%  44751
+  98%  45029
+  99%  45055
+ 100%  45105 (longest request)
+
+
+
+
+
+
+
+MongoDB + pre computed data every 1 hour:
+
+PS C:\Users\Dell i7> ab -n 1000 -c 1000 "http://localhost:8084/api/v1/availability/search?start=2025-08-04T10:00:00&end=2025-08-09T09:00:00"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking localhost (be patient)
+Completed 100 requests
+Completed 200 requests
+Completed 300 requests
+Completed 400 requests
+Completed 500 requests
+Completed 600 requests
+Completed 700 requests
+Completed 800 requests
+Completed 900 requests
+Completed 1000 requests
+Finished 1000 requests
+
+
+Server Software:
+Server Hostname:        localhost
+Server Port:            8084
+
+Document Path:          /api/v1/availability/search?start=2025-08-04T10:00:00&end=2025-08-09T09:00:00
+Document Length:        3361 bytes
+
+Concurrency Level:      1000
+Time taken for tests:   10.627 seconds
+Complete requests:      1000
+Failed requests:        0
+Total transferred:      3636000 bytes
+HTML transferred:       3361000 bytes
+Requests per second:    94.10 [#/sec] (mean)
+Time per request:       10627.096 [ms] (mean)
+Time per request:       10.627 [ms] (mean, across all concurrent requests)
+Transfer rate:          334.13 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   1.5      0      26
+Processing:   516 5579 2693.4   5657    9838
+Waiting:      279 5577 2695.7   5656    9837
+Total:        516 5580 2693.4   5657    9838
+
+Percentage of the requests served within a certain time (ms)
+  50%   5657
+  66%   7048
+  75%   8044
+  80%   8392
+  90%   9197
+  95%   9622
+  98%   9741
+  99%   9786
+ 100%   9838 (longest request)
+
+
+
+
+
+
+
+MySql + stored procedure to calculate on the fly:
+
+
+PS C:\Users\Dell i7> ab -n 1000 -c 1000 "http://localhost:8084/api/v1/availability/search?start=2025-08-04T10:00:00&end=2025-08-09T09:00:00"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking localhost (be patient)
+Completed 100 requests
+Completed 200 requests
+Completed 300 requests
+Completed 400 requests
+Completed 500 requests
+Completed 600 requests
+Completed 700 requests
+Completed 800 requests
+Completed 900 requests
+Completed 1000 requests
+Finished 1000 requests
+
+
+Server Software:
+Server Hostname:        localhost
+Server Port:            8084
+
+Document Path:          /api/v1/availability/search?start=2025-08-04T10:00:00&end=2025-08-09T09:00:00
+Document Length:        1959 bytes
+
+Concurrency Level:      1000
+Time taken for tests:   1.965 seconds
+Complete requests:      1000
+Failed requests:        0
+Total transferred:      2234000 bytes
+HTML transferred:       1959000 bytes
+Requests per second:    509.00 [#/sec] (mean)
+Time per request:       1964.643 [ms] (mean)
+Time per request:       1.965 [ms] (mean, across all concurrent requests)
+Transfer rate:          1110.45 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    1   1.0      0      15
+Processing:   394  822 173.8    756    1302
+Waiting:       41  814 181.9    754    1302
+Total:        395  822 173.7    756    1302
+WARNING: The median and mean for the initial connection time are not within a normal deviation
+        These results are probably not that reliable.
+
+Percentage of the requests served within a certain time (ms)
+  50%    756
+  66%    866
+  75%    961
+  80%   1017
+  90%   1093
+  95%   1127
+  98%   1159
+  99%   1169
+ 100%   1302 (longest request)

@@ -36,7 +36,7 @@ public class AvailabilityService {
 
         for (Object[] result : results) {
 
-            if (((Integer) result[1]) != 0) {
+            if (((Number) result[1]).intValue() != 0) {
                 Long category_id = ((Number) result[0]).longValue();
 
                 float average = ((Number) result[3]).floatValue();

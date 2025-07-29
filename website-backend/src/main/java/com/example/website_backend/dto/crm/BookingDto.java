@@ -18,7 +18,7 @@ public class BookingDto {
     private String user_id;
     private Long category_id;
 
-    private List<String> drivers;
+    private List<DriverDto> drivers;
 
 
     private LocalDateTime start;
@@ -50,5 +50,19 @@ public class BookingDto {
                 ", created_at=" + created_at +
                 ", is_advance_paid=" + is_advance_paid +
                 '}';
+    }
+
+    public BookingDto(Long crm_booking_id, Long website_booking_id, String user_id, Long category_id, LocalDateTime start, LocalDateTime end, float price, String startLocation, String endLocation, LocalDateTime created_at, boolean is_advance_paid) {
+        this.crm_booking_id = crm_booking_id;
+        this.website_booking_id = website_booking_id;
+        this.user_id = user_id;
+        this.category_id = category_id;
+        this.start = start;
+        this.end = end;
+        this.price = price;
+        this.startLocation = startLocation;
+        this.endLocation = endLocation;
+        this.created_at = created_at;
+        this.is_advance_paid = is_advance_paid;
     }
 }

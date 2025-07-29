@@ -19,4 +19,18 @@ public class CategoryDto {
 
     private String imageUrl;
     private String color;
+    private int cars;
+
+    public CategoryDto(Long id, String name, String type, String fuel, boolean automatic, int numOfSeats, float pricePerDay, String description, String imageUrl, String color) {
+        this.id = id;
+        this.name = name;
+        this.type = type;
+        this.fuel = fuel;
+        this.automatic = automatic;
+        this.numOfSeats = numOfSeats;
+        this.pricePerDay = pricePerDay;
+        this.description = description;
+        this.imageUrl = imageUrl;
+        this.color = color;
+    }
 }

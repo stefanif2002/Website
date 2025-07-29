@@ -1,11 +1,13 @@
 package com.example.website_backend.service.sync;
 
-import com.example.website_backend.client.CarClient;
-import com.example.website_backend.client.CategoryClient;
-import com.example.website_backend.dto.crm.CategoryCarSyncDto;
+import com.example.website_backend.client.AvailabilityClient;
 import com.example.website_backend.dto.crm.CategoryDto;
+import com.example.website_backend.dto.crm.InfoDto;
+import com.example.website_backend.dto.crm.SubCarDto;
 import com.example.website_backend.model.Category;
+import com.example.website_backend.model.SubCar;
 import com.example.website_backend.repository.CategoryRepository;
+import com.example.website_backend.repository.SubCarRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -14,7 +16,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -23,13 +24,13 @@ import java.util.concurrent.TimeUnit;
 public class CategorySyncService {
 
     @Autowired
-    private CategoryClient categoryClient;
+    private AvailabilityClient availabilityClient;
 
     @Autowired
     private CategoryRepository repository;
 
     @Autowired
-    private CarClient carClient;
+    private SubCarRepository subCarRepository;
 
 
 
@@ -42,23 +43,42 @@ public class CategorySyncService {
 
         while (true) {
             try {
+                InfoDto infoDtos = availabilityClient.getAll();
                 // Fetch all categories from the category service
-                List<CategoryDto> categories = categoryClient.getAllCategories();
-                CategoryCarSyncDto result = carClient.getNumberOfCarsPerCategory();
+                List<CategoryDto> categories = infoDtos.getCategories();
+
+                repository.deleteAll();
 
                 // Update the local category_copy table with the fetched data
-                if (categories != null && result != null) {
-                    HashMap<Long, Integer> cars = result.getResult();
+                if (categories != null) {
                     List<Category> finalResults = new ArrayList<>();
 
                     for (CategoryDto dto : categories) {
-                        int numOfCars = cars.getOrDefault(dto.getId(), 0);
-                        Category categoryCopy = makeCategory(dto, numOfCars);
+                        Category categoryCopy = makeCategory(dto);
                         finalResults.add(categoryCopy);
                     }
 
                     // Save or update the category copy in the database
                     repository.saveAll(finalResults);
+
+                    log.info("Successfully synchronized categories and car counts.");
+                }
+
+                List<SubCarDto> subCarDtos = infoDtos.getSubCars();
+
+                subCarRepository.deleteAll();
+
+                // Update the local category_copy table with the fetched data
+                if (subCarDtos != null) {
+                    List<SubCar> finalResults = new ArrayList<>();
+
+                    for (SubCarDto dto : subCarDtos) {
+                        SubCar subCar = makeSubCar(dto);
+                        finalResults.add(subCar);
+                    }
+
+                    // Save or update the category copy in the database
+                    subCarRepository.saveAll(finalResults);
 
                     log.info("Successfully synchronized categories and car counts.");
                     break;  // Exit the loop if the operation is successful
@@ -73,7 +93,16 @@ public class CategorySyncService {
         }
     }
 
-    private Category makeCategory(CategoryDto dto, int numOfCars) {
+    private SubCar makeSubCar(SubCarDto dto) {
+        return new SubCar(
+                dto.getLicense(),
+                dto.getCategoryId(),
+                dto.getSubRental_start(),
+                dto.getSubRental_end()
+        );
+    }
+
+    private Category makeCategory(CategoryDto dto) {
         return new Category(
                 dto.getId(),
                 dto.getName(),
@@ -82,7 +111,7 @@ public class CategorySyncService {
                 dto.isAutomatic(),
                 dto.getNumOfSeats(),
                 dto.getPricePerDay(),
-                numOfCars,
+                dto.getCars(),
                 dto.getDescription(),
                 dto.getImageUrl(),
                 dto.getColor()

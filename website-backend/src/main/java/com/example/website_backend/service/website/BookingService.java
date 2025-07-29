@@ -61,7 +61,7 @@ public class BookingService {
                     booking.getId(),
                     booking.getUser_id(),
                     booking.getCategory_id(),
-                    booking.getDrivers(),
+                    //booking.getDrivers(),
                     booking.getStart(),
                     booking.getEnd(),
                     booking.getPrice(),
@@ -103,7 +103,9 @@ public class BookingService {
                 booking.is_advance_paid()
         );
 
-        bookingClient.createBooking(bookingDto);
+        Long crmId = bookingClient.createBooking(bookingDto);
+
+        booking.setCrm_booking_id(crmId);
 
         repository.save(booking);
     }
@@ -119,7 +121,7 @@ public class BookingService {
         // Update the fields of the booking with the values from the DTO
         booking.setCategory_id(bookingDto.getCategory_id());
         booking.setUser_id(bookingDto.getUser_id());
-        booking.setDrivers(bookingDto.getDrivers());
+        //booking.setDrivers(bookingDto.getDrivers());
         booking.setStart(bookingDto.getStart());
         booking.setEnd(bookingDto.getEnd());
         booking.setPrice(bookingDto.getPrice());
@@ -222,7 +224,7 @@ public class BookingService {
                         booking.getId(),
                         booking.getUser_id(),
                         booking.getCategory_id(),
-                        booking.getDrivers(),
+                        //booking.getDrivers(),
                         booking.getStart(),
                         booking.getEnd(),
                         booking.getPrice(),

@@ -60,7 +60,6 @@ public class WebClientConfig {
         return WebClient.builder()
                 .baseUrl("http://localhost:8081/api/v1/availability")
                 .filter(oauth2(manager))
-                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_NDJSON_VALUE)
                 .build();
     }
 
@@ -97,34 +96,15 @@ public class WebClientConfig {
                 .build();
     }
 
-    @Bean
-    public WebClient carWebClient(OAuth2AuthorizedClientManager manager) {
-        return WebClient.builder()
-                .baseUrl("http://localhost:8081/api/v1/category")
-                .filter(oauth2(manager))
-                .build();
-    }
-
     //
     // 4) Typed HTTP-service proxies
     //
     @Bean
-    public CarClient carClient(WebClient carWebClient) {
+    public AvailabilityClient availabilityClient(WebClient availabilityWebClient) {
         HttpServiceProxyFactory factory = HttpServiceProxyFactory
-                .builderFor(WebClientAdapter.create(carWebClient))
+                .builderFor(WebClientAdapter.create(availabilityWebClient))
                 .build();
-        return factory.createClient(CarClient.class);
-    }
-
-    //
-    // 4) Typed HTTP-service proxies
-    //
-    @Bean
-    public CategoryClient categoryClient(WebClient categoryWebClient) {
-        HttpServiceProxyFactory factory = HttpServiceProxyFactory
-                .builderFor(WebClientAdapter.create(categoryWebClient))
-                .build();
-        return factory.createClient(CategoryClient.class);
+        return factory.createClient(AvailabilityClient.class);
     }
 
     //

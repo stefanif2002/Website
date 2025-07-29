@@ -11,6 +11,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -26,93 +27,88 @@ public class BookingSyncService {
     private BookingRepository repository;
 
     @EventListener(ContextRefreshedEvent.class)
-    @Async  // Ensure asynchronous execution
+    @Async
     public void syncBookings() throws InterruptedException {
-        TimeUnit.MINUTES.sleep(1); // Delay to avoid early startup conflicts
+        // give everything else a chance to come up
+        //TimeUnit.MINUTES.sleep(1);
 
         while (true) {
             try {
-                // Fetch all bookings from the booking service
-                List<BookingDto> result = bookingClient.getAll();
+                // 1) fetch the entire stream into a List (blocks until complete or timeout)
+                List<BookingDto> allDtos = bookingClient.getAll()
+                        .collectList()
+                        .block(Duration.ofMinutes(2));
 
-                List<Long> toSend = new ArrayList<>();
-
-                if (result != null) {
-                    List<Booking> newBookings = new ArrayList<>();
-
-                    for (BookingDto dto : result) {
-                        // Check if the booking already exists by website_booking_id
-                        if (dto.getWebsite_booking_id() == null) {
-
-                            // Map the DTO to the Booking entity, excluding website_booking_id
-                            Booking booking = makeBooking(dto);
-
-                            newBookings.add(booking); // Add to new bookings list
-
-                            toSend.add(dto.getCrm_booking_id());
-
-                        } /* else {
-
-                            Booking temp = repository.findById(dto.getWebsite_booking_id()).orElse(null);
-
-                            if (temp != null && dto.getCreated_at().isAfter(temp.getCreated_at())) {
-                                newBookings.add(updateBooking(temp, dto));
-                            }
-
-                        }
-
-                        */
-
-
-
-                    }
-
-                    // Save only new bookings
-                    repository.saveAll(newBookings);
-
-
-                    // Update Crm
-                    List<Booking> allForUpdate = repository.findAllByCRM(toSend);
-                    bookingClient.receiveAll(allForUpdate.stream().map(this::makeBooking).toList());
-
-
-                    log.info("Successfully synchronized bookings. New bookings: {}", newBookings.size());
-
-                    break; // Exit the loop if successful
+                if (allDtos == null) {
+                    log.warn("Booking stream was null; retrying...");
+                    TimeUnit.MINUTES.sleep(1);
+                    continue;
                 }
 
-            } catch (Exception e) {
-                log.error("Error during booking synchronization. Retrying in 1 minute...", e);
-                TimeUnit.MINUTES.sleep(1); // Retry after 1 minute
+                //repository.deleteAllWithCRMId();
+
+                List<Booking> toSave = new ArrayList<>();
+                List<Long>   newlyCreatedCrmIds = new ArrayList<>();
+
+                // 2) detect new vs existing
+                for (BookingDto dto : allDtos) {
+                    if (dto.getWebsite_booking_id() == null) {
+                        // brand-new: map and remember crm id so we can send back the new website ID
+                        Booking b = dtoToEntity(new Booking(), dto);
+                        toSave.add(b);
+                        newlyCreatedCrmIds.add(dto.getCrm_booking_id());
+                    } else {
+                        // existing: fetch, update, and re-save
+                        repository.findById(dto.getWebsite_booking_id())
+                                .ifPresent(existing -> {
+                                    toSave.add(dtoToEntity(existing, dto));
+                                });
+                    }
+                }
+
+                // 3) persist all changes (new + updated)
+                repository.saveAll(toSave);
+
+                // 4) push back the newly created website IDs to CRM
+                if (!newlyCreatedCrmIds.isEmpty()) {
+                    List<Booking> createdEntities =
+                            repository.findAllByCRM(newlyCreatedCrmIds);
+
+                    // map back to lightweight DTOs (only crm + website IDs)
+                    List<BookingDto> replyDtos = new ArrayList<>(createdEntities.size());
+                    for (Booking b : createdEntities) {
+                        BookingDto ack = new BookingDto();
+                        ack.setCrm_booking_id(b.getCrm_booking_id());
+                        ack.setWebsite_booking_id(b.getId());
+                        replyDtos.add(ack);
+                    }
+
+                    bookingClient.receiveAll(replyDtos);
+                }
+
+                log.info("Booking sync complete. Total fetched={}, saved={}",
+                        allDtos.size(), toSave.size());
+                break;  // done
+            } catch (Exception ex) {
+                log.error("Error during booking synchronization; retrying in 1m…", ex);
+                TimeUnit.MINUTES.sleep(1);
             }
         }
     }
 
-    private Booking makeBooking(BookingDto dto) {
-        Booking booking = new Booking();
-        return updateBooking(booking, dto);
+    /** Copy all fields from DTO into the entity (new or existing). */
+    private Booking dtoToEntity(Booking entity, BookingDto dto) {
+        entity.setCrm_booking_id(dto.getCrm_booking_id());
+        entity.setCategory_id(dto.getCategory_id());
+        entity.setUser_id(dto.getUser_id());
+        //entity.setDrivers(dto.getDrivers());
+        entity.setStart(dto.getStart());
+        entity.setEnd(dto.getEnd());
+        entity.setPrice(dto.getPrice());
+        entity.setStartLocation(dto.getStartLocation());
+        entity.setEndLocation(dto.getEndLocation());
+        entity.setCreated_at(dto.getCreated_at());
+        entity.set_advance_paid(dto.is_advance_paid());
+        return entity;
     }
-
-    private Booking updateBooking(Booking booking, BookingDto dto) {
-        booking.setCrm_booking_id(dto.getCrm_booking_id());
-        booking.setCategory_id(dto.getCategory_id());
-        booking.setUser_id(dto.getUser_id());
-        booking.setDrivers(dto.getDrivers());
-        booking.setStart(dto.getStart());
-        booking.setEnd(dto.getEnd());
-        booking.setPrice(dto.getPrice());
-        booking.setStartLocation(dto.getStartLocation());
-        booking.setEndLocation(dto.getEndLocation());
-        booking.setCreated_at(dto.getCreated_at());
-        booking.set_advance_paid(dto.is_advance_paid());
-        return booking;
-    }
-
-    private BookingDto makeBooking(Booking booking) {
-        BookingDto dto = new BookingDto();
-        dto.setWebsite_booking_id(booking.getId());
-        dto.setCrm_booking_id(booking.getCrm_booking_id());
-        return dto;
-    }
-
 }
