@@ -11,6 +11,6 @@ import java.util.List;
         url = "/internal",
         accept = MediaType.APPLICATION_JSON_VALUE)
 public interface PriceClient {
-    @GetExchange("/getAll")
+    @GetExchange("/getAllForWebsite")
     List<PriceDto> getAllPrices();
 }
