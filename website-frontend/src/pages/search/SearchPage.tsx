@@ -283,16 +283,11 @@ function SearchPage({ onSubmit}) {
     return (
         <div
             style={{
-                width: '90%',
-                maxWidth: '1200px',
                 margin: '20px auto',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
             }}
         >
 
-            {width < 3.38 ?
+            {width < 3.4 ?
                 <>
                     <Card style={{
                         textAlign: 'center',

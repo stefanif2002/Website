@@ -76,7 +76,7 @@ function Dashboard() {
 
     return (
             <Layout style={{ height: '100vh', width: '100vw', backgroundColor: 'white'}} hasSider>
-                {width<3.2 ?
+                {width<4.4 ?
                 <Sider trigger={null} style={siderStyle} collapsed={true}>
                     <div className={styles.logo}>
                         <Image
@@ -112,7 +112,7 @@ function Dashboard() {
                                 flexDirection: 'column', // Stack elements vertically
                                 alignItems: 'center', // Center horizontally
                                 borderRadius: borderRadiusLG,
-                                marginInlineStart: width<3.2 ? 80 : 0,
+                                marginInlineStart: width<4.4 ? 80 : 0,
 
                             }}
                         >
@@ -126,7 +126,7 @@ function Dashboard() {
                                         height: '100%',
                                     }}
                                 >
-                                    <div style={{ width: '100%', maxWidth: '1400px', padding: '0 16px' }}>
+                                    <div style={{ width: '100%', padding: '0 16px' }}>
                                         <SearchPage onSubmit={handleSubmit} />
                                     </div>
                                 </div>
