@@ -39,7 +39,6 @@ public class CategorySyncService {
     @Async  // Make sure this runs asynchronously, so it doesn't block the main thread
     public void syncCategories() throws InterruptedException {
         // Wait 1 minute before running the task for the first time
-        TimeUnit.MINUTES.sleep(1);
 
         while (true) {
             try {

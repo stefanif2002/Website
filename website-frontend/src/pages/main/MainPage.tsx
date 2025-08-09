@@ -1,8 +1,9 @@
 import {Button, Carousel, Col, Image, Row, Space} from "antd";
 import React from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faCheck, faCircleCheck, faStar} from "@fortawesome/free-solid-svg-icons";
-import {width} from "../resources/service.ts";
+import {faCheck, faStar} from "@fortawesome/free-solid-svg-icons";
+import {width} from "../../resources/service.ts";
+import {useNavigate} from "react-router-dom";
 
 
 
@@ -15,6 +16,7 @@ function MainPage() {
         background: '#364d79',
     };
     const style: React.CSSProperties = { background: '#0092ff', padding: '8px 0' };
+    const navigation = useNavigate();
 
     return (
         <>

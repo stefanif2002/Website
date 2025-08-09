@@ -22,7 +22,7 @@ export const mainMenuItems: MenuProps['items'] = [
     {
         key: 'booking',
         label: 'Κάντε κράτηση!',
-        onClick: () => window.location.href = '/el/kratisi',
+        onClick: () => window.location.href = '/el/search',
     },
     {
         key: 'fleet',

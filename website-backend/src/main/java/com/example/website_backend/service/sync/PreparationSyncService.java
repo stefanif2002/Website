@@ -32,7 +32,6 @@ public class PreparationSyncService {
     @EventListener(ContextRefreshedEvent.class)
     @Async  // Ensure the method runs asynchronously
     public void syncPreparations() throws InterruptedException {
-        TimeUnit.MINUTES.sleep(1); // Delay to avoid early startup race conditions
 
         while (true) {
             try {

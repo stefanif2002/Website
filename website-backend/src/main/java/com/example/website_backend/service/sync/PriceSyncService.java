@@ -31,7 +31,6 @@ public class PriceSyncService {
     @EventListener(ContextRefreshedEvent.class)
     @Async  // Make sure this runs asynchronously, so it doesn't block the main thread
     public void syncPrices() throws InterruptedException {
-        TimeUnit.MINUTES.sleep(1);
 
         while (true) {
             try {

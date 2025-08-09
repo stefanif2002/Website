@@ -8,7 +8,7 @@ import org.springframework.web.service.annotation.HttpExchange;
 import java.util.List;
 
 @HttpExchange(
-        url = "/internal",
+        url = "",
         accept = MediaType.APPLICATION_JSON_VALUE)
 public interface PriceClient {
     @GetExchange("/getAllForWebsite")

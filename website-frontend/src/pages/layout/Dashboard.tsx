@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useRef} from 'react';
 import styles from "./Dashboard.module.css";
 import type { MenuProps } from 'antd';
 import {Layout, Menu, theme, Image} from 'antd';
@@ -6,10 +6,12 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import MainPage from "../main/MainPage.tsx";
 import MyHeader from "./MyHeader.tsx";
 import MyFooter from "./MyFooter.tsx";
-import {width} from "../resources/service.ts";
+import {width} from "../../resources/service.ts";
+import {useNavigate} from "react-router-dom";
+import SearchPage from "../search/SearchPage.tsx";
 
 
-const {  Content, Footer, Sider } = Layout;
+const {  Content, Sider } = Layout;
 
 const siderStyle: React.CSSProperties = {
     overflowY: 'auto',
@@ -45,13 +47,31 @@ const items: MenuProps['items'] = [
 ];
 
 function Dashboard() {
-    const [stringImage] = useState<string>("/resources/main.png");
     const contentRef = useRef<HTMLDivElement>(null); // Reference for the Content area
+    const navigate = useNavigate();
+    const language = location.pathname.split('/')[1] || 'el';
+    const isMainPagePath= location.pathname === `/${language}/`;
+    const isSearchPath = location.pathname === `/${language}/search`;
+
+    const handleNavigate = (key: string) => {
+        switch (key) {
+            case 'main':
+                navigate(`/${language}`);
+                break;
+            case 'search':
+                navigate(`/${language}/search`);
+                break;
+        }
+    };
 
 
     const {
         token: { borderRadiusLG },
     } = theme.useToken();
+
+    const handleSubmit = () => {
+
+    }
 
 
     return (
@@ -60,10 +80,8 @@ function Dashboard() {
                 <Sider trigger={null} style={siderStyle} collapsed={true}>
                     <div className={styles.logo}>
                         <Image
-
                             src={`https://4rent-thessaloniki.com/images/Logo_White.png`}
                             style={{ maxWidth: '55px', height: 'auto' }} // Ensures responsiveness
-
                         />
                     </div>
                     <Menu mode="inline" items={items} selectedKeys={[]} style={{backgroundColor: 'transparent'}}/>
@@ -94,10 +112,26 @@ function Dashboard() {
                                 flexDirection: 'column', // Stack elements vertically
                                 alignItems: 'center', // Center horizontally
                                 borderRadius: borderRadiusLG,
-                                marginInlineStart: width<3.2 ? 80 : 0
+                                marginInlineStart: width<3.2 ? 80 : 0,
+
                             }}
                         >
-                            <MainPage/>
+                            {isMainPagePath ?  <MainPage/> : null}
+
+                            {isSearchPath ? (
+                                <div
+                                    style={{
+                                        backgroundColor: '#f6f6f8',
+                                        width: '100%',
+                                        height: '100%',
+                                    }}
+                                >
+                                    <div style={{ width: '100%', maxWidth: '1400px', padding: '0 16px' }}>
+                                        <SearchPage onSubmit={handleSubmit} />
+                                    </div>
+                                </div>
+                            ) : null}
+
 
                             <MyFooter/>
                         </div>
