@@ -3,7 +3,7 @@ import React from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCheck, faStar} from "@fortawesome/free-solid-svg-icons";
 import {width} from "../../resources/service.ts";
-import {useNavigate} from "react-router-dom";
+import {useLangRouter} from "../../resources/useLangRouter.ts";
 
 
 
@@ -16,7 +16,13 @@ function MainPage() {
         background: '#364d79',
     };
     const style: React.CSSProperties = { background: '#0092ff', padding: '8px 0' };
-    const navigation = useNavigate();
+
+    const { to, go } = useLangRouter(); // <<-- lang-aware helpers
+
+
+    const handleOnClick = () => {
+        go("/search"); // navigates to "/el/search" (or current lang)
+    };
 
     return (
         <>
@@ -74,6 +80,7 @@ function MainPage() {
                     cursor: 'pointer',
                     marginTop: '80px', // Add spacing between the subtitle and the button
                 }}
+                onClick={() => handleOnClick()}
             >
                 ΚΑΝΤΕ ΚΡΑΤΗΣΗ ΤΩΡΑ
             </Button>

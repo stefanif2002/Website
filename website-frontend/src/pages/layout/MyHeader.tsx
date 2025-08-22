@@ -58,7 +58,7 @@ function MyHeader () {
         <Header style={{ padding: 10, background: 'white', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
             <Row justify="space-between" align="middle" style={{ width: '100%', marginInlineEnd: 17 }}>
                 <Col/>
-                {width<4.4 ? <Col/> : <Col xs={3} >
+                {width<4.4 ? width<4 ? <Col/> : <Col/> : <Col xs={3} >
                     <div className={styles.logo}>
                         <Image
 

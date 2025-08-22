@@ -1,14 +1,14 @@
 import React, {useRef} from 'react';
 import styles from "./Dashboard.module.css";
 import type { MenuProps } from 'antd';
-import {Layout, Menu, theme, Image} from 'antd';
+import {Layout, Menu, Image} from 'antd';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import MainPage from "../main/MainPage.tsx";
 import MyHeader from "./MyHeader.tsx";
 import MyFooter from "./MyFooter.tsx";
 import {width} from "../../resources/service.ts";
-import {useNavigate} from "react-router-dom";
-import SearchPage from "../search/SearchPage.tsx";
+import AddBooking from "../search/AddBooking.tsx";
+import {useLocation} from "react-router-dom";
 
 
 const {  Content, Sider } = Layout;
@@ -48,30 +48,10 @@ const items: MenuProps['items'] = [
 
 function Dashboard() {
     const contentRef = useRef<HTMLDivElement>(null); // Reference for the Content area
-    const navigate = useNavigate();
-    const language = location.pathname.split('/')[1] || 'el';
-    const isMainPagePath= location.pathname === `/${language}/`;
-    const isSearchPath = location.pathname === `/${language}/search`;
-
-    const handleNavigate = (key: string) => {
-        switch (key) {
-            case 'main':
-                navigate(`/${language}`);
-                break;
-            case 'search':
-                navigate(`/${language}/search`);
-                break;
-        }
-    };
-
-
-    const {
-        token: { borderRadiusLG },
-    } = theme.useToken();
-
-    const handleSubmit = () => {
-
-    }
+    const { pathname } = useLocation();const stripSlash = (p: string) => p.replace(/\/+$/, "");
+    const language = (pathname.split("/")[1] || "el");
+    const isMainPagePath = stripSlash(pathname) === `/${language}`;
+    const isSearchPath   = stripSlash(pathname) === `/${language}/search`;
 
 
     return (
@@ -94,12 +74,10 @@ function Dashboard() {
                         style={{
                             position: 'relative', // Make the content container a relative parent
                             zIndex: 1, // Ensure the text stays on top
-                            height: '100%',
-                            display: 'flex', // Flexbox for centering
-                            flexGrow: 1,
-                            justifyContent: 'center', // Center horizontally
-                            backgroundColor: 'white',
-                            overflow: 'auto'
+                            // let the page scroll; do NOT trap scroll inside Content
+                            overflow: 'visible',
+                            // keep clear of the fixed Sider
+                            paddingInlineStart: width < 4.4 ? 80 : 0,
                         }}
                     >
                         {/* Background image div */}
@@ -111,9 +89,7 @@ function Dashboard() {
                                 display: 'flex',
                                 flexDirection: 'column', // Stack elements vertically
                                 alignItems: 'center', // Center horizontally
-                                borderRadius: borderRadiusLG,
-                                marginInlineStart: width<4.4 ? 80 : 0,
-
+                                minHeight: '608px',
                             }}
                         >
                             {isMainPagePath ?  <MainPage/> : null}
@@ -121,21 +97,19 @@ function Dashboard() {
                             {isSearchPath ? (
                                 <div
                                     style={{
-                                        backgroundColor: '#f6f6f8',
                                         width: '100%',
-                                        height: '100%',
+                                        margin: '0 auto',
+                                        padding: '0 16px',
                                     }}
                                 >
-                                    <div style={{ width: '100%', padding: '0 16px' }}>
-                                        <SearchPage onSubmit={handleSubmit} />
-                                    </div>
+                                    <AddBooking />
                                 </div>
                             ) : null}
 
 
-                            <MyFooter/>
                         </div>
 
+                        <MyFooter/>
 
                     </Content>
 

@@ -18,15 +18,10 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {myApi, width, height} from "../../resources/service.ts";
-import DateForm from "../../components/search/DateForm.tsx";
-import AvailabilityCard from "../../components/search/AvailabilityCard.tsx";
+import DateForm from "../../components/search/search/DateForm.tsx";
+import AvailabilityCard from "../../components/search/search/AvailabilityCard.tsx";
 
 const {RangePicker} = DatePicker;
-
-
-interface props {
-    onSubmit: (temp: Partial<Booking>) => void;
-}
 
 interface DriverDto {
     telephone: string;
@@ -80,13 +75,6 @@ interface OptionType {
 function SearchPage({ onSubmit}) {
     const [availabilities, setAvailabilities] = useState<Availability[]>([]);
     const [myDates, setMyDates] = useState<myDateForm>();
-    const [searchParams, setSearchParams] = useState({
-        category_name: "",
-        type: "",
-        fuel: "",
-        numOfSeats: undefined as number | undefined, // undefined to indicate optional
-        automatic: undefined as boolean | undefined, // undefined to indicate optional
-    });
     const [dateParams, setDateParams] = useState<{ start: Dayjs | null; end: Dayjs | null }>({
         start: dayjs().add(1, 'day'), // Tomorrow at the same time
         end: dayjs().add(2, 'day'),   // Two days from now at the same time
@@ -105,15 +93,10 @@ function SearchPage({ onSubmit}) {
     const fetchCategoryIds = useCallback(() => {
 
         console.log("Search with query");
-        console.log("Search parameters: ", searchParams, dateParams)
+        console.log("Search parameters: ", dateParams)
 
         myApi.get(`availability/search`, {
             params: {
-                name: searchParams.category_name,
-                type: searchParams.type,
-                fuel: searchParams.fuel,
-                ...(searchParams.numOfSeats !== undefined && { numOfSeats: searchParams.numOfSeats }),
-                ...(searchParams.automatic !== undefined && { automatic: searchParams.automatic }), // Only include automatic if the switch is disabled (false)
                 start: dateParams.start?.format('YYYY-MM-DDTHH:mm'),
                 end: dateParams.end?.format('YYYY-MM-DDTHH:mm'),
             }
@@ -128,12 +111,12 @@ function SearchPage({ onSubmit}) {
             }).finally( () => {
         });
 
-    }, [dateParams, searchParams]);
+    }, [dateParams]);
 
 
     useEffect(() => {
 
-    }, [fetchCategoryIds, searchParams, dateParams]);
+    }, [fetchCategoryIds, dateParams]);
 
     const handleSelect = (id: number) => {
         console.log("Selected category ID:", id);
@@ -163,27 +146,14 @@ function SearchPage({ onSubmit}) {
     const handleDatesSubmit = (dateForm : myDateForm) => {
         console.log(dateForm)
         setMyDates(dateForm);
+        setDateParams({ start: dateForm.start, end: dateForm.end });
+        fetchCategoryIds()
     };
 
     const handleDatesChange = (start: Dayjs, end: Dayjs) => {
         console.log(start, end)
         setDateParams({ start, end });
     }
-
-    const handleCategoryChange = (name: string, value: string | number | boolean | null) => {
-        console.log(name, value)
-        setSearchParams(prev => ({ ...prev, [name]: value })); // Correctly use dynamic property name
-    };
-
-    const clearAll = () => {
-        setSearchParams({
-            category_name: "",
-            type: "",
-            fuel: "",
-            numOfSeats: undefined,
-            automatic: undefined,
-        });
-    };
 
     const handleSubmit = () => {
         form.validateFields().then((values) => {
@@ -283,20 +253,26 @@ function SearchPage({ onSubmit}) {
     return (
         <div
             style={{
-                margin: '20px auto',
+                margin: 'auto',
+                width: '80%'
             }}
         >
 
             {width < 3.4 ?
                 <>
-                    <Card style={{
-                        textAlign: 'center',
-                        justifyContent: 'center',
-                        alignContent: 'center',
-                        width: '100%',
-                        backgroundColor: '#F7F2EC'
-                    }} title={"Pick dates"}>
-                        <DateForm onDateFormChange={handleDatesChange} onDateFormSubmit={handleDatesSubmit}/>
+                    <Card
+                        style={{
+                            textAlign: "center",
+                            justifyContent: "center",
+                            alignContent: "center",
+                            width: "100%",
+                            borderRadius: 12,
+                            border: "1px solid #e6e9f5",
+                            boxShadow: "0 6px 24px rgba(0,0,0,0.04)",
+                            padding: 20
+                        }}
+                    >
+                        <DateForm onDateFormSubmit={handleDatesSubmit} />
                     </Card>
                     <Row style={{justifyContent:'center', display: 'flex'}}>
                         <Col
@@ -308,16 +284,17 @@ function SearchPage({ onSubmit}) {
                              }}>
                             <div>
                                 <List
-                                    grid={{
-                                        gutter: 16,
-                                        column: width >= 3.2 ? 1 : width >= 2 ? 2 : width >= 1.28 ? 3 : 4
-
-                                    }}
+                                    grid={{ gutter: 16, column: width >= 3 ? 1 : width >= 1.6 ? 2 : 3 }}
                                     dataSource={availabilities}
-
-                                    renderItem={(av: Availability) => (
+                                    renderItem={(av) => (
                                         <List.Item key={av.category.id}>
-                                            <AvailabilityCard av={av} onSelect={handleSelect}/>
+                                            <AvailabilityCard
+                                                av={av}
+                                                onSelect={handleSelect}
+                                                discountPercent={20}      // pass when you have it
+                                                payOnArrival={true}       // or false to hide badge
+                                                isSoldOut={false}         // true -> greyed out & disabled
+                                            />
                                         </List.Item>
                                     )}
                                 />

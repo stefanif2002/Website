@@ -36,4 +36,6 @@ public class AvailabilityController {
         return ResponseEntity.ok(service.searchAvailability(name, type, fuel, automatic, seats, start, end));
     }
 
+
+
 }

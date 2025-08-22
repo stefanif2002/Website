@@ -1,13 +1,13 @@
 import axios, {AxiosError} from "axios";
 import {message, notification} from "antd";
 
-
 export const myApi = axios.create({
     baseURL: `http://localhost:8084/api/v1/`, // Adjust this to your backend's base URL
 });
 
 
 export const url = `http://localhost:8081/api/v1`;
+
 
 
 //export const url = `https://4rent.duckdns.org/api/v1`;
