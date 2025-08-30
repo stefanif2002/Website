@@ -28,4 +28,10 @@ export type BookingWizardProps = {
     vehicleImage?: string;
     pickupLabel?: string;
     dropoffLabel?: string;
+    // Booking context required to create booking on payment success
+    categoryId: number;
+    startIso: string | null;
+    endIso: string | null;
+    startLocation: string;
+    endLocation: string;
 };

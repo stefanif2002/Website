@@ -1,5 +1,5 @@
 import {Col, Image, Layout, Menu, MenuProps, Row, Select, Space} from "antd";
-import React, {useState} from "react";
+import {useState} from "react";
 import {featureNotImplemented, width} from "../../resources/service.ts";
 import { mainMenuItems } from "./menuData.tsx";
 import styles from "./Dashboard.module.css"; // <-- import the big array from above

@@ -1,5 +1,4 @@
 import {Button, Carousel, Col, Image, Row, Space} from "antd";
-import React from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCheck, faStar} from "@fortawesome/free-solid-svg-icons";
 import {width} from "../../resources/service.ts";
@@ -15,9 +14,7 @@ function MainPage() {
         textAlign: 'center',
         background: '#364d79',
     };
-    const style: React.CSSProperties = { background: '#0092ff', padding: '8px 0' };
-
-    const { to, go } = useLangRouter(); // <<-- lang-aware helpers
+    const { go } = useLangRouter(); // <<-- lang-aware helpers
 
 
     const handleOnClick = () => {
@@ -152,7 +149,7 @@ function MainPage() {
                     marginTop: '30px'
                 }}
             >
-                <Carousel autoplay speed='1000' style={{height: '300px'}}>
+                <Carousel autoplay speed={1000} style={{height: '300px'}}>
                     <div
                         style={contentStyle}
                     >

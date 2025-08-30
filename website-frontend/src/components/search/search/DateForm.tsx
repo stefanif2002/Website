@@ -16,7 +16,7 @@ interface DateFormProps {
     onDateFormSubmit: (dateForm: myDateForm) => void;
 }
 
-interface myDateForm {
+export interface myDateForm {
     startLocation: string | null;
     endLocation: string | null;
     start: Dayjs | null;

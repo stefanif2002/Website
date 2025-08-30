@@ -23,5 +23,8 @@
     "noUncheckedSideEffectImports": true,
     "allowSyntheticDefaultImports": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": [
+    "src/pages/layout/Test.tsx"
+  ]
 }

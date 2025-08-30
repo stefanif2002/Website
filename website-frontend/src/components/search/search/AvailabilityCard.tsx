@@ -1,7 +1,7 @@
 import React from "react";
-import { Card, Row, Col, Image, Typography, Tag, Space, Button, Divider } from "antd";
+import { Card, Row, Col, Image, Typography, Space, Button, Divider } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCarSide, faGasPump, faGears, faUsers, faEuroSign } from "@fortawesome/free-solid-svg-icons";
+import { faGasPump, faGears, faUsers, faEuroSign } from "@fortawesome/free-solid-svg-icons";
 import { url, width } from "../../../resources/service.ts";
 
 const { Title, Text } = Typography;
@@ -28,15 +28,12 @@ interface Props {
     onSelect: (id: number) => void;
     /** Optional UI toggles to mimic Carwiz behavior */
     discountPercent?: number;        // e.g. 20 -> shows "-20%" and a crossed original price
-    payOnArrival?: boolean;          // green badge
     isSoldOut?: boolean;             // greys out card and shows disabled button
 }
 
 const AvailabilityCard: React.FC<Props> = ({
                                                av,
                                                onSelect,
-                                               discountPercent,
-                                               payOnArrival = true,
                                                isSoldOut = false,
                                            }) => {
     const cat = av.category;
@@ -44,8 +41,7 @@ const AvailabilityCard: React.FC<Props> = ({
     const daily = av.averagePricePerDay;        // from your API
     const total = av.totalPrice;                // from your API
 
-    const hasDiscount = !!discountPercent && discountPercent > 0 && discountPercent < 100;
-    const originalTotal = hasDiscount ? +(total / (1 - (discountPercent as number) / 100)).toFixed(2) : undefined;
+    // const hasDiscount = !!discountPercent && discountPercent > 0 && discountPercent < 100;
 
     const imgSrc = cat.imageUrl ? `${url}${cat.imageUrl}` : `${url}/resources/default.jpg`;
 

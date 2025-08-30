@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import dayjs, {Dayjs} from "dayjs";
 import {
     AutoComplete,
@@ -18,7 +18,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {myApi, width, height} from "../../resources/service.ts";
-import DateForm from "../../components/search/search/DateForm.tsx";
+import DateForm, { myDateForm } from "../../components/search/search/DateForm.tsx";
 import AvailabilityCard from "../../components/search/search/AvailabilityCard.tsx";
 
 const {RangePicker} = DatePicker;
@@ -41,12 +41,7 @@ interface Booking {
     endLocation: string;
 }
 
-interface myDateForm {
-    startLocation: string;
-    endLocation: string;
-    start: Dayjs | null;
-    end: Dayjs | null;
-}
+// myDateForm type is imported from DateForm
 
 interface Category {
     id: number,
@@ -72,7 +67,8 @@ interface OptionType {
     value: string;
     label: React.ReactNode;
 }
-function SearchPage({ onSubmit}) {
+type Props = { onSubmit: (booking: Partial<Booking>) => void };
+function SearchPage({ onSubmit}: Props) {
     const [availabilities, setAvailabilities] = useState<Availability[]>([]);
     const [myDates, setMyDates] = useState<myDateForm>();
     const [dateParams, setDateParams] = useState<{ start: Dayjs | null; end: Dayjs | null }>({
@@ -291,9 +287,8 @@ function SearchPage({ onSubmit}) {
                                             <AvailabilityCard
                                                 av={av}
                                                 onSelect={handleSelect}
-                                                discountPercent={20}      // pass when you have it
-                                                payOnArrival={true}       // or false to hide badge
-                                                isSoldOut={false}         // true -> greyed out & disabled
+                                                discountPercent={20}
+                                                isSoldOut={false}
                                             />
                                         </List.Item>
                                     )}

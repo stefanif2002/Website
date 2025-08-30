@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Button, Card, Col, Divider, Form, message, Radio, Row, Space, Typography } from "antd";
+import { Button, Divider, message, Radio, Space, Typography } from "antd";
 import type { FormInstance } from "antd/es/form";
 import { myApi } from "../../resources/service";
 
@@ -57,7 +57,7 @@ const Payment: React.FC<Props> = ({
             // mark intent in form (optional)
             form.setFieldsValue({ is_advance_paid: true, payment_method: "stripe" });
             window.location.href = url; // redirect to Stripe Checkout
-        } catch (e: any) {
+        } catch (e: unknown) {
             console.error(e);
             message.error("Αποτυχία δημιουργίας πληρωμής Stripe.");
             setLoading(false);
@@ -76,7 +76,7 @@ const Payment: React.FC<Props> = ({
             if (!approval) throw new Error("No PayPal approval URL returned");
             form.setFieldsValue({ is_advance_paid: true, payment_method: "paypal" });
             window.location.href = approval; // redirect to PayPal
-        } catch (e: any) {
+        } catch (e: unknown) {
             console.error(e);
             message.error("Αποτυχία δημιουργίας πληρωμής PayPal.");
             setLoading(false);

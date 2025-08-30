@@ -1,31 +1,17 @@
-import React, { useState } from "react";
 import { AutoComplete, Button, Col, Form, Input, InputNumber, Row, Space } from "antd";
 import { MinusCircleOutlined } from "@ant-design/icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClipboard, faPlaneDeparture, faUser, faUsers } from "@fortawesome/free-solid-svg-icons";
-import { myApi } from "../../resources/service.ts";
+import type { FormInstance } from "antd/es/form";
 
 
 type Props = {
-    form: any;            // AntD FormInstance
+    form: FormInstance;            // AntD FormInstance
     onPrev: () => void;
     onFinish: () => void; // parent will validate & submit
 };
 
 export default function ConfirmationStep({ onPrev, onFinish }: Props) {
-    const [userOptions, setUserOptions] = useState<{ value: string; label: React.ReactNode }[]>([]);
-
-    const handleUserSearch = async (value: string) => {
-        try {
-            if (!value) {
-                const res = await myApi.get(`user/getAll`);
-                setUserOptions(res.data.map((u: any) => ({ value: u.telephone, label: `${u.telephone}` })));
-            } else {
-                const res = await myApi.get(`user/search`, { params: { telephone: value } });
-                setUserOptions(res.data.map((u: any) => ({ value: u.telephone, label: `${u.telephone}` })));
-            }
-        } catch { /* ignore */ }
-    };
 
     return (
         <div>
@@ -68,7 +54,7 @@ export default function ConfirmationStep({ onPrev, onFinish }: Props) {
                                 </Col>
                                 <Col flex="auto">
                                     <Form.Item
-                                        name={[field.name, "telephone"] as any}
+                                        name={[field.name, "telephone"] as [number, "telephone"]}
                                         label={<Space><i className="bi bi-telephone" /> Τηλέφωνο οδηγού</Space>}
                                         rules={[{ required: true, message: "Enter a telephone" }]}
                                     >
@@ -79,7 +65,7 @@ export default function ConfirmationStep({ onPrev, onFinish }: Props) {
                                 </Col>
                                 <Col flex="auto">
                                     <Form.Item
-                                        name={[field.name, "name"] as any}
+                                        name={[field.name, "name"] as [number, "name"]}
                                         label={<Space><FontAwesomeIcon icon={faUser} /> Όνομα οδηγού</Space>}
                                         rules={[{ required: true, message: "Enter a name" }]}
                                     >

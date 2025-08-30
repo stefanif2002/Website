@@ -1,14 +1,13 @@
-import React, { useMemo, useState } from "react";
-import { Card, Col, Form, Row, Steps, Typography } from "antd";
-import { width } from "../../resources/service.ts";
+import { useEffect, useState } from "react";
+import { Card, Col, Form, Row, Steps, Typography, message } from "antd";
 import AddonsStep from "./AddonsStep";
 import SummaryCard from "./SummaryCard";
 import ConfirmationStep from "./ConfirmationStep";
 import { ADDONS } from "./addonsDef";
 import type { BookingWizardProps, ChecklistEntryDto, Driver } from "./types";
-import SearchPage from "../../pages/search/SearchPage.tsx";
 import MyInfo from "./MyInfo.tsx";
 import Payment from "./Payment.tsx";
+import { myApi } from "../../resources/service.ts";
 
 const { Title } = Typography;
 
@@ -20,25 +19,40 @@ export default function BookingWizard({
                                           vehicleImage,
                                           pickupLabel,
                                           dropoffLabel,
+                                          categoryId,
+                                          startIso,
+                                          endIso,
+                                          startLocation,
+                                          endLocation,
                                       }: BookingWizardProps) {
     const [form] = Form.useForm();
     const [step, setStep] = useState(0);
+    // Stable empty objects to avoid changing deps on every render
+    const [addonsTotal, setAddonsTotal] = useState<number>(0);
 
-    const checklist = Form.useWatch("checklist", form) ?? {};
-    const checklistQty = Form.useWatch("checklistQty", form) ?? {};
+    type FormValues = { checklist?: Record<string, boolean>; checklistQty?: Record<string, number> };
 
-    const addonsTotal = useMemo(() => {
+    const calcAddonsTotal = (values: FormValues): number => {
+        const cl: Record<string, boolean> = values?.checklist ?? {};
+        const clq: Record<string, number> = values?.checklistQty ?? {};
         return ADDONS.reduce((sum, a) => {
-            if (!checklist[a.value]) return sum;
+            if (!cl[a.value]) return sum;
             if (a.qty) {
-                const q = Number(checklistQty[a.value] || 0);
+                const q = Number(clq[a.value] || 0);
                 return sum + (q > 0 ? a.price * q : 0);
             }
             return sum + a.price;
         }, 0);
-    }, [checklist, checklistQty]);
+    };
 
-    const grandTotal = useMemo(() => +(baseTotal + addonsTotal).toFixed(2), [baseTotal, addonsTotal]);
+    // Initialize once from initialValues
+    useEffect(() => {
+        const init = form.getFieldsValue(true) as FormValues;
+        setAddonsTotal(calcAddonsTotal(init));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const grandTotal = +(baseTotal + addonsTotal).toFixed(2);
 
     const handleFinish = async () => {
         try {
@@ -54,10 +68,12 @@ export default function BookingWizard({
                 checklistQty = {},
             } = values;
 
-            const driverList: Driver[] = (drivers as any[]).map(d => ({
-                telephone: d?.telephone,
-                name: d?.name,
-            }));
+            const driverList: Driver[] = Array.isArray(drivers)
+                ? (drivers as Partial<Driver>[]).map(d => ({
+                    telephone: d?.telephone ?? "",
+                    name: d?.name ?? "",
+                }))
+                : [];
 
             const entries: ChecklistEntryDto[] = [];
             for (const a of ADDONS) {
@@ -97,6 +113,67 @@ export default function BookingWizard({
         setStep(2)
     }
 
+    // Called when online payment provider reports success
+    const handlePaid = async () => {
+        try {
+            // Validate and gather the latest form values
+            await form.validateFields();
+            const values = form.getFieldsValue(true);
+            const {
+                telephone,
+                flight = "",
+                number_of_people,
+                notes = "",
+                drivers = [],
+                checklist = {},
+                checklistQty = {},
+            } = values;
+
+            const driverList: Driver[] = Array.isArray(drivers)
+                ? (drivers as Partial<Driver>[]).map(d => ({
+                    telephone: d?.telephone ?? "",
+                    name: d?.name ?? "",
+                }))
+                : [];
+
+            const entries: ChecklistEntryDto[] = [];
+            for (const a of ADDONS) {
+                if (checklist[a.value]) {
+                    if (a.qty) {
+                        const q = Number(checklistQty[a.value] || 0);
+                        if (q > 0) entries.push({ item: a.value, quantity: q });
+                    } else {
+                        entries.push({ item: a.value, quantity: 1 });
+                    }
+                }
+            }
+
+            const payload = {
+                telephone,
+                category_id: categoryId,
+                start: startIso,
+                end: endIso,
+                drivers: driverList,
+                price: grandTotal,
+                startLocation,
+                endLocation,
+                externalCar: false,
+                number_of_people: Number(number_of_people || 1),
+                flight,
+                advance_paid: true,
+                notes,
+                checklist: entries,
+            };
+
+            await myApi.post("booking/create", payload);
+            message.success("Payment confirmed and booking created.");
+            setStep(3);
+        } catch {
+            // validation errors or network error
+            message.error("Could not create booking after payment. Please try again.");
+        }
+    };
+
     return (
         <div style={{ marginTop: 10, width: "90%", margin: "20px auto" }}>
                 <Steps
@@ -105,12 +182,19 @@ export default function BookingWizard({
                     style={{ marginBottom: 16 }}
                 />
 
-                <Row gutter={16} align="start">
+                <Row gutter={16} align="top">
                     <Col xs={24} md={step === 2 ? 24 : 16} >
                         <Form form={form} layout="vertical"   initialValues={{ checklist: {}, checklistQty: {} }}   // <- ensure objects exist
+                              onValuesChange={(_, allValues: FormValues) => {
+                                  setAddonsTotal(calcAddonsTotal(allValues));
+                              }}
                         >
                             {step === 0 && (
-                                <AddonsStep form={form} onNext={handlextraDone} />
+                                <AddonsStep
+                                    form={form}
+                                    onNext={handlextraDone}
+                                    onTotalsChange={(t) => setAddonsTotal(t)}
+                                />
                             )}
 
                             {step === 1 && (
@@ -132,7 +216,7 @@ export default function BookingWizard({
                                         currency={currency}
                                         onPrev={() => setStep(1)}
                                         onSkip={() => setStep(3)}     // proceed without online payment
-                                        onPaid={() => setStep(3)}     // optional if you ever resolve immediately
+                                        onPaid={handlePaid}           // on successful payment: create booking
                                         // stripeEndpoint="/payments/stripe/create-checkout-session"
                                         // paypalEndpoint="/payments/paypal/create-order"
                                     />                                </Card>

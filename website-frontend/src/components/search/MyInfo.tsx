@@ -18,7 +18,7 @@ const { Title, Text } = Typography;
 type CountryOption = { label: string; value: string };
 
 type Props = {
-    form: FormInstance<any>;
+    form: FormInstance;
     onPrev?: () => void;
     onNext?: () => void;     // proceed to next step after validate
     onFinish?: () => void;   // optional finish from this step
@@ -35,7 +35,7 @@ const DEFAULT_COUNTRIES: CountryOption[] = [
     { value: "OTHER", label: "Other" },
 ];
 
-const MyInfo: React.FC<Props> = ({ form, onPrev, onNext, onFinish, countryOptions = DEFAULT_COUNTRIES }) => {
+const MyInfo: React.FC<Props> = ({ form, onPrev, onNext, countryOptions = DEFAULT_COUNTRIES }) => {
     const handleNext = async () => {
         await form.validateFields([
             "telephone",
@@ -47,10 +47,7 @@ const MyInfo: React.FC<Props> = ({ form, onPrev, onNext, onFinish, countryOption
         onNext?.();
     };
 
-    const handleFinishNow = async () => {
-        await form.validateFields(); // validate all fields in this step
-        onFinish?.();
-    };
+    // Removed unused handleFinishNow
 
     return (
         <div>

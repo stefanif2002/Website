@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Card, Col, InputNumber, Row, Space, Typography } from "antd";
 import { ADDONS } from "./addonsDef";
 import type { FormInstance } from "antd/es/form";
@@ -10,11 +10,12 @@ type Props = {
     form: FormInstance;
     onNext: () => void;
     currency?: string;
+    onTotalsChange?: (total: number) => void; // notify parent on change
 };
 
 type QtyMap = Record<string, number>;
 
-export default function AddonsStep({ form, onNext, currency = "EUR" }: Props) {
+export default function AddonsStep({ form, onNext, currency = "EUR", onTotalsChange }: Props) {
     const [qty, setQty] = useState<QtyMap>({});
 
     // Initialize local qty map and form fields once
@@ -27,6 +28,20 @@ export default function AddonsStep({ form, onNext, currency = "EUR" }: Props) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    const computeTotal = () => {
+        const cl: Record<string, boolean> = form.getFieldValue(["checklist"]) || {};
+        const clq: Record<string, number> = form.getFieldValue(["checklistQty"]) || {};
+        const total = ADDONS.reduce((sum, ad) => {
+            if (!cl[ad.value]) return sum;
+            if (ad.qty) {
+                const q = Number(clq[ad.value] || 0);
+                return sum + (q > 0 ? ad.price * q : 0);
+            }
+            return sum + ad.price;
+        }, 0);
+        onTotalsChange?.(total);
+    };
+
     const toggle = (a: AddonDef) => {
         setQty((prev) => {
             const selected = (prev[a.value] ?? 0) > 0;
@@ -36,7 +51,10 @@ export default function AddonsStep({ form, onNext, currency = "EUR" }: Props) {
             form.setFieldValue(["checklist", a.value], !selected);
             if (a.qty) form.setFieldValue(["checklistQty", a.value], !selected ? 1 : 0);
 
-            return { ...prev, [a.value]: nextQty };
+            const updated = { ...prev, [a.value]: nextQty };
+            // notify parent
+            Promise.resolve().then(computeTotal);
+            return updated;
         });
     };
 
@@ -45,6 +63,7 @@ export default function AddonsStep({ form, onNext, currency = "EUR" }: Props) {
         setQty((prev) => ({ ...prev, [a.value]: safe }));
         form.setFieldValue(["checklist", a.value], true);
         form.setFieldValue(["checklistQty", a.value], safe);
+        computeTotal();
     };
 
     return (

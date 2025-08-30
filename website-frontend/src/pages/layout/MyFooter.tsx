@@ -1,4 +1,3 @@
-import React from "react";
 import {Col, Layout, Row} from "antd";
 
 const { Footer } = Layout;

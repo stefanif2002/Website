@@ -28,7 +28,13 @@ export const featureNotImplemented = () => {
 };
 
 // Enhanced function to handle errors with context-sensitive messages
-export const handleApiError = (error: AxiosError, context: string = '', action: string, customMessage: string = '', notFoundMessage: string = 'Item not found') => {
+export const handleApiError = (
+    error: AxiosError,
+    context: string = '',
+    _action?: string,
+    customMessage: string = '',
+    notFoundMessage: string = 'Item not found'
+) => {
     if (error.response) {
         // The request was made and the server responded with a status code outside of the 2xx range
         const { status, data } = error.response;
@@ -47,7 +53,10 @@ export const handleApiError = (error: AxiosError, context: string = '', action: 
 
             case 500:
                 // Handle server error (e.g., internal server error)
-                message.error(`${context}: Server encountered an issue: ${data.message || 'Internal Server Error'}. Please try again later.`);
+                {
+                    const msg = (data as { message?: string } | undefined)?.message;
+                    message.error(`${context}: Server encountered an issue: ${msg || 'Internal Server Error'}. Please try again later.`);
+                }
                 break;
 
             case 403:

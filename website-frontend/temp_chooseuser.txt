@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+﻿import React, {useState} from "react";
 import {AutoComplete, Button, Card, Col, Form, Input, message, Row, Space, Checkbox, InputNumber} from "antd";
 import {MinusCircleOutlined} from "@ant-design/icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -226,7 +226,7 @@ const ChooseUser : React.FC<props> = ({ onSubmit}) => {
                                         <Col flex="auto">
                                             <Form.Item
                                                 // override to nest into the driver object:
-                                                name={[field.name, "telephone"] as [number, "telephone"]}
+                                                name={[field.name, "telephone"] as any}
                                                 label={
                                                     <Space>
                                                         <i className="bi bi-telephone" />
@@ -247,7 +247,7 @@ const ChooseUser : React.FC<props> = ({ onSubmit}) => {
                                         </Col>
                                         <Col flex="auto">
                                             <Form.Item
-                                                name={[field.name, "name"] as [number, "name"]}
+                                                name={[field.name, "name"] as any}
                                                 label={
                                                     <Space>
                                                         <FontAwesomeIcon icon={faUser} />

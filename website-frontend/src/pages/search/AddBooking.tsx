@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, message, Result, Steps } from "antd";
 import { HomeOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
@@ -144,6 +144,11 @@ function AddBooking() {
                             vehicleImage={undefined}
                             pickupLabel={pickupLabel}
                             dropoffLabel={dropoffLabel}
+                            categoryId={booking.category_id}
+                            startIso={booking.start?.toISOString?.() ?? null}
+                            endIso={booking.end?.toISOString?.() ?? null}
+                            startLocation={booking.startLocation}
+                            endLocation={booking.endLocation}
                         />
                     )}
                 </>
