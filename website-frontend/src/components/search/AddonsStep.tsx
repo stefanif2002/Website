@@ -20,11 +20,25 @@ export default function AddonsStep({ form, onNext, currency = "EUR", onTotalsCha
 
     // Initialize local qty map and form fields once
     useEffect(() => {
+        const cl: Record<string, boolean> = form.getFieldValue(["checklist"]) || {};
+        const clq: Record<string, number> = form.getFieldValue(["checklistQty"]) || {};
         const init: QtyMap = {};
-        for (const a of ADDONS) init[a.value] = 0;
+
+        for (const a of ADDONS) {
+            const selected = cl[a.value];
+            if (a.qty) {
+                init[a.value] = selected ? Math.max(1, Number(clq[a.value] || 1)) : 0;
+            } else {
+                init[a.value] = selected ? 1 : 0;
+            }
+        }
         setQty(init);
 
-        form.setFieldsValue({ checklist: {}, checklistQty: {} });
+        // If those objects were never set, create them ONCE (don’t overwrite existing)
+        const patch: any = {};
+        if (form.getFieldValue(["checklist"]) === undefined) patch.checklist = {};
+        if (form.getFieldValue(["checklistQty"]) === undefined) patch.checklistQty = {};
+        if (Object.keys(patch).length) form.setFieldsValue(patch);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

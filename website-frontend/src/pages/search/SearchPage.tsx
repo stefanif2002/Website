@@ -1,10 +1,12 @@
-import {useCallback, useEffect, useState} from "react";
-import dayjs, {Dayjs} from "dayjs";
+// src/pages/booking/SearchPage.tsx
+import {useCallback, useEffect, useMemo, useState} from "react";
+import dayjs, { Dayjs } from "dayjs";
 import {
     AutoComplete,
     Button,
     Card,
-    Col, DatePicker,
+    Col,
+    DatePicker,
     Form,
     Input,
     List,
@@ -13,15 +15,14 @@ import {
     Row,
     Space,
 } from "antd";
-import {
-    faCalendar
-} from "@fortawesome/free-solid-svg-icons";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {myApi, width, height} from "../../resources/service.ts";
-import DateForm, { myDateForm } from "../../components/search/search/DateForm.tsx";
-import AvailabilityCard from "../../components/search/search/AvailabilityCard.tsx";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCalendar } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { myApi, width, height } from "../../resources/service";
+import DateForm, { myDateForm } from "../../components/search/search/DateForm";
+import AvailabilityCard from "../../components/search/search/AvailabilityCard";
 
-const {RangePicker} = DatePicker;
+const { RangePicker } = DatePicker;
 
 interface DriverDto {
     telephone: string;
@@ -29,179 +30,196 @@ interface DriverDto {
     last_name: string;
     driver_license: string;
 }
-
 interface Booking {
     telephone: string;
     category_id: number;
     start: Dayjs;
     end: Dayjs;
-    drivers: DriverDto[]; // Update from string[] to DriverDto[]
+    drivers: DriverDto[];
     price: number;
     startLocation: string;
     endLocation: string;
 }
-
-// myDateForm type is imported from DateForm
-
 interface Category {
-    id: number,
+    id: number;
     name: string;
-    type: string,
-    fuel: string,
-    numOfSeats: number,
-    pricePerDay: number,
-    automatic: boolean,
-    imageUrl: string,
-    color: string
+    type: string;
+    fuel: string;
+    numOfSeats: number;
+    pricePerDay: number;
+    automatic: boolean;
+    imageUrl: string;
+    color: string;
     description: string;
-
 }
-
 interface Availability {
     category: Category;
     totalPrice: number;
     averagePricePerDay: number;
 }
-
-interface OptionType {
-    value: string;
-    label: React.ReactNode;
-}
+type OptionType = { value: string; label: React.ReactNode };
 type Props = { onSubmit: (booking: Partial<Booking>) => void };
-function SearchPage({ onSubmit}: Props) {
+
+function SearchPage({ onSubmit }: Props) {
     const [availabilities, setAvailabilities] = useState<Availability[]>([]);
-    const [myDates, setMyDates] = useState<myDateForm>();
-    const [dateParams, setDateParams] = useState<{ start: Dayjs | null; end: Dayjs | null }>({
-        start: dayjs().add(1, 'day'), // Tomorrow at the same time
-        end: dayjs().add(2, 'day'),   // Two days from now at the same time
-    });
     const [form] = Form.useForm();
     const [popoverVisible, setPopoverVisible] = useState(false);
-    const locationOptions = [
-        { value: "Skypark", label: "Skypark" },
-        { value: "4Rent Office", label: "4Rent Office" },
-        { value: "Thessaloniki Hotel/Airnbnb", label: "Thessaloniki Hotel/Airnbnb" },
-    ];
+    const [sp, setSp] = useSearchParams();
+    const navigate = useNavigate();
 
+    const locationOptions: OptionType[] = useMemo(
+        () => [
+            { value: "Skypark", label: "Skypark" },
+            { value: "4Rent Office", label: "4Rent Office" },
+            { value: "Thessaloniki Hotel/Airnbnb", label: "Thessaloniki Hotel/Airnbnb" },
+        ],
+        []
+    );
 
+    // Helpers to read/write query params
+    const readParams = useCallback(() => {
+        const startIso = sp.get("start");
+        const endIso = sp.get("end");
+        const sl = sp.get("sl") ?? "";
+        const dl = sp.get("dl") ?? "";
+        const start = startIso ? dayjs(startIso) : null;
+        const end = endIso ? dayjs(endIso) : null;
+        return { start, end, startLocation: sl, endLocation: dl };
+    }, [sp]);
 
+    const writeParams = useCallback(
+        (args: { start?: Dayjs | null; end?: Dayjs | null; sl?: string; dl?: string }) => {
+            const next = new URLSearchParams(sp);
+            if (args.start) next.set("start", args.start.toISOString());
+            if (args.end) next.set("end", args.end.toISOString());
+            if (typeof args.sl === "string") next.set("sl", args.sl);
+            if (typeof args.dl === "string") next.set("dl", args.dl);
+            setSp(next, { replace: false });
+        },
+        [sp, setSp]
+    );
 
-    const fetchCategoryIds = useCallback(() => {
+    const [dateParams, setDateParams] = useState<{ start: Dayjs | null; end: Dayjs | null }>(() => {
+        const { start, end } = readParams();
+        return {
+            start: start ?? dayjs().add(1, "day").minute(0),
+            end: end ?? dayjs().add(2, "day").minute(0),
+        };
+    });
 
-        console.log("Search with query");
-        console.log("Search parameters: ", dateParams)
-
-        myApi.get(`availability/search`, {
-            params: {
-                start: dateParams.start?.format('YYYY-MM-DDTHH:mm'),
-                end: dateParams.end?.format('YYYY-MM-DDTHH:mm'),
-            }
-        }).then(response => {
-            console.log(response.data)
-            setAvailabilities(response.data);
-        })
-            .catch(error => {
-                message.error('Failed to fetch availabilities');
-                console.log("Error: "+ error);
-                setAvailabilities([]);
-            }).finally( () => {
-        });
-
+    // Fetch availabilities
+    const fetchAvailability = useCallback(async () => {
+        try {
+            if (!dateParams.start || !dateParams.end) return;
+            const { data } = await myApi.get(`availability/search`, {
+                params: {
+                    start: dateParams.start.format("YYYY-MM-DDTHH:mm"),
+                    end: dateParams.end.format("YYYY-MM-DDTHH:mm"),
+                },
+            });
+            setAvailabilities(data || []);
+        } catch (e) {
+            console.error(e);
+            message.error("Failed to fetch availabilities");
+            setAvailabilities([]);
+        }
     }, [dateParams]);
 
-
+    // Init form from URL on first mount, and trigger search if both dates exist
     useEffect(() => {
-
-    }, [fetchCategoryIds, dateParams]);
+        const { start, end, startLocation, endLocation } = readParams();
+        form.setFieldsValue({
+            startLocation: startLocation ?? "",
+            endLocation: endLocation ?? "",
+            dateRange:
+                start && end ? [start, end] : [dayjs().add(1, "day").minute(0), dayjs().add(2, "day").minute(0)],
+        });
+        if (start && end) {
+            setDateParams({ start, end });
+            fetchAvailability();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // only on first mount
 
     const handleSelect = (id: number) => {
-        console.log("Selected category ID:", id);
-        if (myDates && myDates.start !== null && myDates.end !== null && myDates.startLocation && myDates.endLocation) {
-            const selectedCategory = availabilities.find(av => av.category.id === id);
-            if (!selectedCategory) {
-                message.error("Selected category not found.");
-                return;
-            }
-
-            const booking: Partial<Booking> = {
-                category_id: id,
-                start: myDates.start,
-                end: myDates.end,
-                price: selectedCategory.totalPrice,
-                startLocation: myDates.startLocation,
-                endLocation: myDates.endLocation,
-            };
-
-            onSubmit(booking);
-        } else {
-            message.warning("Please select dates, insert locations, and press search before submitting.");
+        const { start, end, startLocation, endLocation } = readParams();
+        if (!start || !end || !startLocation || !endLocation) {
+            message.warning("Please select dates and locations first.");
+            return;
         }
+
+        const selected = availabilities.find((a) => a.category.id === id);
+        if (!selected) {
+            message.error("Selected category not found.");
+            return;
+        }
+
+        // Navigate to addons step with category id, preserving params
+        const params = new URLSearchParams(sp);
+        navigate(`/book/${id}/extra?${params.toString()}`);
+
+        // Also pass data up (if you keep state in parent)
+        onSubmit({
+            category_id: id,
+            start,
+            end,
+            price: selected.totalPrice,
+            startLocation,
+            endLocation,
+        });
     };
 
-
-    const handleDatesSubmit = (dateForm : myDateForm) => {
-        console.log(dateForm)
-        setMyDates(dateForm);
+    // DateForm (mobile card) callback
+    const handleDatesSubmit = (dateForm: myDateForm) => {
+        writeParams({
+            start: dateForm.start,
+            end: dateForm.end,
+            sl: dateForm.startLocation ?? "",
+            dl: dateForm.endLocation ?? "",
+        });
         setDateParams({ start: dateForm.start, end: dateForm.end });
-        fetchCategoryIds()
+        fetchAvailability();
     };
 
-    const handleDatesChange = (start: Dayjs, end: Dayjs) => {
-        console.log(start, end)
-        setDateParams({ start, end });
-    }
-
+    // Popover form (desktop) submit
     const handleSubmit = () => {
         form.validateFields().then((values) => {
             const { startLocation, endLocation, dateRange } = values;
-            const [start, end] = dateRange;
-            const dateForm: myDateForm = {
-                startLocation,
-                endLocation,
-                start,
-                end
-            };
-            handleDatesChange(start, end);
-            handleDatesSubmit(dateForm);
-            setPopoverVisible(false)
+            const [start, end] = dateRange as [Dayjs, Dayjs];
+            writeParams({ start, end, sl: startLocation, dl: endLocation });
+            setDateParams({ start, end });
+            fetchAvailability();
+            setPopoverVisible(false);
         });
     };
 
-    useEffect(() => {
-        form.setFieldsValue({
-            startLocation: "", // Default value for startLocation
-            endLocation: "",   // Default value for endLocation
-            dateRange: [dayjs().add(1, 'day').minute(0), dayjs().add(2, 'day').minute(0)], // Default date range
-        });
-    }, [form]);
-
+    // Render … (unchanged layout apart from URL wiring)
     const bookingFiltersContent = (
-        <div style={{
-            marginInline: "10px",
-            maxHeight: height > 1.5 ? "300px" : "350px",
-            overflowY: "auto",
-            marginBottom: "20px",
-            padding: "10px",
-            borderRadius: "5px",
-            backgroundColor: "#fff",
-            width: "230px",
-            margin: "auto",
-            overflowX: "hidden"
-        }}>
+        <div
+            style={{
+                marginInline: "10px",
+                maxHeight: height > 1.5 ? "300px" : "350px",
+                overflowY: "auto",
+                marginBottom: "20px",
+                padding: "10px",
+                borderRadius: "5px",
+                backgroundColor: "#fff",
+                width: "230px",
+                margin: "auto",
+                overflowX: "hidden",
+            }}
+        >
             <Form layout="vertical" onFinish={handleSubmit} form={form}>
                 <Row gutter={16}>
                     <Col span={24}>
                         <Form.Item
                             name="startLocation"
                             label="Pick Up At"
-                            rules={[{ required: true, message: 'Please enter pick location' }]}
+                            rules={[{ required: true, message: "Please enter pick location" }]}
                             validateTrigger="onSubmit"
                         >
-
-                            <AutoComplete<OptionType>
-                                options={locationOptions}
-                            >
-                                <Input prefix={<i className="bi bi-geo-alt"></i>} placeholder="Airport or Anywhere" />
+                            <AutoComplete<OptionType> options={locationOptions}>
+                                <Input prefix={<i className="bi bi-geo-alt" />} placeholder="Airport or Anywhere" />
                             </AutoComplete>
                         </Form.Item>
                     </Col>
@@ -209,14 +227,11 @@ function SearchPage({ onSubmit}: Props) {
                         <Form.Item
                             name="endLocation"
                             label="Drop Off At"
-                            rules={[{ required: true, message: 'Please enter drop off location' }]}
+                            rules={[{ required: true, message: "Please enter drop off location" }]}
                             validateTrigger="onSubmit"
                         >
-
-                            <AutoComplete<OptionType>
-                                options={locationOptions}
-                            >
-                                <Input prefix={<i className="bi bi-geo-alt"></i>} placeholder="Airport or Anywhere" />
+                            <AutoComplete<OptionType> options={locationOptions}>
+                                <Input prefix={<i className="bi bi-geo-alt" />} placeholder="Airport or Anywhere" />
                             </AutoComplete>
                         </Form.Item>
                     </Col>
@@ -226,35 +241,33 @@ function SearchPage({ onSubmit}: Props) {
                     <Col span={24}>
                         <Form.Item
                             name="dateRange"
-                            label={<Space><FontAwesomeIcon icon={faCalendar} /> Dates</Space>}
-                            rules={[{ required: true, message: 'Please select the dates!' }]}
+                            label={
+                                <Space>
+                                    <FontAwesomeIcon icon={faCalendar} /> Dates
+                                </Space>
+                            }
+                            rules={[{ required: true, message: "Please select the dates!" }]}
                         >
                             <RangePicker
-                                style={{ width: '100%' }}
-                                showTime={{ format: 'HH:mm', minuteStep: 15 }}
+                                style={{ width: "100%" }}
+                                showTime={{ format: "HH:mm", minuteStep: 15 }}
                                 format="DD-MMM-YYYY, HH:mm"
                             />
                         </Form.Item>
                     </Col>
                 </Row>
-                <Form.Item style={{ display: "flex",justifyContent: "right"}}>
-                    <Button color="primary" variant="outlined" htmlType="submit" >
+                <Form.Item style={{ display: "flex", justifyContent: "right" }}>
+                    <Button color="primary" variant="outlined" htmlType="submit">
                         Search
                     </Button>
                 </Form.Item>
-
             </Form>
         </div>
     );
-    return (
-        <div
-            style={{
-                margin: 'auto',
-                width: '80%'
-            }}
-        >
 
-            {width < 3.4 ?
+    return (
+        <div style={{ margin: "auto", width: "80%" }}>
+            {width < 3.4 ? (
                 <>
                     <Card
                         style={{
@@ -265,19 +278,20 @@ function SearchPage({ onSubmit}: Props) {
                             borderRadius: 12,
                             border: "1px solid #e6e9f5",
                             boxShadow: "0 6px 24px rgba(0,0,0,0.04)",
-                            padding: 20
+                            padding: 20,
                         }}
                     >
-                        <DateForm onDateFormSubmit={handleDatesSubmit} />
+                        <DateForm onDateFormSubmit={handleDatesSubmit} isItMainPage />
                     </Card>
-                    <Row style={{justifyContent:'center', display: 'flex'}}>
+                    <Row style={{ justifyContent: "center", display: "flex" }}>
                         <Col
-                             style={{
-                                 marginTop: '30px',
-                                 display: 'flex',
-                                 flexWrap: 'wrap',
-                                 justifyContent: 'space-between'
-                             }}>
+                            style={{
+                                marginTop: "30px",
+                                display: "flex",
+                                flexWrap: "wrap",
+                                justifyContent: "space-between",
+                            }}
+                        >
                             <div>
                                 <List
                                     grid={{ gutter: 16, column: width >= 3 ? 1 : width >= 1.6 ? 2 : 3 }}
@@ -297,52 +311,51 @@ function SearchPage({ onSubmit}: Props) {
                         </Col>
                     </Row>
                 </>
-                :
+            ) : (
                 <div>
-                    <div style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        marginTop: '30px'
-                    }}>
-
-                        <div style={{
-                            display: 'flex',
-                            justifyContent: 'left',
-                            alignItems: 'center',
-                            overflowX: "hidden"
-                        }}>
+                    <div
+                        style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            marginTop: "30px",
+                        }}
+                    >
+                        <div
+                            style={{
+                                display: "flex",
+                                justifyContent: "left",
+                                alignItems: "center",
+                                overflowX: "hidden",
+                            }}
+                        >
                             <Popover
-                                placement={"bottomRight"} // Ensure `placement` is one of the allowed values
-                                content={bookingFiltersContent} trigger="click" style={{alignItems: 'center'}}
+                                placement="bottomRight"
+                                content={bookingFiltersContent}
+                                trigger="click"
                                 open={popoverVisible}
-                                onOpenChange={setPopoverVisible}>
-                                <Button icon={<FontAwesomeIcon icon={faCalendar}/>}>
-                                    Select Dates & Loc/s
-                                </Button>
+                                onOpenChange={setPopoverVisible}
+                            >
+                                <Button icon={<FontAwesomeIcon icon={faCalendar} />}>Select Dates & Loc/s</Button>
                             </Popover>
                         </div>
-
-
                     </div>
 
                     <List
                         grid={{
                             gutter: 16,
-                            column: width >= 3 ? 1 : width >= 1.6 ? 2 : width >= 1.28 ? 3 : 4
+                            column: width >= 3 ? 1 : width >= 1.6 ? 2 : width >= 1.28 ? 3 : 4,
                         }}
                         dataSource={availabilities}
-                        style={{marginTop: '10px'}}
-
+                        style={{ marginTop: "10px" }}
                         renderItem={(av: Availability) => (
                             <List.Item key={av.category.id}>
-                                <AvailabilityCard av={av} onSelect={handleSelect}/>
+                                <AvailabilityCard av={av} onSelect={handleSelect} />
                             </List.Item>
                         )}
                     />
                 </div>
-            }
-
+            )}
         </div>
     );
 }

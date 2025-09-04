@@ -1,15 +1,54 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, Col, Form, Row, Steps, Typography, message } from "antd";
+import { useLocation, useSearchParams } from "react-router-dom";
 import AddonsStep from "./AddonsStep";
 import SummaryCard from "./SummaryCard";
 import ConfirmationStep from "./ConfirmationStep";
 import { ADDONS } from "./addonsDef";
 import type { BookingWizardProps, ChecklistEntryDto, Driver } from "./types";
-import MyInfo from "./MyInfo.tsx";
-import Payment from "./Payment.tsx";
-import { myApi } from "../../resources/service.ts";
+import MyInfo from "./MyInfo";
+import Payment from "./Payment";
 
 const { Title } = Typography;
+
+type RouteStep = "extra" | "info" | "payment" | "done";
+
+type Props = BookingWizardProps & {
+    routeStep: RouteStep;
+    goto: (s: RouteStep) => void;
+};
+
+// ---- helpers: serialize/parse extras to query param -----------------
+const serializeExtras = (cl: Record<string, boolean> = {}, clq: Record<string, number> = {}) => {
+    const parts: string[] = [];
+    for (const a of ADDONS) {
+        if (cl[a.value]) {
+            if (a.qty) {
+                const q = Math.max(1, Number(clq[a.value] || 1));
+                parts.push(`${encodeURIComponent(a.value)}.${q}`);
+            } else {
+                parts.push(encodeURIComponent(a.value));
+            }
+        }
+    }
+    return parts.join(",");
+};
+
+const parseExtras = (s?: string | null) => {
+    const checklist: Record<string, boolean> = {};
+    const checklistQty: Record<string, number> = {};
+    if (!s) return { checklist, checklistQty };
+    s.split(",")
+        .filter(Boolean)
+        .forEach((item) => {
+            const [raw, q] = item.split(".");
+            const key = decodeURIComponent(raw);
+            checklist[key] = true;
+            if (q) checklistQty[key] = Math.max(1, Number(q) || 1);
+        });
+    return { checklist, checklistQty };
+};
+// ---------------------------------------------------------------------
 
 export default function BookingWizard({
                                           onSubmit,
@@ -24,11 +63,14 @@ export default function BookingWizard({
                                           endIso,
                                           startLocation,
                                           endLocation,
-                                      }: BookingWizardProps) {
+                                          routeStep,
+                                          goto,
+                                      }: Props) {
     const [form] = Form.useForm();
-    const [step, setStep] = useState(0);
-    // Stable empty objects to avoid changing deps on every render
     const [addonsTotal, setAddonsTotal] = useState<number>(0);
+
+    const [sp, setSp] = useSearchParams();
+    const { pathname } = useLocation();
 
     type FormValues = { checklist?: Record<string, boolean>; checklistQty?: Record<string, number> };
 
@@ -44,6 +86,18 @@ export default function BookingWizard({
             return sum + a.price;
         }, 0);
     };
+
+    // On mount / route change: pull extras from URL (once if form is empty)
+    useEffect(() => {
+        const { checklist: urlCl, checklistQty: urlClq } = parseExtras(sp.get("extras"));
+        const current = form.getFieldsValue(["checklist", "checklistQty"]) as any;
+        const has = current?.checklist && Object.keys(current.checklist).length > 0;
+        if (!has && (Object.keys(urlCl).length || Object.keys(urlClq).length)) {
+            form.setFieldsValue({ checklist: urlCl, checklistQty: urlClq });
+            setAddonsTotal(calcAddonsTotal({ checklist: urlCl, checklistQty: urlClq }));
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pathname]);
 
     // Initialize once from initialValues
     useEffect(() => {
@@ -69,7 +123,7 @@ export default function BookingWizard({
             } = values;
 
             const driverList: Driver[] = Array.isArray(drivers)
-                ? (drivers as Partial<Driver>[]).map(d => ({
+                ? (drivers as Partial<Driver>[]).map((d) => ({
                     telephone: d?.telephone ?? "",
                     name: d?.name ?? "",
                 }))
@@ -98,156 +152,94 @@ export default function BookingWizard({
                 entries
             );
         } catch {
-            // AntD will show validation errors automatically
+            // AntD handles validation
         }
     };
 
-    const handlextraDone = () => {
-        console.log("checklist:", form.getFieldValue(["checklist"]));
-        console.log("checklistQty:", form.getFieldValue(["checklistQty"]));
-        setStep(1)
-    }
+    const handlextraDone = () => goto("info");
+    const handleInfoDone = () => goto("payment");
 
-    const handleInfoDone = () => {
-        console.log("Telephone:", form.getFieldValue(["drivers"]));
-        setStep(2)
-    }
-
-    // Called when online payment provider reports success
-    const handlePaid = async () => {
-        try {
-            // Validate and gather the latest form values
-            await form.validateFields();
-            const values = form.getFieldsValue(true);
-            const {
-                telephone,
-                flight = "",
-                number_of_people,
-                notes = "",
-                drivers = [],
-                checklist = {},
-                checklistQty = {},
-            } = values;
-
-            const driverList: Driver[] = Array.isArray(drivers)
-                ? (drivers as Partial<Driver>[]).map(d => ({
-                    telephone: d?.telephone ?? "",
-                    name: d?.name ?? "",
-                }))
-                : [];
-
-            const entries: ChecklistEntryDto[] = [];
-            for (const a of ADDONS) {
-                if (checklist[a.value]) {
-                    if (a.qty) {
-                        const q = Number(checklistQty[a.value] || 0);
-                        if (q > 0) entries.push({ item: a.value, quantity: q });
-                    } else {
-                        entries.push({ item: a.value, quantity: 1 });
-                    }
-                }
-            }
-
-            const payload = {
-                telephone,
-                category_id: categoryId,
-                start: startIso,
-                end: endIso,
-                drivers: driverList,
-                price: grandTotal,
-                startLocation,
-                endLocation,
-                externalCar: false,
-                number_of_people: Number(number_of_people || 1),
-                flight,
-                advance_paid: true,
-                notes,
-                checklist: entries,
-            };
-
-            await myApi.post("booking/create", payload);
-            message.success("Payment confirmed and booking created.");
-            setStep(3);
-        } catch {
-            // validation errors or network error
-            message.error("Could not create booking after payment. Please try again.");
-        }
+    // Keep ?extras in URL + keep totals
+    const handleValuesChange = () => {
+        const all = form.getFieldsValue(true) as FormValues;
+        setAddonsTotal(calcAddonsTotal(all));
+        const extras = serializeExtras(all.checklist ?? {}, all.checklistQty ?? {});
+        const next = new URLSearchParams(sp);
+        if (extras) next.set("extras", extras);
+        else next.delete("extras");
+        setSp(next, { replace: true });
     };
+
+    const step = routeStep === "extra" ? 0 : routeStep === "info" ? 1 : routeStep === "payment" ? 2 : 3;
 
     return (
         <div style={{ marginTop: 10, width: "90%", margin: "20px auto" }}>
-                <Steps
-                    current={step}
-                    items={[{ title: "Εξοπλισμός" }, { title: "Προσωπικά Στοιχεία" }, { title: "Πληρωμή" }, { title: "Τέλος" }]}
-                    style={{ marginBottom: 16 }}
-                />
+            <Steps
+                current={step}
+                items={[{ title: "Εξοπλισμός" }, { title: "Προσωπικά Στοιχεία" }, { title: "Πληρωμή" }, { title: "Τέλος" }]}
+                style={{ marginBottom: 16 }}
+            />
 
-                <Row gutter={16} align="top">
-                    <Col xs={24} md={step === 2 ? 24 : 16} >
-                        <Form form={form} layout="vertical"   initialValues={{ checklist: {}, checklistQty: {} }}   // <- ensure objects exist
-                              onValuesChange={(_, allValues: FormValues) => {
-                                  setAddonsTotal(calcAddonsTotal(allValues));
-                              }}
-                        >
-                            {step === 0 && (
-                                <AddonsStep
+            <Row gutter={16} align="top">
+                <Col xs={24} md={step === 2 ? 24 : 16}>
+                    <Form
+                        form={form}
+                        layout="vertical"
+                        initialValues={{ checklist: {}, checklistQty: {} }}
+                        onValuesChange={handleValuesChange}
+                    >
+                        {routeStep === "extra" && (
+                            <AddonsStep form={form} onNext={handlextraDone} onTotalsChange={(t) => setAddonsTotal(t)} />
+                        )}
+
+                        {routeStep === "info" && (
+                            <Card style={{ borderRadius: 12 }} title={<Title level={4} style={{ margin: 0 }}>Η Πληροφορία Σου</Title>}>
+                                <MyInfo form={form} onPrev={() => goto("extra")} onNext={handleInfoDone} onFinish={handleFinish} />
+                            </Card>
+                        )}
+
+                        {routeStep === "payment" && (
+                            <Card style={{ borderRadius: 12 }} title={<Title level={4} style={{ margin: 0 }}>Πληρωμή</Title>}>
+                                <Payment
                                     form={form}
-                                    onNext={handlextraDone}
-                                    onTotalsChange={(t) => setAddonsTotal(t)}
+                                    amount={grandTotal}
+                                    currency={currency}
+                                    onPrev={() => goto("info")}
+                                    onSkip={() => goto("done")}
+                                    onPaid={async () => {
+                                        // If you capture PayPal on the page:
+                                        try {
+                                            await handleFinish();
+                                        } catch {
+                                            message.error("Could not finalize booking after payment.");
+                                        }
+                                        goto("done");
+                                    }}
                                 />
-                            )}
+                            </Card>
+                        )}
+                    </Form>
+                </Col>
 
-                            {step === 1 && (
-                                <Card style={{ borderRadius: 12 }} title={<Title level={4} style={{ margin: 0 }}>Η Πληροφορία Σου</Title>}>
-                                    <MyInfo
-                                        form={form}
-                                        onPrev={() => setStep(0)}
-                                        onNext={handleInfoDone}
-                                        onFinish={handleFinish}
-                                    />
-                                </Card>
-                            )}
-
-                            {step === 2 && (
-                                <Card style={{ borderRadius: 12 }} title={<Title level={4} style={{ margin: 0 }}>Πληρωμή</Title>}>
-                                    <Payment
-                                        form={form}
-                                        amount={grandTotal}
-                                        currency={currency}
-                                        onPrev={() => setStep(1)}
-                                        onSkip={() => setStep(3)}     // proceed without online payment
-                                        onPaid={handlePaid}           // on successful payment: create booking
-                                        // stripeEndpoint="/payments/stripe/create-checkout-session"
-                                        // paypalEndpoint="/payments/paypal/create-order"
-                                    />                                </Card>
-                            )}
-                        </Form>
+                {step !== 2 && (
+                    <Col xs={24} md={8}>
+                        <SummaryCard
+                            baseTotal={baseTotal}
+                            addonsTotal={addonsTotal}
+                            currency={currency}
+                            vehicleName={vehicleName}
+                            vehicleImage={vehicleImage}
+                            pickupLabel={pickupLabel}
+                            dropoffLabel={dropoffLabel}
+                            showFreeCancel={routeStep === "info"}
+                        />
                     </Col>
-
-                    {step === 2 ? null :
-                        <Col xs={24} md={8}>
-                            <SummaryCard
-                                baseTotal={baseTotal}
-                                addonsTotal={addonsTotal}
-                                currency={currency}
-                                vehicleName={vehicleName}
-                                vehicleImage={vehicleImage}
-                                pickupLabel={pickupLabel}
-                                dropoffLabel={dropoffLabel}
-                                showFreeCancel={step === 1}
-                            />
-                        </Col>
-                    }
-
-                </Row>
+                )}
+            </Row>
 
             {step === 3 && (
                 <Card style={{ borderRadius: 12 }} title={<Title level={4} style={{ margin: 0 }}>Τελος</Title>}>
-                    <ConfirmationStep
-                        form={form}
-                        onPrev={() => setStep(0)}
-                        onFinish={handleFinish}
-                    />
+                    <ConfirmationStep form={form} onPrev={() => goto("extra")} onFinish={handleFinish} />
                 </Card>
             )}
         </div>

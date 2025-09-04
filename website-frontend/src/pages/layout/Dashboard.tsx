@@ -7,35 +7,23 @@ import MainPage from "../main/MainPage.tsx";
 import MyHeader from "./MyHeader.tsx";
 import MyFooter from "./MyFooter.tsx";
 import {width} from "../../resources/service.ts";
-import AddBooking from "../search/AddBooking.tsx";
+import AddBooking from "../search/AddBooking.tsx"; // <- FIXED PATH
 import {useLocation} from "react-router-dom";
 
-
-const {  Content, Sider } = Layout;
+const { Content, Sider } = Layout;
 
 const siderStyle: React.CSSProperties = {
     overflowY: 'auto',
     height: '100vh',
     position: 'fixed',
     scrollbarWidth: 'none',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Black with 60% transparency
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
     zIndex: 2,
 };
 
 type MenuItem = Required<MenuProps>['items'][number];
-
-function getItem(
-    label: React.ReactNode,
-    key: React.Key,
-    icon?: React.ReactNode,
-    onClick?: () => void, // Add an optional onClick handler
-): MenuItem {
-    return {
-        key,
-        icon,
-        label,
-        onClick, // Include the onClick property
-    } as MenuItem;
+function getItem(label: React.ReactNode, key: React.Key, icon?: React.ReactNode, onClick?: () => void): MenuItem {
+    return { key, icon, label, onClick } as MenuItem;
 }
 
 const items: MenuProps['items'] = [
@@ -47,77 +35,65 @@ const items: MenuProps['items'] = [
 ];
 
 function Dashboard() {
-    const contentRef = useRef<HTMLDivElement>(null); // Reference for the Content area
-    const { pathname } = useLocation();const stripSlash = (p: string) => p.replace(/\/+$/, "");
-    const language = (pathname.split("/")[1] || "el");
-    const isMainPagePath = stripSlash(pathname) === `/${language}`;
-    const isSearchPath   = stripSlash(pathname) === `/${language}/search`;
+    const contentRef = useRef<HTMLDivElement>(null);
+    const { pathname } = useLocation();
 
+    const stripSlash = (p: string) => p.replace(/\/+$/, "");
+    const language = (pathname.split("/")[1] || "el");
+
+    // Show main page at "/:lang" or "/" (optional)
+    const isMainPagePath = stripSlash(pathname) === `/${language}` || stripSlash(pathname) === "";
+
+    // Legacy search page path
+    const isSearchPath = stripSlash(pathname) === `/${language}/search`;
+
+    // NEW: any /book path, with or without language prefix (e.g., "/book/*" or "/el/book/*")
+    const isBookPath = /^(\/[a-z]{2})?\/book(\/|$)/i.test(stripSlash(pathname));
 
     return (
-            <Layout style={{ height: '100vh', width: '100vw', backgroundColor: 'white'}} hasSider>
-                {width<4.4 ?
-                <Sider trigger={null} style={siderStyle} collapsed={true}>
+        <Layout style={{ height: '100vh', width: '100vw', backgroundColor: 'white'}} hasSider>
+            {width < 4.4 ? (
+                <Sider trigger={null} style={siderStyle} collapsed>
                     <div className={styles.logo}>
-                        <Image
-                            src={`https://4rent-thessaloniki.com/images/Logo_White.png`}
-                            style={{ maxWidth: '55px', height: 'auto' }} // Ensures responsiveness
-                        />
+                        <Image src={`https://4rent-thessaloniki.com/images/Logo_White.png`} style={{ maxWidth: '55px', height: 'auto' }} />
                     </div>
                     <Menu mode="inline" items={items} selectedKeys={[]} style={{backgroundColor: 'transparent'}}/>
                 </Sider>
-                    : null }
-                <Layout style={{ overflowY: 'auto', overflowX: 'hidden'}}>
-                    <MyHeader/>
-                    <Content
-                        ref={contentRef}
+            ) : null}
+
+            <Layout style={{ overflowY: 'auto', overflowX: 'hidden'}}>
+                <MyHeader/>
+                <Content
+                    ref={contentRef}
+                    style={{
+                        position: 'relative',
+                        zIndex: 1,
+                        overflow: 'visible',
+                        paddingInlineStart: width < 4.4 ? 80 : 0,
+                    }}
+                >
+                    <div
                         style={{
-                            position: 'relative', // Make the content container a relative parent
-                            zIndex: 1, // Ensure the text stays on top
-                            // let the page scroll; do NOT trap scroll inside Content
-                            overflow: 'visible',
-                            // keep clear of the fixed Sider
-                            paddingInlineStart: width < 4.4 ? 80 : 0,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            minHeight: '608px',
                         }}
                     >
-                        {/* Background image div */}
+                        {isMainPagePath ? <MainPage/> : null}
 
+                        {(isSearchPath || isBookPath) ? (
+                            <div style={{ width: '100%', margin: '0 auto', padding: '0 16px' }}>
+                                <AddBooking />
+                            </div>
+                        ) : null}
+                    </div>
 
-                        {/* Centered Content */}
-                        <div
-                            style={{
-                                display: 'flex',
-                                flexDirection: 'column', // Stack elements vertically
-                                alignItems: 'center', // Center horizontally
-                                minHeight: '608px',
-                            }}
-                        >
-                            {isMainPagePath ?  <MainPage/> : null}
-
-                            {isSearchPath ? (
-                                <div
-                                    style={{
-                                        width: '100%',
-                                        margin: '0 auto',
-                                        padding: '0 16px',
-                                    }}
-                                >
-                                    <AddBooking />
-                                </div>
-                            ) : null}
-
-
-                        </div>
-
-                        <MyFooter/>
-
-                    </Content>
-
-
-                </Layout>
+                    <MyFooter/>
+                </Content>
             </Layout>
-    )
-        ;
+        </Layout>
+    );
 }
 
 export default Dashboard;

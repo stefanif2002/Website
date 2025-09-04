@@ -52,6 +52,11 @@ logging:
     com.netflix.discovery: 'DEBUG'
     org.springframework.cloud.netflix.eureka: 'DEBUG'
 
+stripe:
+    secret:
+        key: sk_test_51S2UY3KnXECMMeszgkDCbRmOqO15CMlesIMv3zI8857f7HsNy3agvoJQwTfd4NbeeU3XQNmkyhuw952RVJoENHMR00xwDVBRfJ
+    public:
+        key: pk_test_51S2UY3KnXECMMeszL1gKAaoSrvN4uu6v0YKMkQ4GdKIIaJA8gvjuVO0Z0oOhuWzMRH3sxcLKC89AL6h9pJASNUbX00Rsq57BV4
 
 #Resilinece4j Properties
 resilience4j:
