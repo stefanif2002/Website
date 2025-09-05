@@ -1,22 +1,31 @@
 import React, { useEffect, useState } from "react";
 import { Card, Col, Form, Row, Steps, Typography, message } from "antd";
-import { useLocation, useSearchParams } from "react-router-dom";
+import {useLocation, useNavigate, useSearchParams} from "react-router-dom";
 import AddonsStep from "./AddonsStep";
 import SummaryCard from "./SummaryCard";
-import ConfirmationStep from "./ConfirmationStep";
 import { ADDONS } from "./addonsDef";
-import type { BookingWizardProps, ChecklistEntryDto, Driver } from "./types";
 import MyInfo from "./MyInfo";
 import Payment from "./Payment";
+import { myApi } from "../../resources/service.ts";
+import dayjs from "dayjs";
 
 const { Title } = Typography;
 
 type RouteStep = "extra" | "info" | "payment" | "done";
 
-type Props = BookingWizardProps & {
+type Props = {
+    baseTotal?: number;
+    currency?: string;
+    vehicleName?: string;
+    vehicleImage?: string;
+    pickupLabel?: string;
+    dropoffLabel?: string;
     routeStep: RouteStep;
     goto: (s: RouteStep) => void;
 };
+
+type Driver = { telephone: string; full_name: string };
+type ChecklistEntryDto = { item: string; quantity: number };
 
 // ---- helpers: serialize/parse extras to query param -----------------
 const serializeExtras = (cl: Record<string, boolean> = {}, clq: Record<string, number> = {}) => {
@@ -51,18 +60,12 @@ const parseExtras = (s?: string | null) => {
 // ---------------------------------------------------------------------
 
 export default function BookingWizard({
-                                          onSubmit,
                                           baseTotal = 0,
                                           currency = "EUR",
                                           vehicleName,
                                           vehicleImage,
                                           pickupLabel,
                                           dropoffLabel,
-                                          categoryId,
-                                          startIso,
-                                          endIso,
-                                          startLocation,
-                                          endLocation,
                                           routeStep,
                                           goto,
                                       }: Props) {
@@ -71,6 +74,8 @@ export default function BookingWizard({
 
     const [sp, setSp] = useSearchParams();
     const { pathname } = useLocation();
+
+    const navigate = useNavigate();
 
     type FormValues = { checklist?: Record<string, boolean>; checklistQty?: Record<string, number> };
 
@@ -87,7 +92,7 @@ export default function BookingWizard({
         }, 0);
     };
 
-    // On mount / route change: pull extras from URL (once if form is empty)
+    // Pull extras from URL into the form once
     useEffect(() => {
         const { checklist: urlCl, checklistQty: urlClq } = parseExtras(sp.get("extras"));
         const current = form.getFieldsValue(["checklist", "checklistQty"]) as any;
@@ -99,7 +104,7 @@ export default function BookingWizard({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [pathname]);
 
-    // Initialize once from initialValues
+    // Initialize total
     useEffect(() => {
         const init = form.getFieldsValue(true) as FormValues;
         setAddonsTotal(calcAddonsTotal(init));
@@ -108,27 +113,41 @@ export default function BookingWizard({
 
     const grandTotal = +(baseTotal + addonsTotal).toFixed(2);
 
-    const handleFinish = async () => {
+    // Create booking BEFORE payment to acquire a bookingId
+    const saveDraftAndGoToPayment = async () => {
         try {
+            // Minimal required fields before saving a draft
+            await form.validateFields(["telephone", "name", "last_name", "number_of_people"]);
+
+            // Read form values
             const values = form.getFieldsValue(true);
             const {
-                telephone,
+                telephone,                  // maps to BookingCreateDto.userId via @JsonProperty("telephone")
                 flight = "",
                 number_of_people,
                 notes = "",
-                is_advance_paid = false,
                 drivers = [],
                 checklist = {},
                 checklistQty = {},
-            } = values;
+            } = values as {
+                telephone: string;
+                flight?: string;
+                number_of_people?: number | string;
+                notes?: string;
+                drivers?: Array<Partial<Driver>>;
+                checklist?: Record<string, boolean>;
+                checklistQty?: Record<string, number>;
+            };
 
+            // Build drivers DTO [{ telephone, name }]
             const driverList: Driver[] = Array.isArray(drivers)
                 ? (drivers as Partial<Driver>[]).map((d) => ({
                     telephone: d?.telephone ?? "",
-                    name: d?.name ?? "",
+                    full_name: d?.name ?? "",
                 }))
                 : [];
 
+            // Build extras DTO [{ item, quantity }]
             const entries: ChecklistEntryDto[] = [];
             for (const a of ADDONS) {
                 if (checklist[a.value]) {
@@ -141,23 +160,64 @@ export default function BookingWizard({
                 }
             }
 
-            onSubmit(
-                telephone,
-                driverList,
-                flight,
-                Number(number_of_people || 1),
-                grandTotal,
-                is_advance_paid,
-                notes,
-                entries
-            );
-        } catch {
-            // AntD handles validation
+            // Derive category & date/location from URL
+            const parts = pathname.replace(/\/+$/, "").split("/");
+            const bookIdx = parts.indexOf("book");
+            const categoryId = bookIdx >= 0 ? Number(parts[bookIdx + 1]) : undefined;
+
+            const startIso = sp.get("start");
+            const endIso = sp.get("end");
+            const startLocation = sp.get("sl") || "";
+            const endLocation = sp.get("dl") || "";
+
+            if (!categoryId || !startIso || !endIso) {
+                message.error("Λείπουν δεδομένα κράτησης (ημερομηνίες/όχημα). Επιστρέψτε στην αναζήτηση.");
+                return;
+            }
+
+            // Format as LocalDateTime (no timezone), e.g. 2025-01-31T14:30:00
+            const startLdt = dayjs(startIso).format("YYYY-MM-DDTHH:mm:ss");
+            const endLdt   = dayjs(endIso).format("YYYY-MM-DDTHH:mm:ss");
+
+            // ---- EXACT SHAPE FOR BookingCreateDto ----
+            const payload = {
+                telephone,                      // -> BookingCreateDto.userId (via @JsonProperty("telephone"))
+                category_id: categoryId,        // -> BookingCreateDto.categoryId (via @JsonProperty)
+                drivers: driverList,            // -> List<DriverDto>
+                start: startLdt,                // -> LocalDateTime
+                end: endLdt,                    // -> LocalDateTime
+                price: Number(grandTotal.toFixed(2)), // -> Float
+                startLocation,                  // -> String
+                endLocation,                    // -> String
+                flight,                         // -> String
+                notes,                          // -> String
+                number_of_people: Number(number_of_people || 1), // -> Integer (via @JsonProperty("number_of_people"))
+                checklist: entries,             // -> List<ChecklistItemDto> { item, quantity }
+            };
+
+            const resp = await myApi.post("booking/create", payload);
+            const bookingId = resp?.data;
+            if (!bookingId) {
+                message.error("Δεν ελήφθη bookingId από τον διακομιστή.");
+                return;
+            }
+
+            // Persist bookingId to URL (?bid=)
+            const next = new URLSearchParams(sp);
+            next.set("bid", String(bookingId));
+            setSp(next, { replace: true });
+
+            const prefix = bookIdx > 0 ? parts.slice(0, bookIdx).join("/") : ""; // "" or "/el"
+            const target = `${prefix}/book/${categoryId}/payment${next.toString() ? `?${next.toString()}` : ""}`;
+                    // Navigate directly so the URL includes ?bid= right away
+               navigate(target, { replace: true });
+
+        } catch (err: any) {
+            if (err?.errorFields) return; // AntD validation already shown
+            message.error("Αποτυχία δημιουργίας κράτησης. Προσπαθήστε ξανά.");
         }
     };
 
-    const handlextraDone = () => goto("info");
-    const handleInfoDone = () => goto("payment");
 
     // Keep ?extras in URL + keep totals
     const handleValuesChange = () => {
@@ -189,12 +249,20 @@ export default function BookingWizard({
                         onValuesChange={handleValuesChange}
                     >
                         {routeStep === "extra" && (
-                            <AddonsStep form={form} onNext={handlextraDone} onTotalsChange={(t) => setAddonsTotal(t)} />
+                            <AddonsStep
+                                form={form}
+                                onNext={() => goto("info")}
+                                onTotalsChange={(t) => setAddonsTotal(t)}
+                            />
                         )}
 
                         {routeStep === "info" && (
                             <Card style={{ borderRadius: 12 }} title={<Title level={4} style={{ margin: 0 }}>Η Πληροφορία Σου</Title>}>
-                                <MyInfo form={form} onPrev={() => goto("extra")} onNext={handleInfoDone} onFinish={handleFinish} />
+                                <MyInfo
+                                    form={form}
+                                    onPrev={() => goto("extra")}
+                                    onNext={saveDraftAndGoToPayment}   // <-- create booking first, then go to payment
+                                />
                             </Card>
                         )}
 
@@ -205,16 +273,7 @@ export default function BookingWizard({
                                     amount={grandTotal}
                                     currency={currency}
                                     onPrev={() => goto("info")}
-                                    onSkip={() => goto("done")}
-                                    onPaid={async () => {
-                                        // If you capture PayPal on the page:
-                                        try {
-                                            await handleFinish();
-                                        } catch {
-                                            message.error("Could not finalize booking after payment.");
-                                        }
-                                        goto("done");
-                                    }}
+                                    onPaid={() => goto("done")}        // booking already exists; just go to success
                                 />
                             </Card>
                         )}
@@ -236,12 +295,6 @@ export default function BookingWizard({
                     </Col>
                 )}
             </Row>
-
-            {step === 3 && (
-                <Card style={{ borderRadius: 12 }} title={<Title level={4} style={{ margin: 0 }}>Τελος</Title>}>
-                    <ConfirmationStep form={form} onPrev={() => goto("extra")} onFinish={handleFinish} />
-                </Card>
-            )}
         </div>
     );
 }

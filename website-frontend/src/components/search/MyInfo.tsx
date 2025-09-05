@@ -21,7 +21,6 @@ type Props = {
     form: FormInstance;
     onPrev?: () => void;
     onNext?: () => void;     // proceed to next step after validate
-    onFinish?: () => void;   // optional finish from this step
     countryOptions?: CountryOption[]; // optional override
 };
 

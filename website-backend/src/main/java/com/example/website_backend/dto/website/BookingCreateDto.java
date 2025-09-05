@@ -1,44 +1,39 @@
+// BookingCreateDto.java
 package com.example.website_backend.dto.website;
 
-import lombok.AllArgsConstructor;
+import com.example.website_backend.dto.crm.DriverDto;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class BookingCreateDto {
+    // maps the frontend "telephone" → userId
+    @JsonProperty("telephone")
+    private String userId;
 
-    private String user_id;
-    private UserDto user;
-    private Long category_id;
+    @JsonProperty("category_id")
+    private Long categoryId;
 
-    private List<String> drivers;
-
+    // array of objects { telephone, name }
+    private List<DriverDto> drivers;
 
     private LocalDateTime start;
     private LocalDateTime end;
-
-    private float price;
+    private Float price;
 
     private String startLocation;
     private String endLocation;
 
+    private String flight;
+    private String notes;
 
-    @Override
-    public String toString() {
-        return "WebsiteBookingDto{" +
-                ", user_id='" + user_id + '\'' +
-                ", category_id=" + category_id +
-                ", drivers=" + drivers +
-                ", start=" + start +
-                ", end=" + end +
-                ", price=" + price +
-                ", startLocation='" + startLocation + '\'' +
-                ", endLocation='" + endLocation + '\'' +
-                '}';
-    }
+    @JsonProperty("number_of_people")
+    private Integer numberOfPeople;
+
+    private List<ChecklistItemDto> checklist;
 }

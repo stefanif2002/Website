@@ -3,9 +3,9 @@ import { Badge, Card, Divider, Row, Space, Typography } from "antd";
 const { Title, Text } = Typography;
 
 type Props = {
-    baseTotal: number;
+    baseTotal?: number;
     addonsTotal: number;
-    currency: string;
+    currency?: string;
     vehicleName?: string;
     vehicleImage?: string;
     pickupLabel?: string;
@@ -27,8 +27,7 @@ export default function SummaryCard({
 
     return (
         <Card
-            style={{ position: "sticky", top: 16, borderRadius: 12 }}
-            bodyStyle={{ padding: 16 }}
+            style={{ position: "sticky", top: 16, borderRadius: 12, padding: 16 }}
             title="Περίληψη κόστους"
             extra={<Text type="secondary">Ανοιχτό</Text>}
         >

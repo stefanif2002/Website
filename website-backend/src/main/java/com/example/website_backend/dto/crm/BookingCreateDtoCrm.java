@@ -1,5 +1,7 @@
 package com.example.website_backend.dto.crm;
 
+import com.example.website_backend.dto.website.ChecklistItemDto;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,7 +21,7 @@ public class BookingCreateDtoCrm {
     private LocalDateTime start;
     private LocalDateTime end;
 
-    private List<String> drivers;
+    private List<DriverDto> drivers;
 
     private float price;
 
@@ -28,4 +30,12 @@ public class BookingCreateDtoCrm {
 
     private LocalDateTime created_at;
     private boolean is_advance_paid;
+
+    private String flight;
+    private String notes;
+
+    @JsonProperty("number_of_people")
+    private Integer numberOfPeople;
+
+    private List<ChecklistItemDto> checklist;
 }

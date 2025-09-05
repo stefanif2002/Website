@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { Button, message, Result } from "antd";
-import { HomeOutlined, ProfileOutlined } from "@ant-design/icons";
+import { Button, Result, message } from "antd";
+import { HomeOutlined } from "@ant-design/icons";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import dayjs, { Dayjs } from "dayjs";
-import { myApi, width } from "../../resources/service";
+import { width, myApi } from "../../resources/service";
 import SearchPage from "./SearchPage";
 import BookingWizard from "../../components/search/BookingWizard";
 
@@ -18,24 +18,25 @@ interface Booking {
     startLocation: string;
     endLocation: string;
 }
-interface ChecklistEntryDto { item: string; quantity: number; }
 
 function AddBooking() {
-    const [isItFinished, setIsItFinished] = useState(false);
     const [booking, setBooking] = useState<Booking>();
+    const [confirming, setConfirming] = useState(false);
+    const [confirmed, setConfirmed] = useState(false);
+
     const navigate = useNavigate();
     const { pathname } = useLocation();
     const [sp] = useSearchParams();
 
     // --- find "/book" in the path (works with language prefixes) ---
-    const parts = useMemo(() => pathname.replace(/\/+$/, "").split("/"), [pathname]); // ["", "el", "book", "123", "extra"]
+    const parts = useMemo(() => pathname.replace(/\/+$/, "").split("/"), [pathname]);
     const bookIdx = useMemo(() => parts.indexOf("book"), [parts]);
-    const basePrefix = useMemo(() => (bookIdx > 0 ? parts.slice(0, bookIdx).join("/") : ""), [parts, bookIdx]); // "" or "/el"
+    const basePrefix = useMemo(() => (bookIdx > 0 ? parts.slice(0, bookIdx).join("/") : ""), [parts, bookIdx]);
 
-    // --- route step detection (now handles /payment/success and /payment/retry) ---
+    // --- route step detection (incl. /payment/success and /payment/retry) ---
     const routeStep: "search" | "extra" | "info" | "payment" | "done" = useMemo(() => {
         if (bookIdx === -1) return "search";
-        const after = parts.slice(bookIdx + 1); // ["search"] or [":id","extra"] or [":id","payment","success"]
+        const after = parts.slice(bookIdx + 1);
         if (after[0] === "search") return "search";
         if (after[0] === "done") return "done";
 
@@ -44,14 +45,19 @@ function AddBooking() {
             if (step === "extra" || step === "info") return step;
 
             if (step === "payment") {
-                // treat ".../payment/success" as final success screen
                 if (after[2] === "success") return "done";
-                // treat ".../payment/retry" as coming back to the payment step
                 if (after[2] === "retry") return "payment";
                 return "payment";
             }
         }
         return "search";
+    }, [parts, bookIdx]);
+
+    // stripe-success detection (to confirm the booking)
+    const isStripeSuccess = useMemo(() => {
+        if (bookIdx === -1) return false;
+        const after = parts.slice(bookIdx + 1);
+        return after[1] === "payment" && after[2] === "success";
     }, [parts, bookIdx]);
 
     const categoryId = useMemo(() => {
@@ -82,48 +88,6 @@ function AddBooking() {
         }
     }, [booking, categoryId, startIso, endIso, sl, dl]);
 
-    const onChooseUser = (
-        user: string,
-        drivers: DriverDto[],
-        flight: string,
-        number_of_people: number,
-        price: number,
-        is_advance_paid: boolean,
-        notes: string,
-        checklist: ChecklistEntryDto[]
-    ) => {
-        if (!booking) return;
-
-        const payload = {
-            telephone: user,
-            category_id: booking.category_id,
-            start: booking.start?.toISOString?.() ?? null,
-            end: booking.end?.toISOString?.() ?? null,
-            drivers,
-            price,
-            startLocation: booking.startLocation,
-            endLocation: booking.endLocation,
-            externalCar: false,
-            number_of_people,
-            flight,
-            advance_paid: is_advance_paid,
-            notes,
-            checklist,
-        };
-
-        myApi
-            .post(`booking/createAdmin`, payload)
-            .then(() => {
-                setIsItFinished(true);
-                const prefix = basePrefix || "";
-                navigate(`${prefix}/book/done`);
-            })
-            .catch((error) => {
-                console.error("Error creating booking:", error);
-                message.error("Failed to create booking, ensure the user exists and try again");
-            });
-    };
-
     const isMobile = width >= 3.38;
 
     const pickupLabel =
@@ -144,9 +108,29 @@ function AddBooking() {
         else navigate(`${prefix}/book/${categoryId}/${next}?${qp}`);
     };
 
-    // --- build details destination for the success screen ---
+    // --- on Stripe success: confirm the booking in backend using ONLY booking id ---
     const prefix = basePrefix || "";
-    const bid = sp.get("bid"); // if you later append ?bid=... on success
+    const bid = sp.get("bid"); // booking id created before payment
+
+    useEffect(() => {
+        const shouldConfirm = isStripeSuccess && !!bid && !confirmed && !confirming;
+        if (!shouldConfirm) return;
+
+        (async () => {
+            try {
+                setConfirming(true);
+                await myApi.post(`booking/${bid}/confirm-payment`, {}); // <- no session id
+                setConfirmed(true);
+                message.success("Η πληρωμή επιβεβαιώθηκε.");
+            } catch (e) {
+                console.log(e)
+                message.error("Δεν ήταν δυνατή η επιβεβαίωση πληρωμής. Επικοινωνήστε μαζί μας.");
+            } finally {
+                setConfirming(false);
+            }
+        })();
+    }, [isStripeSuccess, bid, confirmed, confirming]);
+
     const detailsHref = bid
         ? `${prefix}/book/details/${bid}`
         : `${prefix}/book/details${qp ? `?${qp}` : ""}`;
@@ -159,18 +143,12 @@ function AddBooking() {
                 <BookingWizard
                     routeStep={routeStep}
                     goto={goto}
-                    onSubmit={onChooseUser}
                     baseTotal={booking.price ?? 0}
                     currency="EUR"
                     vehicleName={undefined}
                     vehicleImage={undefined}
                     pickupLabel={pickupLabel}
                     dropoffLabel={dropoffLabel}
-                    categoryId={booking.category_id}
-                    startIso={booking.start?.toISOString?.() ?? null}
-                    endIso={booking.end?.toISOString?.() ?? null}
-                    startLocation={booking.startLocation}
-                    endLocation={booking.endLocation}
                 />
             )}
 
@@ -180,11 +158,10 @@ function AddBooking() {
                     title="Η κράτηση σας καταχωριθηκε επιτυχως!"
                     subTitle="Προσεχώς Θα σας αποσταλεί ανάλογο email με όλες τις πληροφορίες της κράτησής σας καθώς και την απόδειξη της πληρωμής."
                     extra={[
-                        <Button
-                            key="home"
-                            onClick={() => navigate("/")}
-                            icon={<HomeOutlined />}
-                        >
+                        <Button type="primary" key="details" onClick={() => navigate(detailsHref)}>
+                            Προβολή λεπτομερειών κράτησης
+                        </Button>,
+                        <Button key="home" onClick={() => navigate("/")} icon={<HomeOutlined />}>
                             Μετάβαση στην αρχικη
                         </Button>,
                     ]}
@@ -204,7 +181,6 @@ function AddBooking() {
             telephone: prev?.telephone ?? "",
             drivers: prev?.drivers ?? [],
         }));
-        // navigation is handled inside SearchPage (keeps params)
     }
 }
 

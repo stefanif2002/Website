@@ -21,7 +21,7 @@ public class BookingController {
 
     // Create a new booking
     @PostMapping("/create")
-    public ResponseEntity<BookingDto> createBooking(@RequestBody BookingCreateDto bookingCreateDto) {
+    public ResponseEntity<Long> createBooking(@RequestBody BookingCreateDto bookingCreateDto) {
         return ResponseEntity.ok(bookingService.createBooking(bookingCreateDto));
     }
 

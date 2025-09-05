@@ -1,11 +1,15 @@
 package com.example.website_backend.model;
 
+import com.example.website_backend.dto.website.ChecklistItemDto;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Setter
@@ -27,11 +31,6 @@ public class Booking {
     @Column(name = "user_id", nullable = false)
     private String user_id;
 
-    @ElementCollection
-    @CollectionTable(name = "booking_drivers", joinColumns = @JoinColumn(name = "booking_id"))
-    @Column(name = "driver_id")
-    private List<String> drivers;
-
     @Column(name = "start", nullable = false)
     private LocalDateTime start;
     @Column(name = "end", nullable = false)
@@ -46,26 +45,44 @@ public class Booking {
     private LocalDateTime created_at;
     private boolean is_advance_paid;
 
+
+    private String flight;
+    private String notes;
+
+    @JsonProperty("number_of_people")
+    private Integer numberOfPeople;
+
+
+    @ElementCollection
+    @CollectionTable(
+            name = "booking_checklist",
+            joinColumns = @JoinColumn(name = "booking_id")
+    )
+    private Set<ChecklistEntry> checklist = new HashSet<>();
     public Booking() {
     }
 
     public Booking(Long category_id,
                    String user_id,
-                   List<String> drivers,
                    LocalDateTime start,
                    LocalDateTime end,
                    float price,
                    String startLocation,
-                   String endLocation)
+                   String endLocation,
+                   int numberOfPeople,
+                   String flight,
+                   String notes)
     {
         this.category_id = category_id;
         this.user_id = user_id;
-        this.drivers = drivers;
         this.start = start;
         this.end = end;
         this.price = price;
         this.startLocation = startLocation;
         this.endLocation = endLocation;
+        this.numberOfPeople = numberOfPeople;
+        this.flight = flight;
+        this.notes = notes;
         this.created_at = LocalDateTime.now();
         this.is_advance_paid = false;
     }

@@ -1,5 +1,7 @@
 package com.example.website_backend.dto.crm;
 
+import com.example.website_backend.dto.website.ChecklistItemDto;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -33,6 +35,14 @@ public class BookingDto {
     private LocalDateTime created_at;
     private boolean is_advance_paid;
 
+    private String flight;
+    private String notes;
+
+    @JsonProperty("number_of_people")
+    private Integer numberOfPeople;
+
+    private List<ChecklistItemDto> checklist;
+
 
     @Override
     public String toString() {
@@ -50,6 +60,11 @@ public class BookingDto {
                 ", created_at=" + created_at +
                 ", is_advance_paid=" + is_advance_paid +
                 '}';
+    }
+
+    public BookingDto(Long crm_booking_id, Long website_booking_id) {
+        this.crm_booking_id = crm_booking_id;
+        this.website_booking_id = website_booking_id;
     }
 
     public BookingDto(Long crm_booking_id, Long website_booking_id, String user_id, Long category_id, LocalDateTime start, LocalDateTime end, float price, String startLocation, String endLocation, LocalDateTime created_at, boolean is_advance_paid) {

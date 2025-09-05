@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button, Divider, message, Radio, Space, Typography, Alert } from "antd";
 import type { FormInstance } from "antd/es/form";
 import { loadStripe } from "@stripe/stripe-js";
@@ -10,12 +10,11 @@ const { Title, Text } = Typography;
 
 type Props = {
     form: FormInstance;
-    amount: number;                // total to charge (final)
-    currency?: string;             // e.g. "EUR"
-    onPrev?: () => void;           // back to previous step
-    onSkip?: () => void;           // continue without online payment
-    onPaid?: () => void;           // called when PayPal capture succeeds (Stripe redirects)
-    stripeEndpoint?: string;       // POST -> { sessionId: string }
+    amount: number;
+    currency?: string;
+    onPrev?: () => void;
+    onSkip?: () => void;
+    onPaid?: () => void;
     paypalCreateEndpoint?: string;
     paypalCaptureEndpoint?: string;
     stripePublishableKey?: string;
@@ -43,19 +42,37 @@ const Payment: React.FC<Props> = ({
     const { pathname } = useLocation();
     const [sp] = useSearchParams();
 
-    // Derive language prefix and category id to build success/cancel URLs
+    // --- Build success + retry URLs ---
     const parts = pathname.replace(/\/+$/, "").split("/");
     const bookIdx = parts.indexOf("book");
     const categoryId = bookIdx >= 0 ? Number(parts[bookIdx + 1]) : undefined;
     const prefix = bookIdx > 0 ? parts.slice(0, bookIdx).join("/") : ""; // "" or "/el"
-    const qp = sp.toString(); // includes extras if set
 
-    const successUrl = `${window.location.origin}${prefix}/book/${categoryId}/payment/success${qp ? `?${qp}` : ""}`;
-    const cancelUrl  = `${window.location.origin}${prefix}/book/${categoryId}/payment/retry${qp ? `?${qp}` : ""}`;
+    // booking id (must be present to confirm on success)
+    const bookingId = sp.get("bid") || undefined;
+
+    // 1) Success keeps ONLY booking info (no session id)
+    const successParams = new URLSearchParams(sp);
+    if (bookingId && !successParams.get("bid")) successParams.set("bid", bookingId);
+    successParams.delete("session_id"); // ensure we don't carry session to success
+    const baseSuccess = `${window.location.origin}${prefix}/book/${categoryId}/payment/success`;
+    const successUrl = successParams.toString()
+        ? `${baseSuccess}?${successParams.toString()}`
+        : baseSuccess;
+
+    // 2) Retry: include the placeholder so Stripe injects the real session id on cancel/back
+    const retryParams = new URLSearchParams(sp);
+    retryParams.set("session_id", "{CHECKOUT_SESSION_ID}");
+    const baseRetry = `${window.location.origin}${prefix}/book/${categoryId}/payment/retry`;
+    const cancelUrl = `${baseRetry}?${retryParams.toString()}`;
 
     const buildMetadata = () => {
-        const { telephone, name, last_name } = form.getFieldsValue(["telephone", "name", "last_name"]) as any;
-        return { telephone, name, last_name };
+        const { telephone, name, last_name } = form.getFieldsValue([
+            "telephone",
+            "name",
+            "last_name",
+        ]) as any;
+        return { telephone, name, last_name, bookingId };
     };
 
     // ---------- STRIPE ----------
@@ -64,15 +81,16 @@ const Payment: React.FC<Props> = ({
             message.error("Stripe key is missing. Επικοινωνήστε με την υποστήριξη.");
             return;
         }
+        if (!bookingId) {
+            message.error("Δεν υπάρχει bookingId. Παρακαλώ επιστρέψτε στο προηγούμενο βήμα.");
+            return;
+        }
+
         setLoading(true);
         try {
             const amountToCharge = isAdvance ? 49.99 : amount;
 
-            console.log(buildMetadata())
-            console.log(amountToCharge)
-            console.log(currency)
-            console.log(successUrl)
-
+            // Your backend returns a plain sessionId (string)
             const resp = await myApi.post(
                 "payment/stripe/create-checkout-session",
                 { amount: amountToCharge, currency, successUrl, cancelUrl, metadata: buildMetadata() },
@@ -85,7 +103,7 @@ const Payment: React.FC<Props> = ({
             const stripe = await stripePromise;
             if (!stripe) throw new Error("Stripe failed to load.");
 
-            form.setFieldsValue({ is_advance_paid: true, payment_method: "stripe" });
+            form.setFieldsValue({ is_advance_paid: isAdvance, payment_method: "stripe" });
             const { error } = await stripe.redirectToCheckout({ sessionId });
             if (error) throw error;
         } catch (e) {
@@ -95,7 +113,45 @@ const Payment: React.FC<Props> = ({
         }
     };
 
-    // ---------- PAYPAL (optional; unchanged flow) ----------
+    // ---------- RETRY (resume existing Checkout session) ----------
+    const retrySessionId = sp.get("session_id") || undefined;
+    const autoTriedRef = useRef(false);
+
+    useEffect(() => {
+        // Only auto-attempt once per mount when we are on the retry URL
+        if (!retrySessionId || autoTriedRef.current) return;
+        autoTriedRef.current = true;
+
+        (async () => {
+            try {
+                const stripe = await stripePromise;
+                if (!stripe) throw new Error("Stripe failed to load.");
+                const { error } = await stripe.redirectToCheckout({ sessionId: retrySessionId });
+                if (error) {
+                    // Let the user retry manually
+                    message.warning("Δεν ήταν δυνατή η αυτόματη επαναφορά πληρωμής. Δοκιμάστε ξανά.");
+                }
+            } catch (err) {
+                console.error(err);
+                message.warning("Δεν ήταν δυνατή η αυτόματη επαναφορά πληρωμής.");
+            }
+        })();
+    }, [retrySessionId, stripePromise]);
+
+    const resumeExistingCheckout = async () => {
+        if (!retrySessionId) return;
+        try {
+            const stripe = await stripePromise;
+            if (!stripe) throw new Error("Stripe failed to load.");
+            const { error } = await stripe.redirectToCheckout({ sessionId: retrySessionId });
+            if (error) message.error("Σφάλμα επαναφοράς πληρωμής.");
+        } catch (e) {
+            console.error(e);
+            message.error("Σφάλμα επαναφοράς πληρωμής.");
+        }
+    };
+
+    // ---------- PAYPAL ----------
     const renderPaypal = () => {
         if (!paypalClientId) {
             return (
@@ -130,16 +186,16 @@ const Payment: React.FC<Props> = ({
                     }}
                     onApprove={async (data) => {
                         try {
+                            if (!bookingId) throw new Error("Missing bookingId on PayPal approve");
                             setLoading(true);
-                            const resp = await myApi.post(paypalCaptureEndpoint, { orderId: data.orderID });
-                            const status = resp?.data?.status || resp?.data?.result?.status;
-                            if (status !== "COMPLETED") throw new Error(`Capture status: ${status}`);
+                            await myApi.post(paypalCaptureEndpoint, { orderId: data.orderID });
+                            await myApi.post(`booking/${bookingId}/confirm-payment`, {});
                             form.setFieldsValue({ is_advance_paid: true, payment_method: "paypal" });
                             message.success("Η πληρωμή ολοκληρώθηκε με επιτυχία.");
                             onPaid?.();
                         } catch (e) {
                             console.error(e);
-                            message.error("Αποτυχία ολοκλήρωσης πληρωμής PayPal.");
+                            message.error("Αποτυχία ολοκλήρωσης/επιβεβαίωσης πληρωμής PayPal.");
                         } finally {
                             setLoading(false);
                         }
@@ -155,7 +211,6 @@ const Payment: React.FC<Props> = ({
         );
     };
 
-    // ---------- UI ----------
     const showStripeButton = method === "stripe";
     const showPaypalButtons = method === "paypal";
 
@@ -170,6 +225,30 @@ const Payment: React.FC<Props> = ({
 
             <Divider style={{ margin: "12px 0" }} />
 
+            {!!retrySessionId && (
+                <Alert
+                    type="info"
+                    showIcon
+                    style={{ marginBottom: 8 }}
+                    message="Επαναφορά πληρωμής"
+                    description={
+                        <div>
+                            Επιστρέψατε από το Checkout. Μπορείτε να συνεχίσετε την πληρωμή σας.
+                            <div style={{ marginTop: 8 }}>
+                                <Space>
+                                    <Button type="primary" onClick={resumeExistingCheckout}>
+                                        Συνέχιση πληρωμής
+                                    </Button>
+                                    <Button onClick={() => payWithStripe(false)}>
+                                        Δημιουργία νέας πληρωμής
+                                    </Button>
+                                </Space>
+                            </div>
+                        </div>
+                    }
+                />
+            )}
+
             <div>
                 <Text strong>Επιλέξτε μέθοδο πληρωμής</Text>
                 <Radio.Group
@@ -179,14 +258,24 @@ const Payment: React.FC<Props> = ({
                 >
                     <Radio.Button value="stripe">
             <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-              <img src="https://cdn.brandfetch.io/idxAg10C0L/w/400/h/400/theme/dark/icon.jpeg" alt="Stripe" height={16} style={{ display: "block" }} />
+              <img
+                  src="https://cdn.brandfetch.io/idxAg10C0L/w/400/h/400/theme/dark/icon.jpeg"
+                  alt="Stripe"
+                  height={16}
+                  style={{ display: "block" }}
+              />
               Stripe
             </span>
                     </Radio.Button>
 
                     <Radio.Button value="paypal">
             <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-              <img src="https://www.paypalobjects.com/webstatic/icon/pp258.png" alt="PayPal" height={16} style={{ display: "block" }} />
+              <img
+                  src="https://www.paypalobjects.com/webstatic/icon/pp258.png"
+                  alt="PayPal"
+                  height={16}
+                  style={{ display: "block" }}
+              />
               PayPal
             </span>
                     </Radio.Button>

@@ -4,13 +4,19 @@ import com.example.website_backend.client.BookingClient;
 import com.example.website_backend.client.UserClient;
 import com.example.website_backend.dto.crm.BookingCreateDtoCrm;
 import com.example.website_backend.dto.crm.BookingDto;
+import com.example.website_backend.dto.crm.DriverDto;
 import com.example.website_backend.dto.crm.UserForWebsiteDto;
 import com.example.website_backend.dto.website.BookingCreateDto;
+import com.example.website_backend.dto.website.ChecklistItemDto;
 import com.example.website_backend.dto.website.UserDto;
 import com.example.website_backend.flags.BitMask;
 import com.example.website_backend.flags.UserFlags;
 import com.example.website_backend.model.Booking;
+import com.example.website_backend.model.ChecklistEntry;
+import com.example.website_backend.model.ChecklistItem;
+import com.example.website_backend.model.Driver;
 import com.example.website_backend.repository.BookingRepository;
+import com.example.website_backend.repository.DriverRepository;
 import com.example.website_backend.service.crm.UserClientService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,45 +44,72 @@ public class BookingService {
     @Autowired
     private UserClientService userClientService;
 
+    @Autowired
+    private DriverRepository driverRepository;
+
 
     // Create a new price
-    public BookingDto createBooking(BookingCreateDto bookingDto) {
+    public Long createBooking(BookingCreateDto bookingDto) {
         try {
-            if (bookingDto.getUser_id() == null || bookingDto.getUser_id().isEmpty())
+            if (bookingDto.getUserId() == null || bookingDto.getUserId().isEmpty())
                 throw new Exception("User id is empty");
 
-            Booking booking = repository.save(new Booking(
-                    bookingDto.getCategory_id(),
-                    bookingDto.getUser_id(),
-                    bookingDto.getDrivers(),
+            Booking booking = new Booking(
+                    bookingDto.getCategoryId(),
+                    bookingDto.getUserId(),
                     bookingDto.getStart(),
                     bookingDto.getEnd(),
                     bookingDto.getPrice(),
                     bookingDto.getStartLocation(),
-                    bookingDto.getEndLocation()
-            ));
-
-            return new BookingDto(
-                    booking.getCrm_booking_id(),
-                    booking.getId(),
-                    booking.getUser_id(),
-                    booking.getCategory_id(),
-                    //booking.getDrivers(),
-                    booking.getStart(),
-                    booking.getEnd(),
-                    booking.getPrice(),
-                    booking.getStartLocation(),
-                    booking.getEndLocation(),
-                    booking.getCreated_at(),
-                    booking.is_advance_paid()
+                    bookingDto.getEndLocation(),
+                    bookingDto.getNumberOfPeople(),
+                    bookingDto.getFlight(),
+                    bookingDto.getNotes()
             );
 
+            if (bookingDto.getChecklist() != null) {
+                booking.setChecklist(
+                        bookingDto.getChecklist().stream()
+                                .map(e -> new ChecklistEntry(ChecklistItem.valueOf(e.getItem()), e.getQuantity()))
+                                .collect(Collectors.toSet())
+                );
+            }
+
+            booking = repository.save(booking);
+
+            createDrivers(bookingDto.getDrivers(), booking.getId());
+
+            log.info("Booking created with ID: {}", booking.getId());
+
+            return booking.getId();
+
         } catch (Exception e) {
-            log.warn("Category already exists");
+            log.warn("Booking already exists");
             log.error("Error: ", e);
             throw new RuntimeException(e);
         }
 
+    }
+
+    public void createDrivers (List<DriverDto> driverDtos, Long bookingId) {
+        List<Driver> entities = driverDtos.stream()
+                .map(d -> new Driver(
+                        new Driver.DriverId(d.getTelephone(), bookingId),
+                        d.getFull_name()
+                ))
+                .toList();
+
+        driverRepository.saveAll(entities);
+    }
+
+    public List<DriverDto> createDriversDto (Long bookingId) {
+        List<Driver> entities = driverRepository.findAllByBooking_id(bookingId);
+        return entities.stream()
+                .map(d -> new DriverDto(
+                        d.getId().getTelephone(),
+                        d.getFullName()
+                ))
+                .toList();
     }
 
     public void confirmPayment(Long id) {
@@ -95,12 +128,18 @@ public class BookingService {
                 booking.getCategory_id(),
                 booking.getStart(),
                 booking.getEnd(),
-                booking.getDrivers(),
+                createDriversDto(booking.getId()),
                 booking.getPrice(),
                 booking.getStartLocation(),
                 booking.getEndLocation(),
                 booking.getCreated_at(),
-                booking.is_advance_paid()
+                booking.is_advance_paid(),
+                booking.getFlight(),
+                booking.getNotes(),
+                booking.getNumberOfPeople(),
+                booking.getChecklist().stream()
+                        .map(e -> new ChecklistItemDto(e.getItem().name(), e.getQuantity()))
+                        .collect(Collectors.toList())
         );
 
         Long crmId = bookingClient.createBooking(bookingDto);
