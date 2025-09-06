@@ -1,5 +1,6 @@
 package com.example.website_backend.service.sync;
 
+import com.example.website_backend.client.AvailabilityClient;
 import com.example.website_backend.client.BookingClient;
 import com.example.website_backend.dto.crm.PreparationDto;
 import com.example.website_backend.model.Preparation;
@@ -21,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 public class PreparationSyncService {
 
     @Autowired
-    private BookingClient bookingClient;
+    private AvailabilityClient availabilityClient;
 
     @Autowired
     private PreparationRepository repository;
@@ -36,7 +37,7 @@ public class PreparationSyncService {
         while (true) {
             try {
                 // Fetch all preparation data from the preparation service
-                List<PreparationDto> result = bookingClient.getAllPreparations();
+                List<PreparationDto> result = availabilityClient.getAllPreparations();
 
                 // Update the local preparation table with the fetched data
                 if (result != null) {

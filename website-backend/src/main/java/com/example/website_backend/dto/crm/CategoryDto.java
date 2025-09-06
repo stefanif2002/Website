@@ -17,6 +17,7 @@ public class CategoryDto {
     private float pricePerDay;
     private String description;
 
+    private String eventType;
     private String imageUrl;
     private String color;
     private int cars;
@@ -33,4 +34,22 @@ public class CategoryDto {
         this.imageUrl = imageUrl;
         this.color = color;
     }
+
+    @Override
+    public String toString() {
+        return "CategoryDto{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", type='" + type + '\'' +
+                ", fuel='" + fuel + '\'' +
+                ", automatic=" + automatic +
+                ", numOfSeats=" + numOfSeats +
+                ", pricePerDay=" + pricePerDay +
+                ", description='" + description + '\'' +
+                ", imageUrl='" + imageUrl + '\'' +
+                ", color='" + color + '\'' +
+                ", cars=" + cars +
+                '}';
+    }
+
 }

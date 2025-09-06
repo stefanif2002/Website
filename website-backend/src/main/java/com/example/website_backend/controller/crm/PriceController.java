@@ -18,21 +18,24 @@ public class PriceController {
     // Create a new price
     @PostMapping("/create")
     public ResponseEntity<Void> createPrice(@RequestBody PriceDto priceDto) {
+        log.info("Price creation received in: {}", priceDto.toString());
         service.createPrice(priceDto);
         return ResponseEntity.noContent().build();
     }
 
     // Update an existing price
-    @PutMapping("/update/{id}")
-    public ResponseEntity<Void> updatePrice(@PathVariable Long id, @RequestBody PriceDto priceDto) {
-        service.updatePrice(id, priceDto);
+    @PutMapping("/update")
+    public ResponseEntity<Void> updatePrice(@RequestBody PriceDto priceDto) {
+        log.info("Price update received in: {}", priceDto.toString());
+        service.updatePrice(priceDto.getId(), priceDto);
         return ResponseEntity.noContent().build();
     }
 
     // Delete a price by ID
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deletePrice(@PathVariable Long id) {
-        service.deletePrice(id);
+    @DeleteMapping("/delete")
+    public ResponseEntity<Void> deletePrice(@RequestBody PriceDto priceDto) {
+        log.info("Price deletion received for ID: {}", priceDto.getId());
+        service.deletePrice(priceDto.getId());
         return ResponseEntity.noContent().build();
     }
 

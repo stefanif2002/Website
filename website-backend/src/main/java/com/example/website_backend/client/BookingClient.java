@@ -26,9 +26,6 @@ public interface BookingClient {
     @PostExchange("/website/receiveAll")
     void receiveAll(@RequestBody List<BookingDto> data);
 
-    @GetExchange("/preparation/getAll")
-    List<PreparationDto> getAllPreparations();
-
     @PostExchange("/create")
     Long createBooking (@RequestBody BookingCreateDtoCrm bookingCreateDto);
 }

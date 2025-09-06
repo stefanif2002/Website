@@ -16,7 +16,4 @@ import java.util.List;
 public interface UserClient {
     @PostExchange("/create")
     UserDto createUser(@RequestBody UserDto userDto);
-
-    @GetExchange("/getAllPhones")
-    List<UserForWebsiteDto> getAllForWebsite();
 }

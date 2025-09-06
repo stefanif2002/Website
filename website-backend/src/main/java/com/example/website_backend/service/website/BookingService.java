@@ -5,19 +5,15 @@ import com.example.website_backend.client.UserClient;
 import com.example.website_backend.dto.crm.BookingCreateDtoCrm;
 import com.example.website_backend.dto.crm.BookingDto;
 import com.example.website_backend.dto.crm.DriverDto;
-import com.example.website_backend.dto.crm.UserForWebsiteDto;
 import com.example.website_backend.dto.website.BookingCreateDto;
 import com.example.website_backend.dto.website.ChecklistItemDto;
 import com.example.website_backend.dto.website.UserDto;
-import com.example.website_backend.flags.BitMask;
-import com.example.website_backend.flags.UserFlags;
 import com.example.website_backend.model.Booking;
 import com.example.website_backend.model.ChecklistEntry;
 import com.example.website_backend.model.ChecklistItem;
 import com.example.website_backend.model.Driver;
 import com.example.website_backend.repository.BookingRepository;
 import com.example.website_backend.repository.DriverRepository;
-import com.example.website_backend.service.crm.UserClientService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -40,9 +36,6 @@ public class BookingService {
 
     @Autowired
     private UserClient userClient;
-
-    @Autowired
-    private UserClientService userClientService;
 
     @Autowired
     private DriverRepository driverRepository;
@@ -147,71 +140,6 @@ public class BookingService {
         booking.setCrm_booking_id(crmId);
 
         repository.save(booking);
-    }
-
-    // Update an existing price
-    public void updateBooking(Long id, BookingDto bookingDto) {
-        Optional<Booking> existing = repository.findById(id);
-        if (existing.isEmpty()) {
-            throw new RuntimeException("Booking with ID " + id + " not found.");
-        }
-        Booking booking = existing.get();
-
-        // Update the fields of the booking with the values from the DTO
-        booking.setCategory_id(bookingDto.getCategory_id());
-        booking.setUser_id(bookingDto.getUser_id());
-        //booking.setDrivers(bookingDto.getDrivers());
-        booking.setStart(bookingDto.getStart());
-        booking.setEnd(bookingDto.getEnd());
-        booking.setPrice(bookingDto.getPrice());
-        booking.setStartLocation(bookingDto.getStartLocation());
-        booking.setEndLocation(bookingDto.getEndLocation());
-        booking.set_advance_paid(bookingDto.is_advance_paid());
-
-        // Save the updated booking
-        repository.save(booking);
-
-        // Optionally log the update operation
-        log.info("Booking with ID " + id + " successfully updated.");
-    }
-
-    // Delete a price
-    public void deleteBooking(Long id) {
-        if (!repository.existsById(id)) {
-            throw new RuntimeException("Booking with ID " + id + " not found.");
-        }
-        repository.deleteById(id);
-    }
-
-    /**
-     * @return empty list if everything required is present,
-     *         null if user doesn’t exist (caller decides what to do)
-     */
-    public List<String> checkUserForBooking(String telephone) {
-        UserForWebsiteDto u = userClientService.usersForWebsite().stream()
-                .filter(x -> x.getTelephone().equals(telephone))
-                .findFirst()
-                .orElse(null);
-
-        if (u == null) return null;
-
-        int f = u.getFlags();
-        List<String> missing = new java.util.ArrayList<>();
-
-        // define what you actually require for a website booking:
-        if (!BitMask.isSet(f, UserFlags.HAS_NAME))              missing.add("name");
-        if (!BitMask.isSet(f, UserFlags.HAS_LAST_NAME))         missing.add("last_name");
-        if (!BitMask.isSet(f, UserFlags.HAS_EMAIL))             missing.add("email");
-        if (!BitMask.isSet(f, UserFlags.HAS_COUNTRY))           missing.add("country");
-        if (!BitMask.isSet(f, UserFlags.HAS_DRIVER_LICENSE))    missing.add("driver_license");
-
-        // If company flag is on, maybe require VAT/company_name
-        if (BitMask.isSet(f, UserFlags.IS_COMPANY)) {
-            if (!BitMask.isSet(f, UserFlags.HAS_VAT_NUMBER))    missing.add("vat_number");
-            if (!BitMask.isSet(f, UserFlags.HAS_COMPANY_NAME))  missing.add("company_name");
-        }
-
-        return missing;
     }
 
 

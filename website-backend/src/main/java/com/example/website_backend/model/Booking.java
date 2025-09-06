@@ -28,7 +28,7 @@ public class Booking {
     private Long crm_booking_id;
     @Column(name = "category_id", nullable = false)
     private Long category_id;
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "user_id")
     private String user_id;
 
     @Column(name = "start", nullable = false)
@@ -36,7 +36,7 @@ public class Booking {
     @Column(name = "end", nullable = false)
     private LocalDateTime end;
 
-    @Column(name = "price", nullable = false)
+    @Column(name = "price")
     private float price;
 
     private String startLocation;

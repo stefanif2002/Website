@@ -4,8 +4,6 @@ import com.example.website_backend.client.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.client.*;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction;
@@ -84,14 +82,6 @@ public class WebClientConfig {
     public WebClient priceWebClient(OAuth2AuthorizedClientManager manager) {
         return WebClient.builder()
                 .baseUrl("http://localhost:8081/api/v1/price")
-                .filter(oauth2(manager))
-                .build();
-    }
-
-    @Bean
-    public WebClient categoryWebClient(OAuth2AuthorizedClientManager manager) {
-        return WebClient.builder()
-                .baseUrl("http://localhost:8081/api/v1/category")
                 .filter(oauth2(manager))
                 .build();
     }

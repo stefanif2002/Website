@@ -10,4 +10,13 @@ import lombok.NoArgsConstructor;
 public class CategoryCarDto {
     private Long id;
     private int cars;
+
+    @Override
+    public String toString() {
+        return "CategoryCarDto{" +
+                "id=" + id +
+                ", cars=" + cars +
+                '}';
+    }
+
 }

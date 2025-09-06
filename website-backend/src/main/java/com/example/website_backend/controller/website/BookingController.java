@@ -25,11 +25,6 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.createBooking(bookingCreateDto));
     }
 
-    @GetMapping("/exists/{userId}")
-    public ResponseEntity<List<String>> exists(@PathVariable String userId) {
-        return ResponseEntity.ok(bookingService.checkUserForBooking(userId));
-    }
-
     @PostMapping("/createUser")
     public ResponseEntity<String> createUser(@RequestBody UserDto userDto) {
         return ResponseEntity.ok(bookingService.createUser(userDto));
@@ -45,19 +40,6 @@ public class BookingController {
     @GetMapping("getAll")
     public ResponseEntity<List<BookingDto>> getAll() {
         return ResponseEntity.ok(bookingService.getAll());
-    }
-
-    @PutMapping("/update/{id}")
-    public ResponseEntity<Void> updateBooking(@PathVariable Long id, @RequestBody BookingDto bookingDto) {
-        bookingService.updateBooking(id, bookingDto);
-        return ResponseEntity.noContent().build();
-    }
-
-    // Delete a booking
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteBooking(@PathVariable Long id) {
-        bookingService.deleteBooking(id);
-        return ResponseEntity.noContent().build();
     }
 
 }
