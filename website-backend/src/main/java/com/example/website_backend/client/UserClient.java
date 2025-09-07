@@ -14,6 +14,6 @@ import java.util.List;
         url = "",
         accept = MediaType.APPLICATION_JSON_VALUE)
 public interface UserClient {
-    @PostExchange("/create")
-    UserDto createUser(@RequestBody UserDto userDto);
+    @PostExchange("/createWebsite")
+    void createUser(@RequestBody UserDto userDto);
 }

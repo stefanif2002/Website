@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserDto {
     private String email;
-
     private String name;
     private String last_name;
     private String telephone;
@@ -19,4 +18,9 @@ public class UserDto {
     private String country;
     private String vat_number;
     private String driver_license;
+    private String driver_license_country;
+    private String passport;
+    private String passport_country;
+    private boolean company;
+    private String company_name;
 }

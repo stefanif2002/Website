@@ -92,7 +92,7 @@ const Payment: React.FC<Props> = ({
 
             // Your backend returns a plain sessionId (string)
             const resp = await myApi.post(
-                "payment/stripe/create-checkout-session",
+                `payment/stripe/create-checkout-session/${bookingId}`,
                 { amount: amountToCharge, currency, successUrl, cancelUrl, metadata: buildMetadata() },
                 { headers: { "Content-Type": "application/json" } }
             );

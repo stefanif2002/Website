@@ -86,6 +86,14 @@ public class WebClientConfig {
                 .build();
     }
 
+    @Bean
+    public WebClient paymentWebClient(OAuth2AuthorizedClientManager manager) {
+        return WebClient.builder()
+                .baseUrl("http://localhost:8081/api/v1/payment")
+                .filter(oauth2(manager))
+                .build();
+    }
+
     //
     // 4) Typed HTTP-service proxies
     //
@@ -122,5 +130,13 @@ public class WebClientConfig {
                 .builderFor(WebClientAdapter.create(userWebClient))
                 .build();
         return factory.createClient(UserClient.class);
+    }
+
+    @Bean
+    public PaymentClient paymentClient(WebClient paymentWebClient) {
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory
+                .builderFor(WebClientAdapter.create(paymentWebClient))
+                .build();
+        return factory.createClient(PaymentClient.class);
     }
 }

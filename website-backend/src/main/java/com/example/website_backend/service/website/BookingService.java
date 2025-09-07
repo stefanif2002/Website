@@ -1,12 +1,8 @@
 package com.example.website_backend.service.website;
 
-import com.example.website_backend.client.BookingClient;
-import com.example.website_backend.client.UserClient;
-import com.example.website_backend.dto.crm.BookingCreateDtoCrm;
 import com.example.website_backend.dto.crm.BookingDto;
 import com.example.website_backend.dto.crm.DriverDto;
 import com.example.website_backend.dto.website.BookingCreateDto;
-import com.example.website_backend.dto.website.ChecklistItemDto;
 import com.example.website_backend.dto.website.UserDto;
 import com.example.website_backend.model.Booking;
 import com.example.website_backend.model.ChecklistEntry;
@@ -14,6 +10,7 @@ import com.example.website_backend.model.ChecklistItem;
 import com.example.website_backend.model.Driver;
 import com.example.website_backend.repository.BookingRepository;
 import com.example.website_backend.repository.DriverRepository;
+import com.example.website_backend.service.helper.OutboxEventService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -32,13 +29,10 @@ public class BookingService {
     private BookingRepository repository;
 
     @Autowired
-    private BookingClient bookingClient;
-
-    @Autowired
-    private UserClient userClient;
-
-    @Autowired
     private DriverRepository driverRepository;
+
+    @Autowired
+    private OutboxEventService outboxEventService;
 
 
     // Create a new price
@@ -72,6 +66,8 @@ public class BookingService {
 
             createDrivers(bookingDto.getDrivers(), booking.getId());
 
+            outboxEventService.push(bookingDto, booking.getId(), "BookingCreated");
+
             log.info("Booking created with ID: {}", booking.getId());
 
             return booking.getId();
@@ -95,16 +91,6 @@ public class BookingService {
         driverRepository.saveAll(entities);
     }
 
-    public List<DriverDto> createDriversDto (Long bookingId) {
-        List<Driver> entities = driverRepository.findAllByBooking_id(bookingId);
-        return entities.stream()
-                .map(d -> new DriverDto(
-                        d.getId().getTelephone(),
-                        d.getFullName()
-                ))
-                .toList();
-    }
-
     public void confirmPayment(Long id) {
         Optional<Booking> existing = repository.findById(id);
         if (existing.isEmpty()) {
@@ -115,36 +101,11 @@ public class BookingService {
 
         repository.save(booking);
 
-        BookingCreateDtoCrm bookingDto = new BookingCreateDtoCrm(
-                booking.getId(),
-                booking.getUser_id(),
-                booking.getCategory_id(),
-                booking.getStart(),
-                booking.getEnd(),
-                createDriversDto(booking.getId()),
-                booking.getPrice(),
-                booking.getStartLocation(),
-                booking.getEndLocation(),
-                booking.getCreated_at(),
-                booking.is_advance_paid(),
-                booking.getFlight(),
-                booking.getNotes(),
-                booking.getNumberOfPeople(),
-                booking.getChecklist().stream()
-                        .map(e -> new ChecklistItemDto(e.getItem().name(), e.getQuantity()))
-                        .collect(Collectors.toList())
-        );
-
-        Long crmId = bookingClient.createBooking(bookingDto);
-
-        booking.setCrm_booking_id(crmId);
-
-        repository.save(booking);
+        outboxEventService.readyToProcess(id);
     }
 
-
-    public String createUser(UserDto user){
-        return userClient.createUser(user).getTelephone();
+    public void createUser(UserDto user){
+        outboxEventService.push(user, user.getTelephone(), "UserCreated");
     }
 
     /**

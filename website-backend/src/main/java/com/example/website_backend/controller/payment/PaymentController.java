@@ -1,9 +1,14 @@
 package com.example.website_backend.controller.payment;
 
+import com.example.website_backend.dto.crm.CreatePaymentRequestDto;
 import com.example.website_backend.dto.website.CheckoutSessionRequestDto;
+import com.example.website_backend.model.Booking;
+import com.example.website_backend.repository.BookingRepository;
+import com.example.website_backend.service.helper.OutboxEventService;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,9 +18,15 @@ import java.util.*;
 @RequestMapping("/api/v1/payment")
 public class PaymentController {
 
-    @PostMapping("/stripe/create-checkout-session")
+    @Autowired
+    private BookingRepository bookingRepository;
+
+    @Autowired
+    private OutboxEventService outboxEventService;
+
+    @PostMapping("/stripe/create-checkout-session/{id}")
     public ResponseEntity<String> createCheckoutSession(
-            @RequestBody CheckoutSessionRequestDto req
+            @PathVariable Long id, @RequestBody CheckoutSessionRequestDto req
     ) throws StripeException {
 
         double value = (req.getAmount() != null ? req.getAmount() : 0.00);
@@ -66,6 +77,21 @@ public class PaymentController {
         }
 
         Session session = Session.create(builder.build());
+
+        // Create a new payment record (CreatePaymentRequestDto) in your system here, associating it with 'id' and 'session.getId()' and push it to outbox
+        CreatePaymentRequestDto paymentRequest = new CreatePaymentRequestDto();
+        paymentRequest.setBooking_id(id);
+        Booking booking = bookingRepository.findById(id).orElse(null);
+        if (booking == null) {
+            return ResponseEntity.badRequest().body("Invalid booking ID");
+        } else
+            paymentRequest.setUser_id(booking.getUser_id());
+        paymentRequest.setAmount((float) value);
+        paymentRequest.setCurrency(currency);
+        paymentRequest.setMethod("stripe");
+
+        outboxEventService.push(paymentRequest, id, "PaymentCreated");
+
         return ResponseEntity.ok(session.getId());
     }
 

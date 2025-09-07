@@ -2,7 +2,6 @@ package com.example.website_backend.client;
 
 import com.example.website_backend.dto.crm.BookingCreateDtoCrm;
 import com.example.website_backend.dto.crm.BookingDto;
-import com.example.website_backend.dto.crm.PreparationDto;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.service.annotation.GetExchange;
@@ -26,6 +25,6 @@ public interface BookingClient {
     @PostExchange("/website/receiveAll")
     void receiveAll(@RequestBody List<BookingDto> data);
 
-    @PostExchange("/create")
+    @PostExchange("/website/create")
     Long createBooking (@RequestBody BookingCreateDtoCrm bookingCreateDto);
 }

@@ -155,7 +155,7 @@ function AddBooking() {
             {routeStep === "done" && (
                 <Result
                     status="success"
-                    title="Η κράτηση σας καταχωριθηκε επιτυχως!"
+                    title="Η κράτηση σας καταχωρήθηκε επιτυχως!"
                     subTitle="Προσεχώς Θα σας αποσταλεί ανάλογο email με όλες τις πληροφορίες της κράτησής σας καθώς και την απόδειξη της πληρωμής."
                     extra={[
                         <Button type="primary" key="details" onClick={() => navigate(detailsHref)}>

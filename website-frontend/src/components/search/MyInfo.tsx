@@ -10,8 +10,12 @@ import {
     Select,
     Space,
     Typography,
+    message,
+    Switch,
+    Divider,
 } from "antd";
 import type { FormInstance } from "antd/es/form";
+import { myApi } from "../../resources/service";
 
 const { Title, Text } = Typography;
 
@@ -20,7 +24,7 @@ type CountryOption = { label: string; value: string };
 type Props = {
     form: FormInstance;
     onPrev?: () => void;
-    onNext?: () => void;     // proceed to next step after validate
+    onNext?: () => void; // proceed to next step after successful submit
     countryOptions?: CountryOption[]; // optional override
 };
 
@@ -34,19 +38,91 @@ const DEFAULT_COUNTRIES: CountryOption[] = [
     { value: "OTHER", label: "Other" },
 ];
 
-const MyInfo: React.FC<Props> = ({ form, onPrev, onNext, countryOptions = DEFAULT_COUNTRIES }) => {
+const MyInfo: React.FC<Props> = ({
+                                     form,
+                                     onPrev,
+                                     onNext,
+                                     countryOptions = DEFAULT_COUNTRIES,
+                                 }) => {
     const handleNext = async () => {
+        // Validate ALL required fields (VAT & company fields are intentionally omitted)
         await form.validateFields([
             "telephone",
             "email",
             "name",
             "last_name",
             "number_of_people",
+            "driver_license",
+            "driver_license_country",
+            "address",
+            "city",
+            "postal_code",
+            "country",
+            "passport",
+            "passport_country",
         ]);
-        onNext?.();
-    };
 
-    // Removed unused handleFinishNow
+        // Build user DTO and send to backend
+        const {
+            telephone,
+            email,
+            name,
+            last_name,
+            address,
+            postal_code,
+            city,
+            country,
+            vat_number, // optional
+            driver_license,
+            driver_license_country,
+            passport,
+            passport_country,
+            company = false, // boolean toggle
+            company_name, // optional
+        } = form.getFieldsValue([
+            "telephone",
+            "email",
+            "name",
+            "last_name",
+            "address",
+            "postal_code",
+            "city",
+            "country",
+            "vat_number",
+            "driver_license",
+            "driver_license_country",
+            "passport",
+            "passport_country",
+            "company",
+            "company_name",
+        ]) as any;
+
+        const userDto = {
+            email,
+            name,
+            last_name,
+            telephone,
+            address,
+            postal_code,
+            city,
+            country,
+            vat_number: vat_number || null, // optional
+            driver_license,
+            driver_license_country,
+            passport,               // required
+            passport_country,       // required
+            company: company,     // optional toggle
+            company_name: company ? company_name || null : null, // optional
+        };
+
+        try {
+            await myApi.post("booking/createUser", userDto);
+            message.success("Τα στοιχεία σας αποθηκεύτηκαν.");
+            onNext?.(); // continue only after successful save
+        } catch (e) {
+            message.error("Αποτυχία αποθήκευσης στοιχείων. Προσπαθήστε ξανά.");
+        }
+    };
 
     return (
         <div>
@@ -111,6 +187,7 @@ const MyInfo: React.FC<Props> = ({ form, onPrev, onNext, countryOptions = DEFAUL
                     </Form.Item>
                 </Col>
 
+                {/* Optional field */}
                 <Col xs={24} md={12}>
                     <Form.Item name="flight" label="Πτήση (προαιρετικό)">
                         <Input placeholder="π.χ. A3 123" />
@@ -118,15 +195,50 @@ const MyInfo: React.FC<Props> = ({ form, onPrev, onNext, countryOptions = DEFAUL
                 </Col>
             </Row>
 
+            <Title level={5} style={{ marginTop: 8 }}>Στοιχεία Ταυτότητας</Title>
+            <Row gutter={[16, 16]}>
+                <Col xs={24} md={12}>
+                    <Form.Item
+                        name="passport"
+                        label="Αριθμός Διαβατηρίου"
+                        rules={[{ required: true, message: "Παρακαλώ εισάγετε διαβατήριο" }]}
+                    >
+                        <Input placeholder="Αριθμός διαβατηρίου" />
+                    </Form.Item>
+                </Col>
+                <Col xs={24} md={12}>
+                    <Form.Item
+                        name="passport_country"
+                        label="Χώρα έκδοσης διαβατηρίου"
+                        rules={[{ required: true, message: "Παρακαλώ επιλέξτε χώρα" }]}
+                    >
+                        <Select
+                            placeholder="Επιλέξτε χώρα"
+                            options={countryOptions}
+                            optionFilterProp="label"
+                            showSearch
+                        />
+                    </Form.Item>
+                </Col>
+            </Row>
+
             <Title level={5} style={{ marginTop: 8 }}>Στοιχεία Οδήγησης</Title>
             <Row gutter={[16, 16]}>
                 <Col xs={24} md={12}>
-                    <Form.Item name="driver_license" label="Δίπλωμα οδήγησης">
+                    <Form.Item
+                        name="driver_license"
+                        label="Δίπλωμα οδήγησης"
+                        rules={[{ required: true, message: "Παρακαλώ εισάγετε δίπλωμα" }]}
+                    >
                         <Input placeholder="Αριθμός διπλώματος" />
                     </Form.Item>
                 </Col>
                 <Col xs={24} md={12}>
-                    <Form.Item name="driver_license_country" label="Χώρα διπλώματος">
+                    <Form.Item
+                        name="driver_license_country"
+                        label="Χώρα διπλώματος"
+                        rules={[{ required: true, message: "Παρακαλώ επιλέξτε χώρα" }]}
+                    >
                         <Select
                             placeholder="Επιλέξτε χώρα"
                             options={countryOptions}
@@ -140,22 +252,38 @@ const MyInfo: React.FC<Props> = ({ form, onPrev, onNext, countryOptions = DEFAUL
             <Title level={5} style={{ marginTop: 8 }}>Διεύθυνση</Title>
             <Row gutter={[16, 16]}>
                 <Col xs={24} md={12}>
-                    <Form.Item name="address" label="Διεύθυνση">
+                    <Form.Item
+                        name="address"
+                        label="Διεύθυνση"
+                        rules={[{ required: true, message: "Παρακαλώ εισάγετε διεύθυνση" }]}
+                    >
                         <Input placeholder="Οδός & αριθμός" />
                     </Form.Item>
                 </Col>
                 <Col xs={24} md={12}>
-                    <Form.Item name="city" label="Πόλη">
+                    <Form.Item
+                        name="city"
+                        label="Πόλη"
+                        rules={[{ required: true, message: "Παρακαλώ εισάγετε πόλη" }]}
+                    >
                         <Input placeholder="Πόλη" />
                     </Form.Item>
                 </Col>
                 <Col xs={24} md={12}>
-                    <Form.Item name="postal_code" label="Ταχυδρομικός κώδικας">
+                    <Form.Item
+                        name="postal_code"
+                        label="Ταχυδρομικός κώδικας"
+                        rules={[{ required: true, message: "Παρακαλώ εισάγετε ΤΚ" }]}
+                    >
                         <Input placeholder="ΤΚ" />
                     </Form.Item>
                 </Col>
                 <Col xs={24} md={12}>
-                    <Form.Item name="country" label="Χώρα">
+                    <Form.Item
+                        name="country"
+                        label="Χώρα"
+                        rules={[{ required: true, message: "Παρακαλώ επιλέξτε χώρα" }]}
+                    >
                         <Select
                             placeholder="Επιλέξτε χώρα"
                             options={countryOptions}
@@ -164,8 +292,51 @@ const MyInfo: React.FC<Props> = ({ form, onPrev, onNext, countryOptions = DEFAUL
                         />
                     </Form.Item>
                 </Col>
+
+                {/* VAT optional */}
+                <Col xs={24} md={12}>
+                    <Form.Item name="vat_number" label="ΑΦΜ (προαιρετικό)">
+                        <Input placeholder="π.χ. EL123456789" />
+                    </Form.Item>
+                </Col>
             </Row>
 
+            <Divider />
+
+            <Title level={5} style={{ marginTop: 0 }}>Στοιχεία Εταιρείας (προαιρετικό)</Title>
+            <Row gutter={[16, 8]} align="middle">
+                <Col xs={24} md={12}>
+                    <Form.Item
+                        name="company"
+                        label="Τιμολόγιο σε εταιρεία;"
+                        valuePropName="checked"
+                        colon={false}
+                    >
+                        <Switch />
+                    </Form.Item>
+                </Col>
+            </Row>
+
+            {/* Show company fields only if switch is ON (still optional) */}
+            <Form.Item noStyle shouldUpdate={(prev, cur) => prev.company !== cur.company}>
+                {({ getFieldValue }) =>
+                    getFieldValue("company") ? (
+                        <Row gutter={[16, 16]}>
+                            <Col xs={24} md={12}>
+                                <Form.Item
+                                    name="company_name"
+                                    label="Επωνυμία Εταιρείας (προαιρετικό)"
+                                >
+                                    <Input placeholder="Επωνυμία" />
+                                </Form.Item>
+                            </Col>
+                            {/* VAT remains optional; it’s above as well. If you prefer to show it only here, move that Form.Item down */}
+                        </Row>
+                    ) : null
+                }
+            </Form.Item>
+
+            {/* Optional notes (not part of createUser, but kept for booking) */}
             <Form.Item name="notes" label="Σημειώσεις (προαιρετικό)">
                 <Input.TextArea rows={3} placeholder="Οδηγίες παράδοσης, ειδικές ανάγκες κ.λπ." />
             </Form.Item>

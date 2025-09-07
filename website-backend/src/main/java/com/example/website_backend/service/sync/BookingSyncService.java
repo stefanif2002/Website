@@ -3,9 +3,6 @@ package com.example.website_backend.service.sync;
 import com.example.website_backend.client.BookingClient;
 import com.example.website_backend.dto.crm.BookingDto;
 import com.example.website_backend.model.Booking;
-import com.example.website_backend.model.ChecklistEntry;
-import com.example.website_backend.model.ChecklistItem;
-import com.example.website_backend.model.Driver;
 import com.example.website_backend.repository.BookingRepository;
 import com.example.website_backend.repository.DriverRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +16,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -58,17 +54,6 @@ public class BookingSyncService {
                         // 1) map & persist new booking to get its ID
                         Booking fresh = dtoToEntity(new Booking(), dto);
                         Booking saved = repository.save(fresh);
-
-                        // 2) save its drivers now that we have the website ID
-                        if (dto.getDrivers() != null) {
-                            List<Driver> drivers = dto.getDrivers().stream()
-                                    .map(d -> new Driver(
-                                            new Driver.DriverId(d.getTelephone(), saved.getId()),
-                                            d.getFull_name()
-                                    ))
-                                    .toList();
-                            driverRepository.saveAll(drivers);
-                        }
                         acks.add(new BookingDto(dto.getCrm_booking_id(), saved.getId()));
                     } else {
                         // existing booking → update & re-save
@@ -76,18 +61,6 @@ public class BookingSyncService {
                                 .ifPresent(existing -> {
                                     Booking updated = dtoToEntity(existing, dto);
                                     repository.save(updated);
-
-                                    // (re)sync drivers too:
-                                    driverRepository.deleteAllByBooking_id(updated.getId());
-                                    if (dto.getDrivers() != null) {
-                                        List<Driver> drivers = dto.getDrivers().stream()
-                                                .map(d -> new Driver(
-                                                        new Driver.DriverId(d.getTelephone(), updated.getId()),
-                                                        d.getFull_name()
-                                                ))
-                                                .toList();
-                                        driverRepository.saveAll(drivers);
-                                    }
                                 });
                     }
                 }
@@ -111,22 +84,9 @@ public class BookingSyncService {
     private Booking dtoToEntity(Booking entity, BookingDto dto) {
         entity.setCrm_booking_id(dto.getCrm_booking_id());
         entity.setCategory_id(dto.getCategory_id());
-        entity.setUser_id(dto.getUser_id());
         entity.setStart(dto.getStart());
         entity.setEnd(dto.getEnd());
-        entity.setPrice(dto.getPrice());
-        entity.setStartLocation(dto.getStartLocation());
-        entity.setEndLocation(dto.getEndLocation());
-        entity.setCreated_at(dto.getCreated_at());
-        entity.set_advance_paid(dto.is_advance_paid());
-        entity.setFlight(dto.getFlight());
-        entity.setNotes(dto.getNotes());
-        entity.setNumberOfPeople(dto.getNumberOfPeople());
-        entity.setChecklist(
-                dto.getChecklist().stream()
-                        .map(e -> new ChecklistEntry(ChecklistItem.valueOf(e.getItem()), e.getQuantity()))
-                        .collect(Collectors.toSet())
-        );
+        entity.set_advance_paid(true);
         return entity;
     }
 }

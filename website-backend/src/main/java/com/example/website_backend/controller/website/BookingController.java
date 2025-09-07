@@ -26,8 +26,9 @@ public class BookingController {
     }
 
     @PostMapping("/createUser")
-    public ResponseEntity<String> createUser(@RequestBody UserDto userDto) {
-        return ResponseEntity.ok(bookingService.createUser(userDto));
+    public ResponseEntity<Void> createUser(@RequestBody UserDto userDto) {
+        bookingService.createUser(userDto);
+        return ResponseEntity.ok().build();
     }
 
     // Confirm payment for a booking

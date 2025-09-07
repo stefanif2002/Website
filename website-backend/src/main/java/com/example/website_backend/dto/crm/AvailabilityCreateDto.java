@@ -16,11 +16,6 @@ public class AvailabilityCreateDto {
     private LocalDateTime end;
     private String eventType;
 
-    public AvailabilityCreateDto(Long id, String eventType) {
-        this.id = id;
-        this.eventType = eventType;
-    }
-
     @Override
     public String toString() {
         return "AvailabilityCreateDto{" +

@@ -31,7 +31,7 @@ public class BookingCreateDtoCrm {
     private LocalDateTime created_at;
     private boolean is_advance_paid;
 
-    private String flight;
+    private String flight_number;
     private String notes;
 
     @JsonProperty("number_of_people")
