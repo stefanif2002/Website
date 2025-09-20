@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import dayjs, { Dayjs } from "dayjs";
 import {
     Button,
@@ -70,6 +70,15 @@ const DateForm: React.FC<DateFormProps> = ({ onDateFormSubmit }) => {
 
     // watch startDate so we can disable invalid end dates
     const startDate = Form.useWatch<Dayjs | null>("startDate", form);
+    const endDate   = Form.useWatch<Dayjs | null>("endDate", form);
+
+    const bumpEndIfNeeded = useCallback((s: Dayjs | null, e: Dayjs | null) => {
+        if (!s) return;
+        if (!e || !e.isAfter(s)) {
+            // keep same time-of-day as start
+            form.setFieldsValue({ endDate: s.add(1, "day") });
+        }
+    }, [form]);
 
     useEffect(() => {
         setStartLocation("4Rent Office");
@@ -81,6 +90,10 @@ const DateForm: React.FC<DateFormProps> = ({ onDateFormSubmit }) => {
             endDate: dayjs().add(2, "day").minute(0),
         });
     }, [form]);
+
+    useEffect(() => {
+        bumpEndIfNeeded(startDate ?? null, endDate ?? null);
+    }, [startDate, endDate, bumpEndIfNeeded]);
 
     const handleSubmit = () => {
         form.validateFields().then((values) => {
@@ -157,6 +170,11 @@ const DateForm: React.FC<DateFormProps> = ({ onDateFormSubmit }) => {
                                             style={{ width: "100%" }}
                                             showTime={{ format: "HH:mm", minuteStep: 15 }}
                                             format="DD-MMM-YYYY, HH:mm"
+                                            onChange={(val) => {
+                                                // immediate UX: if start jumps ahead, fix end right away
+                                                const e = form.getFieldValue("endDate") as Dayjs | null;
+                                                bumpEndIfNeeded(val ?? null, e ?? null);
+                                            }}
                                         />
                                     </Form.Item>
                                 </div>

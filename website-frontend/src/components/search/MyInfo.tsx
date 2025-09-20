@@ -3,19 +3,40 @@ import React from "react";
 import {
     Button,
     Col,
+    DatePicker,
+    Divider,
     Form,
     Input,
     InputNumber,
     Row,
     Select,
     Space,
+    Switch,
     Typography,
     message,
-    Switch,
-    Divider,
 } from "antd";
 import type { FormInstance } from "antd/es/form";
 import { myApi } from "../../resources/service";
+
+// Icons (one per field max)
+import {
+    PhoneOutlined,
+    MailOutlined,
+    UserOutlined,
+    CalendarOutlined,
+    HomeOutlined,
+    EnvironmentOutlined,
+    NumberOutlined,
+    GlobalOutlined,
+    IdcardOutlined,
+    BankOutlined,
+    SendOutlined,
+    UsergroupAddOutlined,
+    TeamOutlined,
+    CloseOutlined,
+    PlusOutlined,
+    ApartmentOutlined,
+} from "@ant-design/icons";
 
 const { Title, Text } = Typography;
 
@@ -24,8 +45,8 @@ type CountryOption = { label: string; value: string };
 type Props = {
     form: FormInstance;
     onPrev?: () => void;
-    onNext?: () => void; // proceed to next step after successful submit
-    countryOptions?: CountryOption[]; // optional override
+    onNext?: () => void;
+    countryOptions?: CountryOption[];
 };
 
 const DEFAULT_COUNTRIES: CountryOption[] = [
@@ -45,24 +66,23 @@ const MyInfo: React.FC<Props> = ({
                                      countryOptions = DEFAULT_COUNTRIES,
                                  }) => {
     const handleNext = async () => {
-        // Validate ALL required fields (VAT & company fields are intentionally omitted)
         await form.validateFields([
             "telephone",
             "email",
             "name",
             "last_name",
-            "number_of_people",
-            "driver_license",
-            "driver_license_country",
+            "date_of_birth",
             "address",
             "city",
             "postal_code",
             "country",
+            "driver_license",
+            "driver_license_country",
             "passport",
             "passport_country",
+            "number_of_people",
         ]);
 
-        // Build user DTO and send to backend
         const {
             telephone,
             email,
@@ -72,13 +92,13 @@ const MyInfo: React.FC<Props> = ({
             postal_code,
             city,
             country,
-            vat_number, // optional
+            vat_number,
             driver_license,
             driver_license_country,
             passport,
             passport_country,
-            company = false, // boolean toggle
-            company_name, // optional
+            company = false,
+            company_name,
         } = form.getFieldsValue([
             "telephone",
             "email",
@@ -95,6 +115,7 @@ const MyInfo: React.FC<Props> = ({
             "passport_country",
             "company",
             "company_name",
+            "date_of_birth",
         ]) as any;
 
         const userDto = {
@@ -106,27 +127,28 @@ const MyInfo: React.FC<Props> = ({
             postal_code,
             city,
             country,
-            vat_number: vat_number || null, // optional
+            vat_number: vat_number || null,
             driver_license,
             driver_license_country,
-            passport,               // required
-            passport_country,       // required
-            company: company,     // optional toggle
-            company_name: company ? company_name || null : null, // optional
+            passport,
+            passport_country,
+            company: !!company,
+            company_name: company ? company_name || null : null,
         };
 
         try {
             await myApi.post("booking/createUser", userDto);
             message.success("Τα στοιχεία σας αποθηκεύτηκαν.");
-            onNext?.(); // continue only after successful save
-        } catch (e) {
+            onNext?.();
+        } catch {
             message.error("Αποτυχία αποθήκευσης στοιχείων. Προσπαθήστε ξανά.");
         }
     };
 
     return (
         <div>
-            <Title level={5} style={{ marginTop: 0, marginBottom: 16 }}>
+            {/* 1) Στοιχεία επικοινωνίας (no icons in title) */}
+            <Title level={5} style={{ marginTop: 0, marginBottom: 12 }}>
                 Στοιχεία Επικοινωνίας
             </Title>
 
@@ -140,7 +162,7 @@ const MyInfo: React.FC<Props> = ({
                             { pattern: /^[0-9+()\-.\s]{6,}$/, message: "Μη έγκυρος αριθμός" },
                         ]}
                     >
-                        <Input placeholder="+30 69..." />
+                        <Input placeholder="+30 69..." prefix={<PhoneOutlined />} />
                     </Form.Item>
                 </Col>
 
@@ -153,7 +175,7 @@ const MyInfo: React.FC<Props> = ({
                             { type: "email", message: "Μη έγκυρο email" },
                         ]}
                     >
-                        <Input placeholder="name@example.com" />
+                        <Input placeholder="name@example.com" prefix={<MailOutlined />} />
                     </Form.Item>
                 </Col>
 
@@ -163,7 +185,7 @@ const MyInfo: React.FC<Props> = ({
                         label="Όνομα"
                         rules={[{ required: true, message: "Παρακαλώ εισάγετε όνομα" }]}
                     >
-                        <Input placeholder="Όνομα" />
+                        <Input placeholder="Όνομα" prefix={<UserOutlined />} />
                     </Form.Item>
                 </Col>
 
@@ -173,83 +195,37 @@ const MyInfo: React.FC<Props> = ({
                         label="Επώνυμο"
                         rules={[{ required: true, message: "Παρακαλώ εισάγετε επώνυμο" }]}
                     >
-                        <Input placeholder="Επώνυμο" />
+                        <Input placeholder="Επώνυμο" prefix={<UserOutlined />} />
                     </Form.Item>
                 </Col>
 
                 <Col xs={24} md={12}>
                     <Form.Item
-                        name="number_of_people"
-                        label="Αριθμός ατόμων"
-                        rules={[{ required: true, message: "Παρακαλώ εισάγετε αριθμό ατόμων" }]}
+                        name="date_of_birth"
+                        label="Ημερομηνία γέννησης"
+                        rules={[{ required: true, message: "Παρακαλώ επιλέξτε ημερομηνία γέννησης" }]}
                     >
-                        <InputNumber min={1} style={{ width: "100%" }} placeholder="1" />
-                    </Form.Item>
-                </Col>
-
-                {/* Optional field */}
-                <Col xs={24} md={12}>
-                    <Form.Item name="flight" label="Πτήση (προαιρετικό)">
-                        <Input placeholder="π.χ. A3 123" />
-                    </Form.Item>
-                </Col>
-            </Row>
-
-            <Title level={5} style={{ marginTop: 8 }}>Στοιχεία Ταυτότητας</Title>
-            <Row gutter={[16, 16]}>
-                <Col xs={24} md={12}>
-                    <Form.Item
-                        name="passport"
-                        label="Αριθμός Διαβατηρίου"
-                        rules={[{ required: true, message: "Παρακαλώ εισάγετε διαβατήριο" }]}
-                    >
-                        <Input placeholder="Αριθμός διαβατηρίου" />
-                    </Form.Item>
-                </Col>
-                <Col xs={24} md={12}>
-                    <Form.Item
-                        name="passport_country"
-                        label="Χώρα έκδοσης διαβατηρίου"
-                        rules={[{ required: true, message: "Παρακαλώ επιλέξτε χώρα" }]}
-                    >
-                        <Select
-                            placeholder="Επιλέξτε χώρα"
-                            options={countryOptions}
-                            optionFilterProp="label"
-                            showSearch
+                        <DatePicker
+                            style={{ width: "100%" }}
+                            format="DD/MM/YYYY"
+                            // one icon only: suffix on the control, plain label
+                            suffixIcon={<CalendarOutlined />}
                         />
                     </Form.Item>
                 </Col>
-            </Row>
 
-            <Title level={5} style={{ marginTop: 8 }}>Στοιχεία Οδήγησης</Title>
-            <Row gutter={[16, 16]}>
                 <Col xs={24} md={12}>
-                    <Form.Item
-                        name="driver_license"
-                        label="Δίπλωμα οδήγησης"
-                        rules={[{ required: true, message: "Παρακαλώ εισάγετε δίπλωμα" }]}
-                    >
-                        <Input placeholder="Αριθμός διπλώματος" />
-                    </Form.Item>
-                </Col>
-                <Col xs={24} md={12}>
-                    <Form.Item
-                        name="driver_license_country"
-                        label="Χώρα διπλώματος"
-                        rules={[{ required: true, message: "Παρακαλώ επιλέξτε χώρα" }]}
-                    >
-                        <Select
-                            placeholder="Επιλέξτε χώρα"
-                            options={countryOptions}
-                            optionFilterProp="label"
-                            showSearch
-                        />
+                    <Form.Item name="vat_number" label="ΑΦΜ">
+                        <Input placeholder="π.χ. EL123456789" prefix={<NumberOutlined />} />
                     </Form.Item>
                 </Col>
             </Row>
 
-            <Title level={5} style={{ marginTop: 8 }}>Διεύθυνση</Title>
+            {/* 2) Διεύθυνση */}
+            <Title level={5} style={{ marginTop: 30 }}>
+                Διεύθυνση
+            </Title>
+
             <Row gutter={[16, 16]}>
                 <Col xs={24} md={12}>
                     <Form.Item
@@ -257,7 +233,7 @@ const MyInfo: React.FC<Props> = ({
                         label="Διεύθυνση"
                         rules={[{ required: true, message: "Παρακαλώ εισάγετε διεύθυνση" }]}
                     >
-                        <Input placeholder="Οδός & αριθμός" />
+                        <Input placeholder="Οδός & αριθμός" prefix={<HomeOutlined />} />
                     </Form.Item>
                 </Col>
                 <Col xs={24} md={12}>
@@ -266,7 +242,7 @@ const MyInfo: React.FC<Props> = ({
                         label="Πόλη"
                         rules={[{ required: true, message: "Παρακαλώ εισάγετε πόλη" }]}
                     >
-                        <Input placeholder="Πόλη" />
+                        <Input placeholder="Πόλη" prefix={<EnvironmentOutlined />} />
                     </Form.Item>
                 </Col>
                 <Col xs={24} md={12}>
@@ -275,7 +251,7 @@ const MyInfo: React.FC<Props> = ({
                         label="Ταχυδρομικός κώδικας"
                         rules={[{ required: true, message: "Παρακαλώ εισάγετε ΤΚ" }]}
                     >
-                        <Input placeholder="ΤΚ" />
+                        <Input placeholder="ΤΚ" prefix={<NumberOutlined />} />
                     </Form.Item>
                 </Col>
                 <Col xs={24} md={12}>
@@ -289,26 +265,79 @@ const MyInfo: React.FC<Props> = ({
                             options={countryOptions}
                             optionFilterProp="label"
                             showSearch
+                            // one icon only: suffix on select
+                            suffixIcon={<GlobalOutlined />}
                         />
                     </Form.Item>
                 </Col>
+            </Row>
 
-                {/* VAT optional */}
+            {/* 3) Οδήγηση */}
+            <Title level={5} style={{ marginTop: 30 }}>
+                Οδήγηση
+            </Title>
+
+            <Row gutter={[16, 16]}>
                 <Col xs={24} md={12}>
-                    <Form.Item name="vat_number" label="ΑΦΜ (προαιρετικό)">
-                        <Input placeholder="π.χ. EL123456789" />
+                    <Form.Item name="driver_license" label="Δίπλωμα οδήγησης">
+                        <Input placeholder="Αριθμός διπλώματος" prefix={<IdcardOutlined />} />
+                    </Form.Item>
+                </Col>
+                <Col xs={24} md={12}>
+                    <Form.Item name="driver_license_country" label="Χώρα διπλώματος">
+                        <Select
+                            placeholder="Επιλέξτε χώρα"
+                            options={countryOptions}
+                            optionFilterProp="label"
+                            showSearch
+                            suffixIcon={<GlobalOutlined />}
+                        />
+                    </Form.Item>
+                </Col>
+            </Row>
+
+            {/* 4) Ταυτότητα */}
+            <Title level={5} style={{ marginTop: 30 }}>
+                Ταυτότητα
+            </Title>
+
+            <Row gutter={[16, 16]}>
+                <Col xs={24} md={12}>
+                    <Form.Item name="passport" label="Αριθμός διαβατηρίου">
+                        <Input placeholder="Αριθμός διαβατηρίου" prefix={<IdcardOutlined />} />
+                    </Form.Item>
+                </Col>
+                <Col xs={24} md={12}>
+                    <Form.Item name="passport_country" label="Χώρα έκδοσης διαβατηρίου">
+                        <Select
+                            placeholder="Επιλέξτε χώρα"
+                            options={countryOptions}
+                            optionFilterProp="label"
+                            showSearch
+                            suffixIcon={<GlobalOutlined />}
+                        />
                     </Form.Item>
                 </Col>
             </Row>
 
             <Divider />
 
-            <Title level={5} style={{ marginTop: 0 }}>Στοιχεία Εταιρείας (προαιρετικό)</Title>
+            {/* 5) Εταιρεία (προαιρετικό) */}
+            <Title level={5} style={{ marginTop: 0 }}>
+                Εταιρεία (προαιρετικό)
+            </Title>
+
             <Row gutter={[16, 8]} align="middle">
                 <Col xs={24} md={12}>
                     <Form.Item
                         name="company"
-                        label="Τιμολόγιο σε εταιρεία;"
+                        // one icon only, placed in the label because Switch has no prefix/suffix
+                        label={
+                            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                <BankOutlined />
+                Τιμολόγιο σε εταιρεία;
+              </span>
+                        }
                         valuePropName="checked"
                         colon={false}
                     >
@@ -317,73 +346,145 @@ const MyInfo: React.FC<Props> = ({
                 </Col>
             </Row>
 
-            {/* Show company fields only if switch is ON (still optional) */}
             <Form.Item noStyle shouldUpdate={(prev, cur) => prev.company !== cur.company}>
                 {({ getFieldValue }) =>
                     getFieldValue("company") ? (
                         <Row gutter={[16, 16]}>
                             <Col xs={24} md={12}>
-                                <Form.Item
-                                    name="company_name"
-                                    label="Επωνυμία Εταιρείας (προαιρετικό)"
-                                >
-                                    <Input placeholder="Επωνυμία" />
+                                <Form.Item name="company_name" label="Επωνυμία εταιρείας (προαιρετικό)">
+                                    <Input placeholder="Επωνυμία" prefix={<ApartmentOutlined />} />
                                 </Form.Item>
                             </Col>
-                            {/* VAT remains optional; it’s above as well. If you prefer to show it only here, move that Form.Item down */}
+                            <Col xs={24} md={12}>
+                                <Form.Item name="vat_number" label="ΑΦΜ (προαιρετικό)">
+                                    <Input placeholder="π.χ. EL123456789" prefix={<NumberOutlined />} />
+                                </Form.Item>
+                            </Col>
                         </Row>
                     ) : null
                 }
             </Form.Item>
 
-            {/* Optional notes (not part of createUser, but kept for booking) */}
-            <Form.Item name="notes" label="Σημειώσεις (προαιρετικό)">
+            <Divider />
+
+            {/* 6) Έξτρα στοιχεία κράτησης */}
+            <Title level={5} style={{ marginTop: 30 }}>
+                Έξτρα στοιχεία κράτησης
+            </Title>
+
+            <Row gutter={[16, 16]}>
+                <Col xs={24} md={12}>
+                    <Form.Item name="flight" label="Πτήση (προαιρετικό)">
+                        <Input placeholder="π.χ. A3 123" prefix={<SendOutlined />} />
+                    </Form.Item>
+                </Col>
+                <Col xs={24} md={12}>
+                    <Form.Item
+                        name="number_of_people"
+                        // InputNumber can't have prefix -> show the single icon in the label
+                        label={
+                            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                <UsergroupAddOutlined />
+                Αριθμός ατόμων
+              </span>
+                        }
+                        rules={[{ required: true, message: "Παρακαλώ εισάγετε αριθμό ατόμων" }]}
+                    >
+                        <InputNumber min={1} style={{ width: "100%" }} placeholder="1" />
+                    </Form.Item>
+                </Col>
+            </Row>
+
+            {/* Επιπλέον οδηγοί */}
+            <div style={{ marginTop: 24 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                    <TeamOutlined />
+                    <Title level={5} style={{ margin: 0 }}>
+                        Επιπλέον οδηγοί (προαιρετικό)
+                    </Title>
+                </div>
+
+                <div
+                    style={{
+                        border: "1px solid #dfe7ff",
+                        background: "#f7fbff",
+                        borderRadius: 12,
+                        boxShadow: "0 6px 18px rgba(47,90,255,0.07)",
+                        padding: 12,
+                    }}
+                >
+                    <Form.List name="drivers">
+                        {(fields, { add, remove }) => (
+                            <>
+                                {fields.map((field, idx) => (
+                                    <div
+                                        key={field.key}
+                                        style={{
+                                            position: "relative",
+                                            border: "1px dashed #b9c8ff",
+                                            background: "#fff",
+                                            borderRadius: 10,
+                                            padding: 12,
+                                            marginBottom: 14,
+                                            boxShadow: "0 4px 12px rgba(47,90,255,0.05)",
+                                        }}
+                                    >
+                                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                            <Text type="secondary">Οδηγός #{idx + 2}</Text>
+                                            <Button
+                                                type="text"
+                                                danger
+                                                shape="circle"
+                                                icon={<CloseOutlined />}
+                                                onClick={() => remove(field.name)}
+                                                aria-label="Αφαίρεση οδηγού"
+                                            />
+                                        </div>
+
+                                        <Row gutter={[12, 12]} style={{ marginTop: 8 }}>
+                                            <Col span={24}>
+                                                <Form.Item
+                                                    name={[field.name, "telephone"]}
+                                                    label="Τηλέφωνο οδηγού"
+                                                    rules={[{ required: true, message: "Παρακαλώ εισάγετε τηλέφωνο οδηγού" }]}
+                                                >
+                                                    <Input placeholder="Τηλέφωνο οδηγού" prefix={<PhoneOutlined />} />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={24}>
+                                                <Form.Item
+                                                    name={[field.name, "name"]}
+                                                    label="Όνομα οδηγού"
+                                                    rules={[{ required: true, message: "Παρακαλώ εισάγετε όνομα οδηγού" }]}
+                                                >
+                                                    <Input placeholder="Όνομα οδηγού" prefix={<UserOutlined />} />
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
+                                    </div>
+                                ))}
+
+                                <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                                    Προσθήκη οδηγού
+                                </Button>
+                            </>
+                        )}
+                    </Form.List>
+                </div>
+            </div>
+
+            <Form.Item name="notes" label="Σημειώσεις (προαιρετικό)" style={{ marginTop: 30 }}>
                 <Input.TextArea rows={3} placeholder="Οδηγίες παράδοσης, ειδικές ανάγκες κ.λπ." />
             </Form.Item>
 
-            <Title level={5} style={{ marginTop: 8 }}>Επιπλέον οδηγοί (προαιρετικό)</Title>
-            <Form.List name="drivers">
-                {(fields, { add, remove }) => (
-                    <>
-                        {fields.map((field, idx) => (
-                            <Row key={field.key} gutter={12} align="middle">
-                                <Col xs={24} md={8}>
-                                    <Text type="secondary">Οδηγός #{idx + 2}</Text>
-                                </Col>
-                                <Col xs={24} md={8}>
-                                    <Form.Item
-                                        name={[field.name, "telephone"]}
-                                        rules={[{ required: true, message: "Τηλέφωνο οδηγού" }]}
-                                    >
-                                        <Input placeholder="Τηλέφωνο οδηγού" />
-                                    </Form.Item>
-                                </Col>
-                                <Col xs={24} md={7}>
-                                    <Form.Item
-                                        name={[field.name, "name"]}
-                                        rules={[{ required: true, message: "Όνομα οδηγού" }]}
-                                    >
-                                        <Input placeholder="Όνομα οδηγού" />
-                                    </Form.Item>
-                                </Col>
-                                <Col xs={24} md={1}>
-                                    <Button danger onClick={() => remove(field.name)}>✕</Button>
-                                </Col>
-                            </Row>
-                        ))}
-                        <Button type="dashed" onClick={() => add()} block>
-                            Προσθήκη οδηγού
-                        </Button>
-                    </>
-                )}
-            </Form.List>
-
-            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 16 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 30 }}>
                 <Space>
                     <Button onClick={onPrev}>ΠΙΣΩ</Button>
                 </Space>
                 <Space>
-                    <Button type="primary" onClick={handleNext}>ΣΥΝΕΧΕΙΑ</Button>
+                    <Button type="primary" onClick={handleNext}>
+                        ΟΛΟΚΛΗΡΩΣΗ & ΠΛΗΡΩΜΗ
+                    </Button>
                 </Space>
             </div>
         </div>

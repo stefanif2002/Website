@@ -58,6 +58,9 @@ stripe:
     public:
         key: pk_test_51S2UY3KnXECMMeszL1gKAaoSrvN4uu6v0YKMkQ4GdKIIaJA8gvjuVO0Z0oOhuWzMRH3sxcLKC89AL6h9pJASNUbX00Rsq57BV4
 
+sendgrid:
+    api-key: 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
+
 #Resilinece4j Properties
 resilience4j:
   circuitbreaker:

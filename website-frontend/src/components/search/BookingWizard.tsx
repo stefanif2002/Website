@@ -117,12 +117,15 @@ export default function BookingWizard({
     const saveDraftAndGoToPayment = async () => {
         try {
             // Minimal required fields before saving a draft
-            await form.validateFields(["telephone", "name", "last_name", "number_of_people"]);
+            await form.validateFields(["telephone", "email", "name", "last_name", "number_of_people"]);
 
             // Read form values
             const values = form.getFieldsValue(true);
             const {
-                telephone,                  // maps to BookingCreateDto.userId via @JsonProperty("telephone")
+                telephone,                  // -> BookingCreateDto.userId via @JsonProperty("telephone")
+                email,
+                name,
+                last_name,
                 flight = "",
                 number_of_people,
                 notes = "",
@@ -131,6 +134,9 @@ export default function BookingWizard({
                 checklistQty = {},
             } = values as {
                 telephone: string;
+                email: string;
+                name: string;
+                last_name: string;
                 flight?: string;
                 number_of_people?: number | string;
                 notes?: string;
@@ -139,7 +145,7 @@ export default function BookingWizard({
                 checklistQty?: Record<string, number>;
             };
 
-            // Build drivers DTO [{ telephone, name }]
+            // Build drivers DTO [{ telephone, full_name }]
             const driverList: Driver[] = Array.isArray(drivers)
                 ? (drivers as Partial<Driver>[]).map((d) => ({
                     telephone: d?.telephone ?? "",
@@ -181,18 +187,18 @@ export default function BookingWizard({
 
             // ---- EXACT SHAPE FOR BookingCreateDto ----
             const payload = {
-                telephone,                      // -> BookingCreateDto.userId (via @JsonProperty("telephone"))
-                category_id: categoryId,        // -> BookingCreateDto.categoryId (via @JsonProperty)
-                drivers: driverList,            // -> List<DriverDto>
-                start: startLdt,                // -> LocalDateTime
-                end: endLdt,                    // -> LocalDateTime
+                telephone,                       // -> BookingCreateDto.userId (via @JsonProperty("telephone"))
+                category_id: categoryId,         // -> BookingCreateDto.categoryId (via @JsonProperty)
+                drivers: driverList,             // -> List<DriverDto>
+                start: startLdt,                 // -> LocalDateTime
+                end: endLdt,                     // -> LocalDateTime
                 price: Number(grandTotal.toFixed(2)), // -> Float
-                startLocation,                  // -> String
-                endLocation,                    // -> String
-                flight,                         // -> String
-                notes,                          // -> String
-                number_of_people: Number(number_of_people || 1), // -> Integer (via @JsonProperty("number_of_people"))
-                checklist: entries,             // -> List<ChecklistItemDto> { item, quantity }
+                startLocation,                   // -> String
+                endLocation,                     // -> String
+                flight,                          // -> String
+                notes,                           // -> String
+                number_of_people: Number(number_of_people || 1), // -> Integer
+                checklist: entries,              // -> List<ChecklistItemDto> { item, quantity }
             };
 
             const resp = await myApi.post("booking/create", payload);
@@ -207,16 +213,40 @@ export default function BookingWizard({
             next.set("bid", String(bookingId));
             setSp(next, { replace: true });
 
+            // --- Send Booking Confirmation Email (non-blocking for UX) ---
+            const fullName = `${name ?? ""} ${last_name ?? ""}`.trim();
+            const emailDto = {
+                email,
+                telephone,
+                name: fullName,
+                bookingId,
+                start: startLdt,          // LocalDateTime
+                end: endLdt,              // LocalDateTime
+                startLocation,
+                endLocation,
+            };
+
+            try {
+                // If your controller is @RequestMapping("/api/v1/email")
+                await myApi.post("email/sendBookingConfirmationEmail", emailDto);
+                // If your controller is @RequestMapping("/api/email") instead, use:
+                // await myApi.post("/api/email/sendBookingConfirmationEmail", emailDto);
+            } catch (e) {
+                // Don’t block: just warn and keep going to payment
+                console.warn("Failed to send confirmation email", e);
+            }
+
+            // Go to payment (ensure URL includes bid)
             const prefix = bookIdx > 0 ? parts.slice(0, bookIdx).join("/") : ""; // "" or "/el"
             const target = `${prefix}/book/${categoryId}/payment${next.toString() ? `?${next.toString()}` : ""}`;
-                    // Navigate directly so the URL includes ?bid= right away
-               navigate(target, { replace: true });
+            navigate(target, { replace: true });
 
         } catch (err: any) {
             if (err?.errorFields) return; // AntD validation already shown
             message.error("Αποτυχία δημιουργίας κράτησης. Προσπαθήστε ξανά.");
         }
     };
+
 
 
     // Keep ?extras in URL + keep totals
@@ -236,7 +266,7 @@ export default function BookingWizard({
         <div style={{ marginTop: 10, width: "90%", margin: "20px auto" }}>
             <Steps
                 current={step}
-                items={[{ title: "Εξοπλισμός" }, { title: "Προσωπικά Στοιχεία" }, { title: "Πληρωμή" }, { title: "Τέλος" }]}
+                items={[{ title: "Εξοπλισμός" }, { title: "Προσωπικά Στοιχεία" }, { title: "Πληρωμή" }]}
                 style={{ marginBottom: 16 }}
             />
 

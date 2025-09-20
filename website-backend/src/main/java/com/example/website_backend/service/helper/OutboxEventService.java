@@ -8,6 +8,7 @@ import com.example.website_backend.dto.crm.BookingCreateDtoCrm;
 import com.example.website_backend.dto.crm.CreatePaymentRequestDto;
 import com.example.website_backend.dto.crm.DriverDto;
 import com.example.website_backend.dto.website.ChecklistItemDto;
+import com.example.website_backend.dto.website.EmailDto;
 import com.example.website_backend.dto.website.UserDto;
 import com.example.website_backend.model.Booking;
 import com.example.website_backend.model.Driver;
@@ -51,9 +52,12 @@ public class OutboxEventService {
     @Autowired
     private UserClient userClient;
 
-
     @Autowired
     private PaymentClient paymentClient;
+
+    @Autowired
+    private EmailService emailService;
+
 
     public void push(Object dto, Long id, String eventType) {
         OutboxEvent e = new OutboxEvent();
@@ -113,7 +117,7 @@ public class OutboxEventService {
     public void publishOutboxEvents() {
 
         List<OutboxEvent> events = outboxEventRepository
-                .findByProcessedFalse(List.of("BookingCreated", "UserCreated", "PaymentCreated"));
+                .findByProcessedFalse(List.of("BookingCreated", "UserCreated", "PaymentCreated", "BookingConfirmationEmail"));
 
         log.info("Found {} unprocessed outbox events", events.size());
 
@@ -164,6 +168,11 @@ public class OutboxEventService {
                         CreatePaymentRequestDto paymentDto = objectMapper.readValue(event.getPayload(), CreatePaymentRequestDto.class);
                         log.info("Sending PaymentOccurred to CRM: {}", paymentDto);
                         paymentClient.createPayment(paymentDto);
+                    }
+                    case "BookingConfirmationEmail" -> {
+                        EmailDto emailDto = objectMapper.readValue(event.getPayload(), EmailDto.class);
+                        log.info("Sending booking confirmation email to: {} at: {}", emailDto.getName(), emailDto.getEmail());
+                        emailService.sendBookingConfirmationEmail(emailDto);
                     }
                     default -> {
                         log.warn("Skipping unknown outbox eventType: {}", event.getEventType());
