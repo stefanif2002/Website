@@ -27,6 +27,11 @@ export const featureNotImplemented = () => {
     });
 };
 
+export const getLangPrefix = (path: string) => {
+    const m = path.match(/^\/([a-z]{2})(\/|$)/i);
+    return m ? `/${m[1].toLowerCase()}` : "/el";
+};
+
 // Enhanced function to handle errors with context-sensitive messages
 export const handleApiError = (
     error: AxiosError,

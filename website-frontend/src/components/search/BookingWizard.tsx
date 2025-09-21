@@ -6,7 +6,7 @@ import SummaryCard from "./SummaryCard";
 import { ADDONS } from "./addonsDef";
 import MyInfo from "./MyInfo";
 import Payment from "./Payment";
-import { myApi } from "../../resources/service.ts";
+import {getLangPrefix, myApi} from "../../resources/service.ts";
 import dayjs from "dayjs";
 
 const { Title } = Typography;
@@ -237,8 +237,10 @@ export default function BookingWizard({
             }
 
             // Go to payment (ensure URL includes bid)
-            const prefix = bookIdx > 0 ? parts.slice(0, bookIdx).join("/") : ""; // "" or "/el"
-            const target = `${prefix}/book/${categoryId}/payment${next.toString() ? `?${next.toString()}` : ""}`;
+            const langPrefix = getLangPrefix(pathname);          // <- "/el" if none found
+            const target = `${langPrefix}/book/${categoryId}/payment${
+                next.toString() ? `?${next.toString()}` : ""
+            }`;
             navigate(target, { replace: true });
 
         } catch (err: any) {

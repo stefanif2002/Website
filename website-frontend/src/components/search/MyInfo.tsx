@@ -65,6 +65,9 @@ const MyInfo: React.FC<Props> = ({
                                      onNext,
                                      countryOptions = DEFAULT_COUNTRIES,
                                  }) => {
+
+    const isGreek = /^\/el(\/|$)/i.test(location.pathname); // <-- lang prefix check
+
     const handleNext = async () => {
         await form.validateFields([
             "telephone",
@@ -132,7 +135,7 @@ const MyInfo: React.FC<Props> = ({
             driver_license_country,
             passport,
             passport_country,
-            company: !!company,
+            company: company,
             company_name: company ? company_name || null : null,
         };
 
@@ -214,11 +217,19 @@ const MyInfo: React.FC<Props> = ({
                     </Form.Item>
                 </Col>
 
-                <Col xs={24} md={12}>
-                    <Form.Item name="vat_number" label="ΑΦΜ">
-                        <Input placeholder="π.χ. EL123456789" prefix={<NumberOutlined />} />
-                    </Form.Item>
-                </Col>
+                {isGreek ?
+
+                    <Col xs={24} md={12}>
+                        <Form.Item name="vat_number" label="ΑΦΜ">
+                            <Input placeholder="π.χ. EL123456789" prefix={<NumberOutlined />} />
+                        </Form.Item>
+                    </Col>
+
+                    :
+
+                    null
+                }
+
             </Row>
 
             {/* 2) Διεύθυνση */}
@@ -298,17 +309,17 @@ const MyInfo: React.FC<Props> = ({
 
             {/* 4) Ταυτότητα */}
             <Title level={5} style={{ marginTop: 30 }}>
-                Ταυτότητα
+                Διαβατήριο / Ταυτότητα
             </Title>
 
             <Row gutter={[16, 16]}>
                 <Col xs={24} md={12}>
-                    <Form.Item name="passport" label="Αριθμός διαβατηρίου">
-                        <Input placeholder="Αριθμός διαβατηρίου" prefix={<IdcardOutlined />} />
+                    <Form.Item name="passport" label="Διαβατηρίο / Ταυτότητα">
+                        <Input placeholder="Αριθμός διαβατηρίου / ταυτότητας" prefix={<IdcardOutlined />} />
                     </Form.Item>
                 </Col>
                 <Col xs={24} md={12}>
-                    <Form.Item name="passport_country" label="Χώρα έκδοσης διαβατηρίου">
+                    <Form.Item name="passport_country" label="Χώρα έκδοσης διαβατηρίου / ταυτότητας">
                         <Select
                             placeholder="Επιλέξτε χώρα"
                             options={countryOptions}

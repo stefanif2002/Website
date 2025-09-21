@@ -18,7 +18,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendar } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { myApi, width, height } from "../../resources/service";
+import {myApi, width, height, getLangPrefix} from "../../resources/service";
 import DateForm, { myDateForm } from "../../components/search/search/DateForm";
 import AvailabilityCard from "../../components/search/search/AvailabilityCard";
 
@@ -156,7 +156,8 @@ function SearchPage({ onSubmit }: Props) {
 
         // Navigate to addons step with category id, preserving params
         const params = new URLSearchParams(sp);
-        navigate(`/book/${id}/extra?${params.toString()}`);
+        const langPrefix = getLangPrefix(location.pathname);
+        navigate(`${langPrefix}/book/${id}/extra?${params.toString()}`);
 
         // Also pass data up (if you keep state in parent)
         onSubmit({
