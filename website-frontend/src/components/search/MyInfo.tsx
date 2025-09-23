@@ -14,11 +14,10 @@ import {
     Switch,
     Typography,
     message,
+    Checkbox,
 } from "antd";
 import type { FormInstance } from "antd/es/form";
 import { myApi } from "../../resources/service";
-
-// Icons (one per field max)
 import {
     PhoneOutlined,
     MailOutlined,
@@ -37,6 +36,7 @@ import {
     PlusOutlined,
     ApartmentOutlined,
 } from "@ant-design/icons";
+import dayjs from "dayjs";
 
 const { Title, Text } = Typography;
 
@@ -65,32 +65,48 @@ const MyInfo: React.FC<Props> = ({
                                      onNext,
                                      countryOptions = DEFAULT_COUNTRIES,
                                  }) => {
+    const isGreek = /^\/el(\/|$)/i.test(location.pathname);
+    const termsHref = isGreek ? "/el/terms" : "/terms";
 
-    const isGreek = /^\/el(\/|$)/i.test(location.pathname); // <-- lang prefix check
+    const accepted = Form.useWatch<boolean>("acceptTerms", form) ?? false;
+    const dob = Form.useWatch("date_of_birth", form);
+
+    // --- AGE LOGIC ---
+    const calcAge = (v: any): number | null => {
+        if (!v) return null;
+        const d = dayjs.isDayjs(v) ? v : dayjs(v);
+        if (!d.isValid()) return null;
+        // integer years difference
+        return dayjs().diff(d, "year");
+    };
+
+    const age = calcAge(dob);
+    const requiresExtraInsurance =
+        age !== null && ((age >= 21 && age <= 23) || (age >= 65 && age <= 72));
+    const isAgeBlocked = age !== null && (age < 21 || age > 72);
 
     const handleNext = async () => {
-        await form.validateFields([
-            "telephone",
-            "email",
-            "name",
-            "last_name",
-            "date_of_birth",
-            "address",
-            "city",
-            "postal_code",
-            "country",
-            "driver_license",
-            "driver_license_country",
-            "passport",
-            "passport_country",
-            "number_of_people",
-        ]);
+        // validate all fields (including DOB + acceptTerms)
+        await form.validateFields();
+
+        // hard-stop by age policy (defensive; validator also covers this)
+        if (isAgeBlocked) {
+            message.error(
+                isGreek
+                    ? "Δεν μπορείτε να προχωρήσετε. Η ηλικία πρέπει να είναι από 21 έως 72."
+                    : "You cannot proceed. Age must be between 21 and 72."
+            );
+            return;
+        }
+
+        const values = form.getFieldsValue(true) as any;
 
         const {
             telephone,
             email,
             name,
             last_name,
+            date_of_birth,
             address,
             postal_code,
             city,
@@ -102,55 +118,94 @@ const MyInfo: React.FC<Props> = ({
             passport_country,
             company = false,
             company_name,
-        } = form.getFieldsValue([
-            "telephone",
-            "email",
-            "name",
-            "last_name",
-            "address",
-            "postal_code",
-            "city",
-            "country",
-            "vat_number",
-            "driver_license",
-            "driver_license_country",
-            "passport",
-            "passport_country",
-            "company",
-            "company_name",
-            "date_of_birth",
-        ]) as any;
+            flight,
+            number_of_people,
+            drivers = [],
+            notes,
+            acceptTerms,
+        } = values;
 
-        const userDto = {
+        const payload = {
+            // contact
+            telephone,
             email,
             name,
             last_name,
-            telephone,
+
+            // dates
+            date_of_birth: date_of_birth
+                ? (dayjs.isDayjs(date_of_birth)
+                    ? date_of_birth.format("YYYY-MM-DD")
+                    : String(date_of_birth))
+                : null,
+
+            // age policy
+            age,
+            requires_extra_insurance: requiresExtraInsurance,
+
+            // address
             address,
             postal_code,
             city,
             country,
-            vat_number: vat_number || null,
-            driver_license,
-            driver_license_country,
-            passport,
-            passport_country,
+
+            // company
             company: company,
             company_name: company ? company_name || null : null,
+            vat_number: vat_number || null,
+
+            // IDs / license (optional)
+            driver_license: driver_license || null,
+            driver_license_country: driver_license_country || null,
+            passport: passport || null,
+            passport_country: passport_country || null,
+
+            // booking extras
+            flight: flight || null,
+            number_of_people:
+                typeof number_of_people === "number"
+                    ? number_of_people
+                    : Number(number_of_people) || 1,
+
+            // additional drivers
+            drivers: Array.isArray(drivers)
+                ? drivers
+                    .map((d: any) => ({
+                        telephone: d?.telephone ?? null,
+                        name: d?.name ?? null,
+                    }))
+                    .filter((d: any) => d.telephone || d.name)
+                : [],
+
+            // notes
+            notes: notes || null,
+
+            // legal
+            acceptTerms: !!acceptTerms,
+
+            // optional UI language
+            lang: isGreek ? "el" : "en",
         };
 
         try {
-            await myApi.post("booking/createUser", userDto);
-            message.success("Τα στοιχεία σας αποθηκεύτηκαν.");
+            await myApi.post("booking/createUser", payload);
+            message.success(
+                isGreek ? "Τα στοιχεία σας αποθηκεύτηκαν." : "Your details were saved."
+            );
             onNext?.();
-        } catch {
-            message.error("Αποτυχία αποθήκευσης στοιχείων. Προσπαθήστε ξανά.");
+        } catch (e) {
+            console.log(e);
+            message.error(
+                isGreek
+                    ? "Αποτυχία αποθήκευσης στοιχείων. Προσπαθήστε ξανά."
+                    : "Failed to save details. Please try again."
+            );
         }
     };
 
     return (
         <div>
-            {/* 1) Στοιχεία επικοινωνίας (no icons in title) */}
+            {/* 1) Στοιχεία επικοινωνίας */}
             <Title level={5} style={{ marginTop: 0, marginBottom: 12 }}>
                 Στοιχεία Επικοινωνίας
             </Title>
@@ -206,30 +261,64 @@ const MyInfo: React.FC<Props> = ({
                     <Form.Item
                         name="date_of_birth"
                         label="Ημερομηνία γέννησης"
-                        rules={[{ required: true, message: "Παρακαλώ επιλέξτε ημερομηνία γέννησης" }]}
+                        rules={[
+                            { required: true, message: "Παρακαλώ επιλέξτε ημερομηνία γέννησης" },
+                            // Disallow <21 or >72
+                            {
+                                validator: (_, value) => {
+                                    const a = calcAge(value);
+                                    if (a === null) return Promise.resolve();
+                                    if (a < 21 || a > 72) {
+                                        return Promise.reject(
+                                            new Error(
+                                                isGreek
+                                                    ? "Η ηλικία πρέπει να είναι από 21 έως 72."
+                                                    : "Age must be between 21 and 72."
+                                            )
+                                        );
+                                    }
+                                    return Promise.resolve();
+                                },
+                            },
+                        ]}
+                        extra={
+                            age !== null
+                                ? isAgeBlocked
+                                    ? (
+                                        <Text type="danger">
+                                            {isGreek
+                                                ? "Δεν μπορείτε να προχωρήσετε (ηλικία εκτός ορίων 21–72)."
+                                                : "You cannot proceed (age outside 21–72)."}
+                                        </Text>
+                                    )
+                                    : requiresExtraInsurance
+                                        ? (
+                                            <Text type="warning">
+                                                {isGreek
+                                                    ? "Απαιτείται πρόσθετη ασφάλιση λόγω ηλικίας."
+                                                    : "Extra insurance required due to age."}
+                                            </Text>
+                                        )
+                                        : null
+                                : null
+                        }
                     >
                         <DatePicker
                             style={{ width: "100%" }}
                             format="DD/MM/YYYY"
-                            // one icon only: suffix on the control, plain label
                             suffixIcon={<CalendarOutlined />}
+                            disabledDate={(current) => !!current && current > dayjs().endOf("day")}
                         />
                     </Form.Item>
                 </Col>
 
-                {isGreek ?
-
+                {isGreek ? (
                     <Col xs={24} md={12}>
-                        <Form.Item name="vat_number" label="ΑΦΜ">
+                        <Form.Item name="vat_number" label="ΑΦΜ" rules={[{ required: true, message: "Παρακαλώ εισάγετε ΑΦΜ" }]}>
                             <Input placeholder="π.χ. EL123456789" prefix={<NumberOutlined />} />
                         </Form.Item>
                     </Col>
-
-                    :
-
-                    null
-                }
-
+                ) : null}
             </Row>
 
             {/* 2) Διεύθυνση */}
@@ -276,7 +365,6 @@ const MyInfo: React.FC<Props> = ({
                             options={countryOptions}
                             optionFilterProp="label"
                             showSearch
-                            // one icon only: suffix on select
                             suffixIcon={<GlobalOutlined />}
                         />
                     </Form.Item>
@@ -342,7 +430,6 @@ const MyInfo: React.FC<Props> = ({
                 <Col xs={24} md={12}>
                     <Form.Item
                         name="company"
-                        // one icon only, placed in the label because Switch has no prefix/suffix
                         label={
                             <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
                 <BankOutlined />
@@ -392,7 +479,6 @@ const MyInfo: React.FC<Props> = ({
                 <Col xs={24} md={12}>
                     <Form.Item
                         name="number_of_people"
-                        // InputNumber can't have prefix -> show the single icon in the label
                         label={
                             <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
                 <UsergroupAddOutlined />
@@ -488,12 +574,43 @@ const MyInfo: React.FC<Props> = ({
                 <Input.TextArea rows={3} placeholder="Οδηγίες παράδοσης, ειδικές ανάγκες κ.λπ." />
             </Form.Item>
 
+            <Form.Item
+                name="acceptTerms"
+                valuePropName="checked"
+                rules={[
+                    {
+                        validator: (_, v) =>
+                            v
+                                ? Promise.resolve()
+                                : Promise.reject(
+                                    new Error(
+                                        isGreek
+                                            ? "Παρακαλώ αποδεχτείτε τους Όρους & Προϋποθέσεις"
+                                            : "Please accept the Terms & Conditions"
+                                    )
+                                ),
+                    },
+                ]}
+                style={{ marginTop: 20 }}
+            >
+                <Checkbox>
+                    {isGreek ? "Αποδέχομαι τους " : "I accept the "}
+                    <a href={termsHref} target="_blank" rel="noopener noreferrer">
+                        {isGreek ? "Όρους & Προϋποθέσεις" : "Terms & Conditions"}
+                    </a>
+                </Checkbox>
+            </Form.Item>
+
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 30 }}>
                 <Space>
                     <Button onClick={onPrev}>ΠΙΣΩ</Button>
                 </Space>
                 <Space>
-                    <Button type="primary" onClick={handleNext}>
+                    <Button
+                        type="primary"
+                        onClick={handleNext}
+                        disabled={!accepted || isAgeBlocked}
+                    >
                         ΟΛΟΚΛΗΡΩΣΗ & ΠΛΗΡΩΜΗ
                     </Button>
                 </Space>
