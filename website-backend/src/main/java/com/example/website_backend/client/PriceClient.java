@@ -1,5 +1,6 @@
 package com.example.website_backend.client;
 
+import com.example.website_backend.dto.crm.DiscountCouponDto;
 import com.example.website_backend.dto.crm.PriceDto;
 import org.springframework.http.MediaType;
 import org.springframework.web.service.annotation.GetExchange;
@@ -13,4 +14,7 @@ import java.util.List;
 public interface PriceClient {
     @GetExchange("/getAllForWebsite")
     List<PriceDto> getAllPrices();
+
+    @GetExchange("/discount/getAll")
+    List<DiscountCouponDto> getAllCoupons();
 }

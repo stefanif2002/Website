@@ -4,11 +4,10 @@ import com.example.website_backend.dto.crm.BookingDto;
 import com.example.website_backend.dto.crm.DriverDto;
 import com.example.website_backend.dto.website.BookingCreateDto;
 import com.example.website_backend.dto.website.UserDto;
-import com.example.website_backend.model.Booking;
-import com.example.website_backend.model.ChecklistEntry;
-import com.example.website_backend.model.ChecklistItem;
-import com.example.website_backend.model.Driver;
+import com.example.website_backend.dto.website.ValidateCouponRequest;
+import com.example.website_backend.model.*;
 import com.example.website_backend.repository.BookingRepository;
+import com.example.website_backend.repository.DiscountCouponRepository;
 import com.example.website_backend.repository.DriverRepository;
 import com.example.website_backend.service.helper.OutboxEventService;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +32,9 @@ public class BookingService {
 
     @Autowired
     private OutboxEventService outboxEventService;
+
+    @Autowired
+    private DiscountCouponRepository discountCouponRepository;
 
 
     // Create a new price
@@ -161,6 +163,43 @@ public class BookingService {
                         booking.getCreated_at(),
                         booking.is_advance_paid()))
                 .collect(Collectors.toList());
+    }
+
+
+    public float validateDiscountCode(ValidateCouponRequest req) {
+        DiscountCoupon c = discountCouponRepository.findIfOverlaps(
+                req.getCode(),
+                req.getCategoryId(),
+                req.getStartDate(),
+                req.getEndDate()
+        );
+
+        if (c == null) {
+            return 0.0f;
+        }
+
+
+//        LocalDate resStart = req.getStartDate();
+//        LocalDate resEnd   = req.getEndDate();
+//        LocalDate coupStart = c.getStartDate();
+//        LocalDate coupEnd   = c.getEndDate();
+//
+//        // treat endDate as exclusive to match your 5-day example
+//        long totalResDays = ChronoUnit.DAYS.between(resStart, resEnd);
+//        long overlapDays  = ChronoUnit.DAYS.between(
+//                resStart.isAfter(coupStart) ? resStart : coupStart,
+//                resEnd.isBefore(coupEnd)    ? resEnd   : coupEnd
+//        );
+//
+//        if (totalResDays <= 0 || overlapDays <= 0) {
+//            throw new RuntimeException("No applicable days for discount");
+//        }
+//
+//        float ratio = (float) overlapDays / (float) totalResDays;
+//        return c.getDiscountPercentage() * ratio;
+
+        return c.getDiscountPercentage();
+
     }
 
 }

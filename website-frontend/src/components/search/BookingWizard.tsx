@@ -299,7 +299,7 @@ export default function BookingWizard({
                         )}
 
                         {routeStep === "payment" && (
-                            <Card style={{ borderRadius: 12 }} title={<Title level={4} style={{ margin: 0 }}>Πληρωμή</Title>}>
+                            <Card style={{ borderRadius: 12 }} title={<Title></Title>}>
                                 <Payment
                                     form={form}
                                     amount={grandTotal}

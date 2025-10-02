@@ -3,6 +3,7 @@ package com.example.website_backend.controller.website;
 import com.example.website_backend.dto.crm.BookingDto;
 import com.example.website_backend.dto.website.BookingCreateDto;
 import com.example.website_backend.dto.website.UserDto;
+import com.example.website_backend.dto.website.ValidateCouponRequest;
 import com.example.website_backend.service.website.BookingService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,11 @@ public class BookingController {
     @GetMapping("getAll")
     public ResponseEntity<List<BookingDto>> getAll() {
         return ResponseEntity.ok(bookingService.getAll());
+    }
+
+    @PostMapping("discount/validate")
+    public ResponseEntity<Float> validateDiscountCode(@RequestBody ValidateCouponRequest request) {
+        return ResponseEntity.ok(bookingService.validateDiscountCode(request));
     }
 
 }

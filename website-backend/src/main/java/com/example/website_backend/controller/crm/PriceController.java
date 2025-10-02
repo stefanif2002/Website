@@ -1,11 +1,13 @@
 package com.example.website_backend.controller.crm;
 
+import com.example.website_backend.dto.crm.DiscountCouponDto;
 import com.example.website_backend.dto.crm.PriceDto;
 import com.example.website_backend.service.crm.PriceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.service.annotation.PostExchange;
 
 @RestController
 @RequestMapping("/api/v1/price")
@@ -36,6 +38,13 @@ public class PriceController {
     public ResponseEntity<Void> deletePrice(@RequestBody PriceDto priceDto) {
         log.info("Price deletion received for ID: {}", priceDto.getId());
         service.deletePrice(priceDto.getId());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/alterDiscountCoupons")
+    public ResponseEntity<Void> alterDiscountCoupons(@RequestBody DiscountCouponDto priceDto) {
+        log.info("Alter discount coupons received in: {}", priceDto.toString());
+        service.alterDiscountCoupons(priceDto);
         return ResponseEntity.noContent().build();
     }
 

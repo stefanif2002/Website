@@ -1,7 +1,10 @@
 package com.example.website_backend.service.crm;
 
+import com.example.website_backend.dto.crm.DiscountCouponDto;
 import com.example.website_backend.dto.crm.PriceDto;
+import com.example.website_backend.model.DiscountCoupon;
 import com.example.website_backend.model.Price;
+import com.example.website_backend.repository.DiscountCouponRepository;
 import com.example.website_backend.repository.PriceRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -19,6 +22,9 @@ public class PriceService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    DiscountCouponRepository discountCouponRepository;
 
     // Create a new price
     public void createPrice(PriceDto priceDto) {
@@ -54,4 +60,42 @@ public class PriceService {
         }
         repository.deleteById(id);
     }
+
+    public void alterDiscountCoupons(DiscountCouponDto discountCouponDto) {
+        String eventType = discountCouponDto.getEventType();
+        String couponId = discountCouponDto.getId();
+        switch (eventType) {
+            case "DiscountCouponCreatedWebsite" -> {
+                // Map and save new coupon
+                DiscountCoupon coupon = modelMapper.map(discountCouponDto, DiscountCoupon.class);
+                discountCouponRepository.save(coupon);
+                log.info("Created DiscountCoupon ID {} in CRM", couponId);
+            }
+            case "DiscountCouponUpdatedWebsite" -> {
+                // Update existing coupon
+                Optional<DiscountCoupon> existing = discountCouponRepository.findById(couponId);
+                if (existing.isEmpty()) {
+                    log.error("DiscountCoupon ID {} not found in CRM for update.", couponId);
+                } else {
+                    DiscountCoupon couponToUpdate = existing.get();
+                    modelMapper.map(discountCouponDto, couponToUpdate);
+                    discountCouponRepository.save(couponToUpdate);
+                    log.info("Updated DiscountCoupon ID {} in CRM", couponId);
+                }
+            }
+            case "DiscountCouponDeletedWebsite" -> {
+                // Delete coupon
+                if (!discountCouponRepository.existsById(couponId)) {
+                    log.error("DiscountCoupon ID {} not found in CRM for deletion.", couponId);
+                } else {
+                    discountCouponRepository.deleteById(couponId);
+                    log.info("Deleted DiscountCoupon ID {} from CRM", couponId);
+                }
+            }
+            default ->
+                log.error("Unknown DiscountCoupon event type '{}' for coupon ID {}", eventType, couponId);
+
+        }
+    }
+
 }
