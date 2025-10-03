@@ -7,7 +7,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { myApi } from "../../resources/service";
 import { useLocation, useSearchParams } from "react-router-dom";
 import {
-    LockOutlined, ThunderboltOutlined, PercentageOutlined, ClearOutlined,
+    LockOutlined, PercentageOutlined, ClearOutlined,
     CheckCircleTwoTone, GiftTwoTone, ArrowLeftOutlined, CreditCardOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
@@ -23,14 +23,12 @@ type Props = {
     stripePublishableKey?: string;
 };
 
-type PayChoice = "advance" | "full";
 
 const Payment: React.FC<Props> = ({
                                       form,
                                       amount,
                                       currency = "EUR",
                                       onPrev,
-                                      onPaid,
                                       stripePublishableKey = "pk_test_51S2UY3KnXECMMeszL1gKAaoSrvN4uu6v0YKMkQ4GdKIIaJA8gvjuVO0Z0oOhuWzMRH3sxcLKC89AL6h9pJASNUbX00Rsq57BV4",
                                   }) => {
     const [loading, setLoading] = useState(false);
