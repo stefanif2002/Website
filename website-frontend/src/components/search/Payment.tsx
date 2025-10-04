@@ -100,6 +100,8 @@ const Payment: React.FC<Props> = ({
     }, []);
 
     // ---------------- COUPON LOGIC ----------------
+    // inside Payment.tsx
+
     const applyCoupon = async (codeArg?: string, opts?: { silent?: boolean }) => {
         const code = (codeArg ?? coupon).trim();
         if (!code) {
@@ -107,15 +109,26 @@ const Payment: React.FC<Props> = ({
             return;
         }
 
-        const body = { code, categoryId: Number.isFinite(categoryId) ? Number(categoryId) : undefined, startDate, endDate };
+        const body = {
+            code,
+            categoryId: Number.isFinite(categoryId) ? Number(categoryId) : undefined,
+            startDate,
+            endDate,
+        };
 
         setValidatingCoupon(true);
         try {
-            const resp = await myApi.post("booking/discount/validate", body, { headers: { "Content-Type": "application/json" } });
+            const resp = await myApi.post("booking/discount/validate", body, {
+                headers: { "Content-Type": "application/json" },
+            });
+
             const returned = resp?.data;
             const pct =
-                typeof returned === "number" ? returned :
-                    typeof returned?.percentage === "number" ? returned.percentage : NaN;
+                typeof returned === "number"
+                    ? returned
+                    : typeof returned?.percentage === "number"
+                        ? returned.percentage
+                        : NaN;
 
             if (!isFinite(pct) || pct <= 0) {
                 setDiscountPct(0);
@@ -125,10 +138,32 @@ const Payment: React.FC<Props> = ({
                 return;
             }
 
+            // success UI state
             setDiscountPct(pct);
             setCouponApplied(true);
             setCoupon(code);
-            persistToUrl(code);  // <-- WRITE coupon to URL
+            persistToUrl(code);
+
+            // --- inform backend this booking now has a discount (non-blocking) ---
+            try {
+                if (bookingId) {
+                    const discountedTotal = +(amount * (1 - pct / 100)).toFixed(2);
+                    await myApi.post(
+                        `booking/${encodeURIComponent(bookingId)}/apply-discount`,
+                        {
+                            couponCode: code,
+                            discountPercentage: pct,
+                            originalTotal: amount,
+                            discountedTotal,
+                        },
+                        { headers: { "Content-Type": "application/json" } }
+                    );
+                }
+            } catch (notifyErr) {
+                // Don't interrupt the user — just log & toast softly
+                console.warn("Failed to notify backend about discount", notifyErr);
+                message.warning("Το κουπόνι εφαρμόστηκε, αλλά δεν ενημερώθηκε ο διακομιστής.");
+            }
 
             if (!opts?.silent) message.success(`Το κουπόνι εφαρμόστηκε: -${pct}%`);
         } catch (e) {
@@ -138,6 +173,7 @@ const Payment: React.FC<Props> = ({
             setValidatingCoupon(false);
         }
     };
+
 
     const clearCoupon = () => {
         setCoupon("");

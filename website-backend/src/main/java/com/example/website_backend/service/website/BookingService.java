@@ -2,6 +2,7 @@ package com.example.website_backend.service.website;
 
 import com.example.website_backend.dto.crm.BookingDto;
 import com.example.website_backend.dto.crm.DriverDto;
+import com.example.website_backend.dto.website.ApplyDiscountRequest;
 import com.example.website_backend.dto.website.BookingCreateDto;
 import com.example.website_backend.dto.website.UserDto;
 import com.example.website_backend.dto.website.ValidateCouponRequest;
@@ -200,6 +201,16 @@ public class BookingService {
 
         return c.getDiscountPercentage();
 
+    }
+
+    public void applyDiscount(String bookingId, ApplyDiscountRequest req) {
+        Optional<Booking> existing = repository.findById(Long.valueOf(bookingId));
+        if (existing.isEmpty()) {
+            throw new RuntimeException("Booking with ID " + bookingId + " not found.");
+        }
+        Booking booking = existing.get();
+        booking.setPrice(req.getDiscountedTotal());
+        repository.save(booking);
     }
 
 }
