@@ -1,16 +1,12 @@
 package com.example.website_backend.controller.website;
 
 import com.example.website_backend.dto.crm.BookingDto;
-import com.example.website_backend.dto.website.ApplyDiscountRequest;
-import com.example.website_backend.dto.website.BookingCreateDto;
-import com.example.website_backend.dto.website.UserDto;
-import com.example.website_backend.dto.website.ValidateCouponRequest;
+import com.example.website_backend.dto.website.*;
 import com.example.website_backend.service.website.BookingService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.service.annotation.GetExchange;
 
 import java.util.List;
 

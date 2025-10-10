@@ -22,9 +22,17 @@ public interface OutboxEventRepository extends JpaRepository<OutboxEvent, Long> 
 
     @Query(
             value = "SELECT * FROM outbox_event o "
-                    + "WHERE o.aggregate_id = :id "
-                    + "LIMIT 100",
+                    + "WHERE o.aggregate_id = :id ",
             nativeQuery = true
     )
     List<OutboxEvent> findAllByAggregateId(Long id);
+
+    @Query(
+            value = "SELECT * FROM outbox_event o "
+                    + "WHERE o.aggregate_id = :id "
+                    + "AND o.event_type = 'PaymentCreated' "
+                    + "AND o.ready_to_process = false ",
+            nativeQuery = true
+    )
+    List<OutboxEvent> findAllByAggregateIdToDelete(Long id);
 }

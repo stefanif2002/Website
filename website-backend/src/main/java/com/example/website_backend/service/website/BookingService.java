@@ -2,14 +2,12 @@ package com.example.website_backend.service.website;
 
 import com.example.website_backend.dto.crm.BookingDto;
 import com.example.website_backend.dto.crm.DriverDto;
-import com.example.website_backend.dto.website.ApplyDiscountRequest;
-import com.example.website_backend.dto.website.BookingCreateDto;
-import com.example.website_backend.dto.website.UserDto;
-import com.example.website_backend.dto.website.ValidateCouponRequest;
+import com.example.website_backend.dto.website.*;
 import com.example.website_backend.model.*;
 import com.example.website_backend.repository.BookingRepository;
 import com.example.website_backend.repository.DiscountCouponRepository;
 import com.example.website_backend.repository.DriverRepository;
+import com.example.website_backend.service.crm.UserService;
 import com.example.website_backend.service.helper.OutboxEventService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +34,9 @@ public class BookingService {
 
     @Autowired
     private DiscountCouponRepository discountCouponRepository;
+
+    @Autowired
+    private UserService userService;
 
 
     // Create a new price
@@ -108,6 +109,7 @@ public class BookingService {
     }
 
     public void createUser(UserDto user){
+        userService.createUserInternal(user);
         outboxEventService.push(user, user.getTelephone(), "UserCreated");
     }
 

@@ -4,6 +4,7 @@ import com.example.website_backend.dto.crm.CreatePaymentRequestDto;
 import com.example.website_backend.dto.website.CheckoutSessionRequestDto;
 import com.example.website_backend.model.Booking;
 import com.example.website_backend.repository.BookingRepository;
+import com.example.website_backend.repository.OutboxEventRepository;
 import com.example.website_backend.service.helper.OutboxEventService;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
@@ -23,6 +24,9 @@ public class PaymentController {
 
     @Autowired
     private OutboxEventService outboxEventService;
+
+    @Autowired
+    private OutboxEventRepository outboxEventRepository;
 
     @PostMapping("/stripe/create-checkout-session/{id}")
     public ResponseEntity<String> createCheckoutSession(
@@ -89,6 +93,8 @@ public class PaymentController {
         paymentRequest.setAmount((float) value);
         paymentRequest.setCurrency(currency);
         paymentRequest.setMethod("stripe");
+
+        outboxEventRepository.deleteAll(outboxEventRepository.findAllByAggregateIdToDelete(id));
 
         outboxEventService.push(paymentRequest, id, "PaymentCreated");
 
