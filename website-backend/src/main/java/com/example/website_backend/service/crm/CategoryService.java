@@ -137,4 +137,14 @@ public class CategoryService {
         return categoryMap;  // Return the map
     }
 
+    @Cacheable("category_types")
+    public List<String> getDistinctTypes() {
+        return categoryRepository.findDistinctTypes();
+    }
+
+    @Cacheable("category_fuels")
+    public List<String> getDistinctFuels() {
+        return categoryRepository.findDistinctFuels();
+    }
+
 }

@@ -26,7 +26,7 @@ public class AvailabilityService {
     @Autowired
     private CategoryService categoryService;
 
-    public List<AvailabilityDto> searchAvailability(String name, String type, String fuel, Boolean automatic, Integer seats, LocalDateTime start, LocalDateTime end) {
+    public List<AvailabilityDto> searchAvailability(String name, String type, String fuel, Boolean automatic, String seats, LocalDateTime start, LocalDateTime end) {
 
         if (start == null || end == null)
             throw new RuntimeException();

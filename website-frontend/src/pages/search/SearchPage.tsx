@@ -1,9 +1,8 @@
 // src/pages/booking/SearchPage.tsx
-import {useCallback, useEffect, useMemo, useState} from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
 import {
     AutoComplete,
-    Button,
     Card,
     Col,
     DatePicker,
@@ -11,18 +10,20 @@ import {
     Input,
     List,
     message,
-    Popover,
     Row,
     Space,
+    Grid,
 } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendar } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import {myApi, width, height, getLangPrefix} from "../../resources/service";
+import { myApi, getLangPrefix } from "../../resources/service";
 import DateForm, { myDateForm } from "../../components/search/search/DateForm";
 import AvailabilityCard from "../../components/search/search/AvailabilityCard";
+import CategorySearchFilters from "../../components/search/CategorySearchFilters";
 
 const { RangePicker } = DatePicker;
+const { useBreakpoint } = Grid;
 
 interface DriverDto {
     telephone: string;
@@ -57,26 +58,32 @@ interface Availability {
     totalPrice: number;
     averagePricePerDay: number;
 }
+
 type OptionType = { value: string; label: React.ReactNode };
 type Props = { onSubmit: (booking: Partial<Booking>) => void };
+
+/**
+ * IMPORTANT: multi-select filters are CSV strings in URL/state.
+ * - type: "SUV,Hatchback"
+ * - fuel: "Petrol,Hybrid"
+ * - numOfSeats: "4,7"
+ */
+type Filters = {
+    category_name?: string;              // reserved if you add it later
+    type?: string;                       // CSV
+    fuel?: string;                       // CSV
+    numOfSeats?: string;                 // CSV
+    automatic?: "true" | "false" | undefined; // undefined => All
+};
 
 function SearchPage({ onSubmit }: Props) {
     const [availabilities, setAvailabilities] = useState<Availability[]>([]);
     const [form] = Form.useForm();
-    const [popoverVisible, setPopoverVisible] = useState(false);
     const [sp, setSp] = useSearchParams();
     const navigate = useNavigate();
+    const screens = useBreakpoint();
 
-    const locationOptions: OptionType[] = useMemo(
-        () => [
-            { value: "Skypark", label: "Skypark" },
-            { value: "4Rent Office", label: "4Rent Office" },
-            { value: "Thessaloniki Hotel/Airnbnb", label: "Thessaloniki Hotel/Airnbnb" },
-        ],
-        []
-    );
-
-    // Helpers to read/write query params
+    // ---- URL helpers (dates/locations only)
     const readParams = useCallback(() => {
         const startIso = sp.get("start");
         const endIso = sp.get("end");
@@ -86,6 +93,30 @@ function SearchPage({ onSubmit }: Props) {
         const end = endIso ? dayjs(endIso) : null;
         return { start, end, startLocation: sl, endLocation: dl };
     }, [sp]);
+
+    // ---- filters kept as CSV strings
+    const [filters, setFilters] = useState<Filters>(() => readFiltersFromUrl(sp));
+
+    // UI-friendly initial values for the sidebar
+    const initialUIFilters = useMemo(
+        () => ({
+            type: filters.type?.split(",").filter(Boolean) ?? [],
+            fuelType: filters.fuel?.split(",").filter(Boolean) ?? [],
+            numOfSeats: filters.numOfSeats?.split(",").filter(Boolean) ?? [],
+            automatic: typeof filters.automatic === "undefined" ? "off" : filters.automatic,
+        }),
+        [filters]
+    );
+
+    // Locations for the hidden inline form (used only on first mount parse)
+    const locationOptions: OptionType[] = useMemo(
+        () => [
+            { value: "Skypark", label: "Skypark" },
+            { value: "4Rent Office", label: "4Rent Office" },
+            { value: "Thessaloniki Hotel/Airnbnb", label: "Thessaloniki Hotel/Airnbnb" },
+        ],
+        []
+    );
 
     const writeParams = useCallback(
         (args: { start?: Dayjs | null; end?: Dayjs | null; sl?: string; dl?: string }) => {
@@ -99,6 +130,29 @@ function SearchPage({ onSubmit }: Props) {
         [sp, setSp]
     );
 
+    const writeFiltersToUrl = useCallback(
+        (f: Filters) => {
+            const next = new URLSearchParams(sp);
+            if (f.category_name) next.set("fn", f.category_name);
+            else next.delete("fn");
+
+            if (f.type) next.set("ft", f.type);
+            else next.delete("ft");
+
+            if (f.fuel) next.set("ff", f.fuel);
+            else next.delete("ff");
+
+            if (f.numOfSeats) next.set("fs", f.numOfSeats); // CSV
+            else next.delete("fs");
+
+            if (typeof f.automatic !== "undefined") next.set("fa", f.automatic);
+            else next.delete("fa");
+
+            setSp(next, { replace: true });
+        },
+        [sp, setSp]
+    );
+
     const [dateParams, setDateParams] = useState<{ start: Dayjs | null; end: Dayjs | null }>(() => {
         const { start, end } = readParams();
         return {
@@ -107,25 +161,35 @@ function SearchPage({ onSubmit }: Props) {
         };
     });
 
-    // Fetch availabilities
+    // ---- Fetch availabilities (includes filters)
     const fetchAvailability = useCallback(async () => {
         try {
             if (!dateParams.start || !dateParams.end) return;
-            const { data } = await myApi.get(`availability/search`, {
-                params: {
-                    start: dateParams.start.format("YYYY-MM-DDTHH:mm"),
-                    end: dateParams.end.format("YYYY-MM-DDTHH:mm"),
-                },
-            });
-            setAvailabilities(data || []);
+            const params: Record<string, any> = {
+                start: dateParams.start.format("YYYY-MM-DDTHH:mm"),
+                end: dateParams.end.format("YYYY-MM-DDTHH:mm"),
+            };
+
+            if (filters.category_name) params.category_name = filters.category_name;
+            if (filters.type) params.type = filters.type;                 // CSV
+            if (filters.fuel) params.fuel = filters.fuel;                 // CSV
+            if (filters.numOfSeats) {
+                params.seats = filters.numOfSeats;                          // CSV ("4,7")
+                // If your API expects "numOfSeats", also send it:
+                params.numOfSeats = filters.numOfSeats;
+            }
+            if (typeof filters.automatic !== "undefined") params.automatic = filters.automatic;
+
+            const { data } = await myApi.get(`availability/search`, { params });
+            setAvailabilities(Array.isArray(data) ? data : []);
         } catch (e) {
             console.error(e);
             message.error("Failed to fetch availabilities");
             setAvailabilities([]);
         }
-    }, [dateParams]);
+    }, [dateParams, filters]);
 
-    // Init form from URL on first mount, and trigger search if both dates exist
+    // ---- Init from URL on mount
     useEffect(() => {
         const { start, end, startLocation, endLocation } = readParams();
         form.setFieldsValue({
@@ -136,30 +200,31 @@ function SearchPage({ onSubmit }: Props) {
         });
         if (start && end) {
             setDateParams({ start, end });
+            setFilters(readFiltersFromUrl(sp));
             fetchAvailability();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // only on first mount
+    }, []);
 
+    // re-fetch on deps change
+    useEffect(() => {
+        fetchAvailability();
+    }, [fetchAvailability]);
+
+    // ---- Result selection
     const handleSelect = (id: number) => {
         const { start, end, startLocation, endLocation } = readParams();
         if (!start || !end || !startLocation || !endLocation) {
             message.warning("Please select dates and locations first.");
             return;
         }
-
         const selected = availabilities.find((a) => a.category.id === id);
-        if (!selected) {
-            message.error("Selected category not found.");
-            return;
-        }
+        if (!selected) return message.error("Selected category not found.");
 
-        // Navigate to addons step with category id, preserving params
         const params = new URLSearchParams(sp);
         const langPrefix = getLangPrefix(location.pathname);
         navigate(`${langPrefix}/book/${id}/extra?${params.toString()}`);
 
-        // Also pass data up (if you keep state in parent)
         onSubmit({
             category_id: id,
             start,
@@ -170,7 +235,7 @@ function SearchPage({ onSubmit }: Props) {
         });
     };
 
-    // DateForm (mobile card) callback
+    // ---- Date bar submit
     const handleDatesSubmit = (dateForm: myDateForm) => {
         writeParams({
             start: dateForm.start,
@@ -179,186 +244,121 @@ function SearchPage({ onSubmit }: Props) {
             dl: dateForm.endLocation ?? "",
         });
         setDateParams({ start: dateForm.start, end: dateForm.end });
-        fetchAvailability();
     };
 
-    // Popover form (desktop) submit
-    const handleSubmit = () => {
+    // Hidden inline form (only used for initial URL parse)
+    const handleInlineSubmit = () => {
         form.validateFields().then((values) => {
             const { startLocation, endLocation, dateRange } = values;
             const [start, end] = dateRange as [Dayjs, Dayjs];
             writeParams({ start, end, sl: startLocation, dl: endLocation });
             setDateParams({ start, end });
-            fetchAvailability();
-            setPopoverVisible(false);
         });
     };
 
-    // Render … (unchanged layout apart from URL wiring)
-    const bookingFiltersContent = (
-        <div
-            style={{
-                marginInline: "10px",
-                maxHeight: height > 1.5 ? "300px" : "350px",
-                overflowY: "auto",
-                marginBottom: "20px",
-                padding: "10px",
-                borderRadius: "5px",
-                backgroundColor: "#fff",
-                width: "230px",
-                margin: "auto",
-                overflowX: "hidden",
-            }}
-        >
-            <Form layout="vertical" onFinish={handleSubmit} form={form}>
-                <Row gutter={16}>
-                    <Col span={24}>
-                        <Form.Item
-                            name="startLocation"
-                            label="Pick Up At"
-                            rules={[{ required: true, message: "Please enter pick location" }]}
-                            validateTrigger="onSubmit"
-                        >
-                            <AutoComplete<OptionType> options={locationOptions}>
-                                <Input prefix={<i className="bi bi-geo-alt" />} placeholder="Airport or Anywhere" />
-                            </AutoComplete>
-                        </Form.Item>
-                    </Col>
-                    <Col span={24}>
-                        <Form.Item
-                            name="endLocation"
-                            label="Drop Off At"
-                            rules={[{ required: true, message: "Please enter drop off location" }]}
-                            validateTrigger="onSubmit"
-                        >
-                            <AutoComplete<OptionType> options={locationOptions}>
-                                <Input prefix={<i className="bi bi-geo-alt" />} placeholder="Airport or Anywhere" />
-                            </AutoComplete>
-                        </Form.Item>
-                    </Col>
-                </Row>
+    // ---- Filter change from sidebar (values are CSV strings or "true"/"false")
+    const onFilterChange = (name: string, value: string | number | boolean | null) => {
+        setFilters((prev) => {
+            const next: Filters = { ...prev };
+            if (name === "category_name") next.category_name = (value as string) || undefined;
+            if (name === "type") next.type = (value as string) || undefined;            // CSV
+            if (name === "fuel") next.fuel = (value as string) || undefined;            // CSV
+            if (name === "numOfSeats") next.numOfSeats = (value as string) || undefined; // CSV
+            if (name === "automatic")
+                next.automatic = typeof value === "undefined" ? undefined : (value as "true" | "false");
+            writeFiltersToUrl(next);
+            return next;
+        });
+    };
 
-                <Row gutter={16}>
-                    <Col span={24}>
-                        <Form.Item
-                            name="dateRange"
-                            label={
-                                <Space>
-                                    <FontAwesomeIcon icon={faCalendar} /> Dates
-                                </Space>
-                            }
-                            rules={[{ required: true, message: "Please select the dates!" }]}
-                        >
-                            <RangePicker
-                                style={{ width: "100%" }}
-                                showTime={{ format: "HH:mm", minuteStep: 15 }}
-                                format="DD-MMM-YYYY, HH:mm"
-                            />
-                        </Form.Item>
-                    </Col>
-                </Row>
-                <Form.Item style={{ display: "flex", justifyContent: "right" }}>
-                    <Button color="primary" variant="outlined" htmlType="submit">
-                        Search
-                    </Button>
-                </Form.Item>
-            </Form>
-        </div>
-    );
+    const clearAllFilters = () => {
+        const cleared: Filters = {};
+        setFilters(cleared);
+        writeFiltersToUrl(cleared);
+    };
 
+    // ====== RENDER ======
     return (
-        <div style={{ margin: "auto", width: "80%" }}>
-            {width < 3.4 ? (
-                <>
-                    <Card
-                        style={{
-                            textAlign: "center",
-                            justifyContent: "center",
-                            alignContent: "center",
-                            width: "100%",
-                            borderRadius: 12,
-                            border: "1px solid #e6e9f5",
-                            boxShadow: "0 6px 24px rgba(0,0,0,0.04)",
-                            padding: 20,
-                        }}
-                    >
-                        <DateForm onDateFormSubmit={handleDatesSubmit} isItMainPage />
-                    </Card>
-                    <Row style={{ justifyContent: "center", display: "flex" }}>
-                        <Col
-                            style={{
-                                marginTop: "30px",
-                                display: "flex",
-                                flexWrap: "wrap",
-                                justifyContent: "space-between",
-                            }}
-                        >
-                            <div>
-                                <List
-                                    grid={{ gutter: 16, column: width >= 3 ? 1 : width >= 1.6 ? 2 : 3 }}
-                                    dataSource={availabilities}
-                                    renderItem={(av) => (
-                                        <List.Item key={av.category.id}>
-                                            <AvailabilityCard
-                                                av={av}
-                                                onSelect={handleSelect}
-                                                discountPercent={20}
-                                                isSoldOut={false}
-                                            />
-                                        </List.Item>
-                                    )}
-                                />
-                            </div>
-                        </Col>
-                    </Row>
-                </>
-            ) : (
-                <div>
-                    <div
-                        style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            marginTop: "30px",
-                        }}
-                    >
-                        <div
-                            style={{
-                                display: "flex",
-                                justifyContent: "left",
-                                alignItems: "center",
-                                overflowX: "hidden",
-                            }}
-                        >
-                            <Popover
-                                placement="bottomRight"
-                                content={bookingFiltersContent}
-                                trigger="click"
-                                open={popoverVisible}
-                                onOpenChange={setPopoverVisible}
-                            >
-                                <Button icon={<FontAwesomeIcon icon={faCalendar} />}>Select Dates & Loc/s</Button>
-                            </Popover>
-                        </div>
-                    </div>
+        <div style={{ margin: "0 auto", width: "95%" }}>
+            {/* TOP: Search bar */}
+            <Card
+                style={{
+                    borderRadius: 12,
+                    border: "1px solid #e6e9f5",
+                    boxShadow: "0 6px 24px rgba(0,0,0,0.04)",
+                    padding: 20,
+                    marginTop: 16,
+                    marginBottom: 16,
+                }}
+            >
+                <DateForm onDateFormSubmit={handleDatesSubmit} />
+            </Card>
 
+            {/* BELOW: Two-column layout */}
+            <Row gutter={[16, 16]} align="top">
+                {/* LEFT: Filters (sticky on desktop) */}
+                <Col xs={24} lg={7} xl={5} xxl={4}>
+                    <div style={{ position: screens.lg ? "sticky" : "static", top: 16 }}>
+                        <CategorySearchFilters
+                            onFilterChange={onFilterChange}
+                            clearAll={clearAllFilters}
+                            initialFilters={initialUIFilters}
+                        />
+                    </div>
+                </Col>
+
+                {/* RIGHT: Results */}
+                <Col xs={24} lg={17} xl={19} xxl={20}>
                     <List
                         grid={{
                             gutter: 16,
-                            column: width >= 3 ? 1 : width >= 1.6 ? 2 : width >= 1.28 ? 3 : 4,
+                            column: screens.xxl ? 3 : screens.xl ? 3 : screens.lg ? 2 : screens.md ? 2 : 1,
                         }}
                         dataSource={availabilities}
-                        style={{ marginTop: "10px" }}
                         renderItem={(av: Availability) => (
                             <List.Item key={av.category.id}>
                                 <AvailabilityCard av={av} onSelect={handleSelect} />
                             </List.Item>
                         )}
                     />
-                </div>
-            )}
+                </Col>
+            </Row>
+
+            {/* Hidden inline form only used for initial URL parse */}
+            <Form form={form} onFinish={handleInlineSubmit} style={{ display: "none" }}>
+                <Form.Item name="startLocation">
+                    <AutoComplete<OptionType> options={locationOptions}>
+                        <Input />
+                    </AutoComplete>
+                </Form.Item>
+                <Form.Item name="endLocation">
+                    <AutoComplete<OptionType> options={locationOptions}>
+                        <Input />
+                    </AutoComplete>
+                </Form.Item>
+                <Form.Item name="dateRange">
+                    <RangePicker showTime={{ format: "HH:mm", minuteStep: 15 }} format="DD-MMM-YYYY, HH:mm" />
+                </Form.Item>
+            </Form>
         </div>
     );
 }
 
 export default SearchPage;
+
+// ---------- helpers ----------
+function readFiltersFromUrl(sp: URLSearchParams): Filters {
+    const fn = (sp.get("fn") || "").trim();
+    const ft = (sp.get("ft") || "").trim(); // CSV
+    const ff = (sp.get("ff") || "").trim(); // CSV
+    const fs = (sp.get("fs") || "").trim(); // CSV
+    const fa = sp.get("fa");                // 'true' | 'false' | null
+
+    return {
+        category_name: fn || undefined,
+        type: ft || undefined,
+        fuel: ff || undefined,
+        numOfSeats: fs || undefined,
+        automatic: fa === "true" ? "true" : fa === "false" ? "false" : undefined,
+    };
+}

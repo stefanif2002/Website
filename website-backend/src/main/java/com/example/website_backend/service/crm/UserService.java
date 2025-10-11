@@ -153,6 +153,7 @@ public class UserService {
         dto.setDriver_license_country(user.isDriver_license_country());
         dto.setPassport(user.isPassport());
         dto.setPassport_country(user.isPassport_country());
+        
         dto.setCompany(user.isCompany());
         dto.setCompany_name(user.isCompany_name());
         if (dto.getEmail().equals(email))

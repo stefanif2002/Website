@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/v1/category")
@@ -37,6 +39,18 @@ public class CategoryController {
         log.info("Sub-car changes received in: {}", subCar.toString());
         service.alterSubCar(subCar);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/types")
+    public ResponseEntity<List<String>> getTypes() {
+        List<String> types = service.getDistinctTypes();
+        return ResponseEntity.ok(types);
+    }
+
+    @GetMapping("/fuels")
+    public ResponseEntity<List<String>> getFuels() {
+        List<String> fuels = service.getDistinctFuels();
+        return ResponseEntity.ok(fuels);
     }
 
 }

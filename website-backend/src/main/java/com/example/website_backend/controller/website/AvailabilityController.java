@@ -28,7 +28,7 @@ public class AvailabilityController {
             @RequestParam(required = false)  String type,
             @RequestParam(required = false) String fuel,
             @RequestParam(required = false) Boolean automatic,
-            @RequestParam(required = false) Integer seats,
+            @RequestParam(required = false) String seats,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
 
