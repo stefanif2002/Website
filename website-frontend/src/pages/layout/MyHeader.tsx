@@ -1,57 +1,97 @@
-import {Col, Image, Layout, Menu, MenuProps, Row, Select, Space} from "antd";
-import {useState} from "react";
-import {featureNotImplemented, width} from "../../resources/service.ts";
-import { mainMenuItems } from "./menuData.tsx";
-import styles from "./Dashboard.module.css"; // <-- import the big array from above
+import React, { useMemo } from "react";
+import { Col, Image, Layout, Menu, MenuProps, Row, Select, Space } from "antd";
+import styles from "./Dashboard.module.css";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { mainMenuItems, type NavItem } from "./menuData";
+import {width} from "../../resources/service.ts";
 
-const menuItems: MenuProps['items'] = mainMenuItems;
+const { Header } = Layout;
 
-const { Header} = Layout;
+const SUPPORTED = ["en", "el-GR"] as const;
+type SupportedLng = typeof SUPPORTED[number];
 
+const LANG_PREFIX_RE = /^\/[a-z]{2}(?:-[A-Z]{2})?(?=\/|$)/i;
 
-function MyHeader () {
-    const typeOptions = [
+function isExternal(href: string) {
+    return /^(https?:)?\/\//i.test(href) || /^mailto:/i.test(href) || /^tel:/i.test(href);
+}
+
+function rePrefix(path: string, lang: SupportedLng) {
+    if (!path) return `/${lang}/`;
+    if (isExternal(path)) return path;
+    const normalized = path.startsWith("/") ? path : `/${path}`;
+    const stripped = normalized.replace(LANG_PREFIX_RE, ""); // remove any existing /{lang}
+    return `/${lang}${stripped || "/"}`;
+}
+
+function replaceLangInPath(pathname: string, newLng: SupportedLng) {
+    const parts = pathname.replace(/\/+$/, "").split("/").filter(Boolean);
+    const isLang = parts[0] && SUPPORTED.includes(parts[0] as SupportedLng);
+    const next = isLang ? [newLng, ...parts.slice(1)] : [newLng, ...parts];
+    return "/" + next.join("/");
+}
+
+/** Map our simple NavItem[] to AntD Menu items */
+function mapNavToMenu(
+    items: NavItem[] | undefined,
+    navigate: ReturnType<typeof useNavigate>,
+    currentLng: SupportedLng
+): MenuProps["items"] {
+    return items?.map((it) => {
+        if (!it) return it as any;
+        const out: any = {
+            key: it.key,
+            label: it.label,
+        };
+        if (it.children) {
+            out.children = mapNavToMenu(it.children, navigate, currentLng);
+        }
+        if (it.href) {
+            out.onClick = () => navigate(rePrefix(it.href!, currentLng));
+        }
+        return out;
+    });
+}
+
+export default function MyHeader() {
+    const { i18n } = useTranslation();
+    const navigate = useNavigate();
+    const { pathname } = useLocation();
+
+    const resolved = (i18n.resolvedLanguage || i18n.language) as SupportedLng | string;
+    const currentLng: SupportedLng = SUPPORTED.includes(resolved as SupportedLng) ? (resolved as SupportedLng) : "en";
+
+    const options = [
         {
             label: (
-                <Space >
-                    <img
-                        src="https://flagcdn.com/w40/gb.png"
-                        alt="English"
-                        style={{ width: 20, height: 15, marginTop:'8px' }}
-                    />
+                <Space>
+                    <img src="https://flagcdn.com/w40/gb.png" alt="English" style={{ width: 20, height: 15, marginTop: 8 }} />
                     English
                 </Space>
             ),
-            value: 'en',
+            value: "en",
         },
         {
             label: (
                 <Space>
-                    <img
-                        src="https://flagcdn.com/w40/gr.png"
-                        alt="Ελληνικά"
-                        style={{ width: 20, height: 15, marginTop:'8px' }}
-
-                    />
+                    <img src="https://flagcdn.com/w40/gr.png" alt="Ελληνικά" style={{ width: 20, height: 15, marginTop: 8 }} />
                     Ελληνικά
                 </Space>
             ),
-            value: 'el',
+            value: "el-GR",
         },
-        // Add more languages here as needed
     ];
 
-    const [language, setLanguage] = useState<string>('en'); // Default language
+    const langMenuItems: MenuProps["items"] = useMemo(
+        () => mapNavToMenu(mainMenuItems, navigate, currentLng),
+        [navigate, currentLng]
+    );
 
-    // Handle language change
-    const handleLanguageChange = (value: string) => {
-        if (value === "el")
-            featureNotImplemented()
-        else {
-            setLanguage(value);
-        }
-
-        // You can implement the language switching logic here (e.g., update translations)
+    const onChange = async (lng: SupportedLng) => {
+        await i18n.changeLanguage(lng);
+        const nextPath = replaceLangInPath(pathname, lng);
+        navigate(nextPath, { replace: true });
     };
 
     return (
@@ -70,23 +110,12 @@ function MyHeader () {
                 </Col> }
 
                 <Col span={12}>
-                    <Menu
-                        mode="horizontal"
-                        items={menuItems}
-                        selectable={false}
-                        // optional: subMenuCloseDelay, subMenuOpenDelay, etc.
-                    />
+                    <Menu mode="horizontal" items={langMenuItems} selectable={false} />
                 </Col>
 
                 <Col style={{ display: 'flex', alignItems: 'center'}}>
                     <Space>
-                        <Select
-                            defaultValue={language}
-                            onChange={handleLanguageChange}
-                            options={typeOptions}
-                            style={{width:'120px'}}
-                        />
-
+                        <Select value={currentLng} onChange={onChange} options={options} style={{ width: 140 }} />
                     </Space>
 
                 </Col>
@@ -94,5 +123,3 @@ function MyHeader () {
         </Header>
     );
 }
-
-export default MyHeader;
