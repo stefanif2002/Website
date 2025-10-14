@@ -109,8 +109,8 @@ public class BookingService {
     }
 
     public void createUser(UserDto user){
-        userService.createUserInternal(user);
-        outboxEventService.push(user, user.getTelephone(), "UserCreated");
+        if(userService.checkUserInternal(user.getCc(), user.getTelephone(), user.getEmail()))
+            outboxEventService.push(user, user.getTelephone(), "UserCreated");
     }
 
     /**

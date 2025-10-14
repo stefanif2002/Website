@@ -16,6 +16,7 @@ import com.example.website_backend.model.OutboxEvent;
 import com.example.website_backend.repository.BookingRepository;
 import com.example.website_backend.repository.DriverRepository;
 import com.example.website_backend.repository.OutboxEventRepository;
+import com.example.website_backend.service.crm.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -57,6 +58,9 @@ public class OutboxEventService {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private UserService userService;
 
 
     public void push(Object dto, Long id, String eventType) {
@@ -162,7 +166,7 @@ public class OutboxEventService {
                         UserDto userDto = objectMapper.readValue(event.getPayload(), UserDto.class);
                         log.info("Sending UserCreated to CRM: {}", userDto);
                         userClient.createUser(userDto);
-
+                        userService.createUserInternal(userDto);
                     }
                     case "PaymentCreated" -> {
                         CreatePaymentRequestDto paymentDto = objectMapper.readValue(event.getPayload(), CreatePaymentRequestDto.class);

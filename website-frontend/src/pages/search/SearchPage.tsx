@@ -11,16 +11,14 @@ import {
     List,
     message,
     Row,
-    Space,
     Grid,
 } from "antd";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCalendar } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { myApi, getLangPrefix } from "../../resources/service";
+import { myApi } from "../../resources/service"; // ⬅ removed getLangPrefix
 import DateForm, { myDateForm } from "../../components/search/search/DateForm";
 import AvailabilityCard from "../../components/search/search/AvailabilityCard";
 import CategorySearchFilters from "../../components/search/CategorySearchFilters";
+import { withLang } from "../../resources/useLangRouter"; // ⬅ add this
 
 const { RangePicker } = DatePicker;
 const { useBreakpoint } = Grid;
@@ -62,18 +60,19 @@ interface Availability {
 type OptionType = { value: string; label: React.ReactNode };
 type Props = { onSubmit: (booking: Partial<Booking>) => void };
 
-/**
- * IMPORTANT: multi-select filters are CSV strings in URL/state.
- * - type: "SUV,Hatchback"
- * - fuel: "Petrol,Hybrid"
- * - numOfSeats: "4,7"
- */
 type Filters = {
-    category_name?: string;              // reserved if you add it later
-    type?: string;                       // CSV
-    fuel?: string;                       // CSV
-    numOfSeats?: string;                 // CSV
-    automatic?: "true" | "false" | undefined; // undefined => All
+    category_name?: string;
+    type?: string;
+    fuel?: string;
+    numOfSeats?: string;
+    automatic?: "true" | "false" | undefined;
+};
+
+type UIFilters = {
+    type?: string[];
+    fuelType?: string[];
+    numOfSeats?: string[];
+    automatic?: "off" | "true" | "false";
 };
 
 function SearchPage({ onSubmit }: Props) {
@@ -83,7 +82,6 @@ function SearchPage({ onSubmit }: Props) {
     const navigate = useNavigate();
     const screens = useBreakpoint();
 
-    // ---- URL helpers (dates/locations only)
     const readParams = useCallback(() => {
         const startIso = sp.get("start");
         const endIso = sp.get("end");
@@ -94,21 +92,24 @@ function SearchPage({ onSubmit }: Props) {
         return { start, end, startLocation: sl, endLocation: dl };
     }, [sp]);
 
-    // ---- filters kept as CSV strings
+    const csvToArr = useCallback((csv?: string): string[] => {
+        return csv ? csv.split(",").filter(Boolean) : [];
+    }, []);
+
     const [filters, setFilters] = useState<Filters>(() => readFiltersFromUrl(sp));
 
-    // UI-friendly initial values for the sidebar
-    const initialUIFilters = useMemo(
-        () => ({
-            type: filters.type?.split(",").filter(Boolean) ?? [],
-            fuelType: filters.fuel?.split(",").filter(Boolean) ?? [],
-            numOfSeats: filters.numOfSeats?.split(",").filter(Boolean) ?? [],
-            automatic: typeof filters.automatic === "undefined" ? "off" : filters.automatic,
-        }),
-        [filters]
-    );
+    const initialUIFilters = useMemo<UIFilters>(() => {
+        const automatic: "off" | "true" | "false" =
+            typeof filters.automatic === "undefined" ? "off" : filters.automatic;
 
-    // Locations for the hidden inline form (used only on first mount parse)
+        return {
+            type: csvToArr(filters.type),
+            fuelType: csvToArr(filters.fuel),
+            numOfSeats: csvToArr(filters.numOfSeats),
+            automatic,
+        };
+    }, [filters, csvToArr]);
+
     const locationOptions: OptionType[] = useMemo(
         () => [
             { value: "Skypark", label: "Skypark" },
@@ -142,7 +143,7 @@ function SearchPage({ onSubmit }: Props) {
             if (f.fuel) next.set("ff", f.fuel);
             else next.delete("ff");
 
-            if (f.numOfSeats) next.set("fs", f.numOfSeats); // CSV
+            if (f.numOfSeats) next.set("fs", f.numOfSeats);
             else next.delete("fs");
 
             if (typeof f.automatic !== "undefined") next.set("fa", f.automatic);
@@ -161,7 +162,6 @@ function SearchPage({ onSubmit }: Props) {
         };
     });
 
-    // ---- Fetch availabilities (includes filters)
     const fetchAvailability = useCallback(async () => {
         try {
             if (!dateParams.start || !dateParams.end) return;
@@ -171,11 +171,10 @@ function SearchPage({ onSubmit }: Props) {
             };
 
             if (filters.category_name) params.category_name = filters.category_name;
-            if (filters.type) params.type = filters.type;                 // CSV
-            if (filters.fuel) params.fuel = filters.fuel;                 // CSV
+            if (filters.type) params.type = filters.type;
+            if (filters.fuel) params.fuel = filters.fuel;
             if (filters.numOfSeats) {
-                params.seats = filters.numOfSeats;                          // CSV ("4,7")
-                // If your API expects "numOfSeats", also send it:
+                params.seats = filters.numOfSeats;
                 params.numOfSeats = filters.numOfSeats;
             }
             if (typeof filters.automatic !== "undefined") params.automatic = filters.automatic;
@@ -189,7 +188,6 @@ function SearchPage({ onSubmit }: Props) {
         }
     }, [dateParams, filters]);
 
-    // ---- Init from URL on mount
     useEffect(() => {
         const { start, end, startLocation, endLocation } = readParams();
         form.setFieldsValue({
@@ -206,7 +204,6 @@ function SearchPage({ onSubmit }: Props) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // re-fetch on deps change
     useEffect(() => {
         fetchAvailability();
     }, [fetchAvailability]);
@@ -222,8 +219,9 @@ function SearchPage({ onSubmit }: Props) {
         if (!selected) return message.error("Selected category not found.");
 
         const params = new URLSearchParams(sp);
-        const langPrefix = getLangPrefix(location.pathname);
-        navigate(`${langPrefix}/book/${id}/extra?${params.toString()}`);
+        // ✅ Prefix with current language automatically (supports en / el-GR)
+        const target = withLang(`/book/${id}/extra?${params.toString()}`);
+        navigate(target);
 
         onSubmit({
             category_id: id,
@@ -235,7 +233,6 @@ function SearchPage({ onSubmit }: Props) {
         });
     };
 
-    // ---- Date bar submit
     const handleDatesSubmit = (dateForm: myDateForm) => {
         writeParams({
             start: dateForm.start,
@@ -246,7 +243,6 @@ function SearchPage({ onSubmit }: Props) {
         setDateParams({ start: dateForm.start, end: dateForm.end });
     };
 
-    // Hidden inline form (only used for initial URL parse)
     const handleInlineSubmit = () => {
         form.validateFields().then((values) => {
             const { startLocation, endLocation, dateRange } = values;
@@ -256,14 +252,13 @@ function SearchPage({ onSubmit }: Props) {
         });
     };
 
-    // ---- Filter change from sidebar (values are CSV strings or "true"/"false")
     const onFilterChange = (name: string, value: string | number | boolean | null) => {
         setFilters((prev) => {
             const next: Filters = { ...prev };
             if (name === "category_name") next.category_name = (value as string) || undefined;
-            if (name === "type") next.type = (value as string) || undefined;            // CSV
-            if (name === "fuel") next.fuel = (value as string) || undefined;            // CSV
-            if (name === "numOfSeats") next.numOfSeats = (value as string) || undefined; // CSV
+            if (name === "type") next.type = (value as string) || undefined;
+            if (name === "fuel") next.fuel = (value as string) || undefined;
+            if (name === "numOfSeats") next.numOfSeats = (value as string) || undefined;
             if (name === "automatic")
                 next.automatic = typeof value === "undefined" ? undefined : (value as "true" | "false");
             writeFiltersToUrl(next);
@@ -277,10 +272,8 @@ function SearchPage({ onSubmit }: Props) {
         writeFiltersToUrl(cleared);
     };
 
-    // ====== RENDER ======
     return (
         <div style={{ margin: "0 auto", width: "95%" }}>
-            {/* TOP: Search bar */}
             <Card
                 style={{
                     borderRadius: 12,
@@ -294,9 +287,7 @@ function SearchPage({ onSubmit }: Props) {
                 <DateForm onDateFormSubmit={handleDatesSubmit} />
             </Card>
 
-            {/* BELOW: Two-column layout */}
             <Row gutter={[16, 16]} align="top">
-                {/* LEFT: Filters (sticky on desktop) */}
                 <Col xs={24} lg={7} xl={5} xxl={4}>
                     <div style={{ position: screens.lg ? "sticky" : "static", top: 16 }}>
                         <CategorySearchFilters
@@ -307,7 +298,6 @@ function SearchPage({ onSubmit }: Props) {
                     </div>
                 </Col>
 
-                {/* RIGHT: Results */}
                 <Col xs={24} lg={17} xl={19} xxl={20}>
                     <List
                         grid={{
@@ -324,7 +314,6 @@ function SearchPage({ onSubmit }: Props) {
                 </Col>
             </Row>
 
-            {/* Hidden inline form only used for initial URL parse */}
             <Form form={form} onFinish={handleInlineSubmit} style={{ display: "none" }}>
                 <Form.Item name="startLocation">
                     <AutoComplete<OptionType> options={locationOptions}>
@@ -349,10 +338,10 @@ export default SearchPage;
 // ---------- helpers ----------
 function readFiltersFromUrl(sp: URLSearchParams): Filters {
     const fn = (sp.get("fn") || "").trim();
-    const ft = (sp.get("ft") || "").trim(); // CSV
-    const ff = (sp.get("ff") || "").trim(); // CSV
-    const fs = (sp.get("fs") || "").trim(); // CSV
-    const fa = sp.get("fa");                // 'true' | 'false' | null
+    const ft = (sp.get("ft") || "").trim();
+    const ff = (sp.get("ff") || "").trim();
+    const fs = (sp.get("fs") || "").trim();
+    const fa = sp.get("fa");
 
     return {
         category_name: fn || undefined,

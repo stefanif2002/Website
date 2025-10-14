@@ -187,7 +187,7 @@ const AvailabilityCard: React.FC<Props> = ({
                         color: 'white'
                     }}
                 >
-                    Book Now
+                    Κράτηση Τώρα
                 </Button>
             </div>
 

@@ -1,3 +1,4 @@
+// src/pages/booking/Payment.tsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
     Alert, Button, Card, Divider, Input, Space, Statistic, Tag, Tooltip, Typography, message,
@@ -11,6 +12,7 @@ import {
     CheckCircleTwoTone, GiftTwoTone, ArrowLeftOutlined, CreditCardOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
+import { getLangFromPath } from "../../resources/useLangRouter"; // ⬅️ read exact lang from URL
 
 const { Title, Text } = Typography;
 
@@ -23,7 +25,6 @@ type Props = {
     stripePublishableKey?: string;
 };
 
-
 const Payment: React.FC<Props> = ({
                                       form,
                                       amount,
@@ -33,13 +34,11 @@ const Payment: React.FC<Props> = ({
                                   }) => {
     const [loading, setLoading] = useState(false);
 
-    // --- Coupon state ---
     const [coupon, setCoupon] = useState("");
     const [discountPct, setDiscountPct] = useState<number>(0);
     const [validatingCoupon, setValidatingCoupon] = useState(false);
     const [couponApplied, setCouponApplied] = useState(false);
 
-    // Derived amounts
     const effectiveAmount = useMemo(() => {
         const pct = Math.min(Math.max(discountPct || 0, 0), 100);
         return Math.max(0, +(amount * (1 - pct / 100)).toFixed(2));
@@ -47,13 +46,17 @@ const Payment: React.FC<Props> = ({
 
     const stripePromise = loadStripe(stripePublishableKey);
     const { pathname } = useLocation();
-    const [sp, setSp] = useSearchParams();               // <-- we both read & write URL
+    const [sp, setSp] = useSearchParams();
+
+    // 🔹 exact language segment from the URL (e.g. "el-GR" or "en")
+    const lang = useMemo(() => getLangFromPath(pathname), [pathname]);
+    const langPrefix = `/${lang}`;
 
     // URL parts / params
     const parts = pathname.replace(/\/+$/, "").split("/");
     const bookIdx = parts.indexOf("book");
     const categoryId = bookIdx >= 0 ? Number(parts[bookIdx + 1]) : undefined;
-    const prefix = bookIdx > 0 ? parts.slice(0, bookIdx).join("/") : "";
+
     const bookingId = sp.get("bid") || undefined;
 
     const startIso = sp.get("start");
@@ -61,16 +64,16 @@ const Payment: React.FC<Props> = ({
     const startDate = startIso ? dayjs(startIso).format("YYYY-MM-DD") : undefined;
     const endDate = endIso ? dayjs(endIso).format("YYYY-MM-DD") : undefined;
 
-    // Success/Cancel keep current URL params (including coupon & pay)
+    // ✅ Success/Cancel URLs KEEP the current language prefix and params
     const successParams = new URLSearchParams(sp);
     if (bookingId && !successParams.get("bid")) successParams.set("bid", bookingId);
     successParams.delete("session_id");
-    const baseSuccess = `${window.location.origin}${prefix}/book/${categoryId}/payment/success`;
+    const baseSuccess = `${window.location.origin}${langPrefix}/book/${categoryId}/payment/success`;
     const successUrl = successParams.toString() ? `${baseSuccess}?${successParams.toString()}` : baseSuccess;
 
     const retryParams = new URLSearchParams(sp);
     retryParams.set("session_id", "{CHECKOUT_SESSION_ID}");
-    const baseRetry = `${window.location.origin}${prefix}/book/${categoryId}/payment/retry`;
+    const baseRetry = `${window.location.origin}${langPrefix}/book/${categoryId}/payment/retry`;
     const cancelUrl = `${baseRetry}?${retryParams.toString()}`;
 
     const buildMetadata = () => {
@@ -78,7 +81,6 @@ const Payment: React.FC<Props> = ({
         return { telephone, name, last_name, bookingId, coupon, discountPct };
     };
 
-    // --- Helpers to PERSIST/READ state from the URL -------------------
     const persistToUrl = (coupon?: string | null) => {
         const next = new URLSearchParams(sp);
         if (coupon && coupon.trim()) next.set("coupon", coupon.trim());
@@ -86,7 +88,6 @@ const Payment: React.FC<Props> = ({
         setSp(next, { replace: true });
     };
 
-    // On first mount: read coupon from URL and auto-apply
     const appliedFromUrlRef = useRef(false);
     useEffect(() => {
         if (appliedFromUrlRef.current) return;
@@ -98,9 +99,6 @@ const Payment: React.FC<Props> = ({
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    // ---------------- COUPON LOGIC ----------------
-    // inside Payment.tsx
 
     const applyCoupon = async (codeArg?: string, opts?: { silent?: boolean }) => {
         const code = (codeArg ?? coupon).trim();
@@ -138,13 +136,11 @@ const Payment: React.FC<Props> = ({
                 return;
             }
 
-            // success UI state
             setDiscountPct(pct);
             setCouponApplied(true);
             setCoupon(code);
             persistToUrl(code);
 
-            // --- inform backend this booking now has a discount (non-blocking) ---
             try {
                 if (bookingId) {
                     const discountedTotal = +(amount * (1 - pct / 100)).toFixed(2);
@@ -160,7 +156,6 @@ const Payment: React.FC<Props> = ({
                     );
                 }
             } catch (notifyErr) {
-                // Don't interrupt the user — just log & toast softly
                 console.warn("Failed to notify backend about discount", notifyErr);
                 message.warning("Το κουπόνι εφαρμόστηκε, αλλά δεν ενημερώθηκε ο διακομιστής.");
             }
@@ -174,19 +169,17 @@ const Payment: React.FC<Props> = ({
         }
     };
 
-
     const clearCoupon = () => {
         setCoupon("");
         setDiscountPct(0);
         setCouponApplied(false);
-        persistToUrl(null);    // <-- REMOVE coupon from URL
+        persistToUrl(null);
     };
 
     // ---------------- STRIPE ----------------
     const payWithStripe = async (isAdvance: boolean) => {
         if (!stripePromise) return message.error("Stripe key is missing. Επικοινωνήστε με την υποστήριξη.");
-        if (!bookingId)   return message.error("Δεν υπάρχει bookingId. Παρακαλώ επιστρέψτε στο προηγούμενο βήμα.");
-
+        if (!bookingId) return message.error("Δεν υπάρχει bookingId. Παρακαλώ επιστρέψτε στο προηγούμενο βήμα.");
 
         setLoading(true);
         try {
@@ -218,11 +211,9 @@ const Payment: React.FC<Props> = ({
 
     const hasDiscount = discountPct > 0 && effectiveAmount < amount;
 
-    // Styles kept short
     const headerGradient =
         "linear-gradient(200deg, rgba(95,123,255,0.10) 0%, rgba(47,90,255,0.04) 48%, rgba(47,90,255,0.02) 100%)";
     const couponBoxStyle: React.CSSProperties = { marginTop: 14, border: "1px solid #FFE7BA", background: "rgba(255,249,224,0.18)", borderRadius: 12, padding: 12 };
-    const footnoteStyle: React.CSSProperties = { marginTop: 16, padding: "10px 12px", background: "#FAFAFA", borderRadius: 10, border: "1px solid #E6E9F5", display: "flex", alignItems: "center", gap: 8 };
 
     return (
         <Card bordered={false} style={{ borderRadius: 16, boxShadow: "0 8px 30px rgba(0,0,0,0.06)", overflow: "hidden" }} bodyStyle={{ padding: 0 }}>
@@ -302,7 +293,6 @@ const Payment: React.FC<Props> = ({
 
                 <Divider style={{ margin: "14px 0" }} />
 
-                {/* Retry notice → creates NEW session using saved pay choice from URL */}
                 {(sp.get("session_id") || sp.get("pay")) && (
                     <Alert
                         type="error"
@@ -313,7 +303,6 @@ const Payment: React.FC<Props> = ({
                     />
                 )}
 
-                {/* Actions */}
                 <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4, gap: 12, flexWrap: "wrap" }}>
                     <Button onClick={onPrev} icon={<ArrowLeftOutlined />} size="large">ΠΙΣΩ</Button>
                     <Space wrap>
@@ -328,7 +317,6 @@ const Payment: React.FC<Props> = ({
                     </Space>
                 </div>
 
-                {/* Footer */}
                 <div style={{ marginTop: 16, padding: "10px 12px", background: "#FAFAFA", borderRadius: 10, border: "1px solid #E6E9F5", display: "flex", alignItems: "center", gap: 8 }}>
                     <LockOutlined style={{ color: "#8C8C8C" }} />
                     <Text type="secondary" style={{ fontSize: 12 }}>

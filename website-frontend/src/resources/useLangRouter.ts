@@ -7,7 +7,7 @@ const LANG_REGEX = /^[a-z]{2}$/i;
 export const getLangFromPath = (path?: string): string => {
     const pathname = path ?? (typeof window !== "undefined" ? window.location.pathname : "");
     const seg = (pathname.split("/")[1] || "").trim();
-    return LANG_REGEX.test(seg) ? seg : "el";
+    return LANG_REGEX.test(seg) ? seg : "el-GR";
 };
 
 const isExternal = (p: string) =>

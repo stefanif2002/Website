@@ -50,7 +50,8 @@ public class UserService {
     }
 
     public void createUserInternal(UserDto dto) {
-        User user = userRepository.findById(dto.getTelephone()).orElse(null);
+        String fullTelephone = dto.getCc() + dto.getTelephone();
+        User user = userRepository.findById(dto.getTelephone()).orElse(userRepository.findById(fullTelephone).orElse(userRepository.findById("+" + fullTelephone).orElse(null)));
         if (user != null) {
             if (dto.getEmail() != null)                user.setEmail(dto.getEmail());
             if (dto.getName() != null)                 user.setName(dto.getName());
@@ -75,7 +76,7 @@ public class UserService {
             user = new User();
         // Map only phone, email, and presence flags into the User entity
 
-        user.setTelephone(dto.getTelephone());
+        user.setTelephone("+" + fullTelephone);
         user.setEmail(dto.getEmail());
         user.setName(dto.getName());
         user.setLast_name(dto.getLast_name());
@@ -124,9 +125,11 @@ public class UserService {
         }
     }
 
-    public UserWebsiteUpdateDto checkUser(String telephone, String email) {
-        Optional<User> existing = userRepository.findById(telephone);
-        if (existing.isEmpty()) {
+    public UserWebsiteUpdateDto checkUser(String cc, String telephone, String email) {
+        String fullTelephone = cc + telephone;
+        User existing = userRepository.findById(telephone).orElse(userRepository.findById(fullTelephone).orElse(userRepository.findById("+" + fullTelephone).orElse(null)));
+
+        if (existing == null) {
             UserWebsiteUpdateDto userDto = userClient.getForWebsite(telephone);
             if (userDto == null)
                 return null;
@@ -136,30 +139,40 @@ public class UserService {
             if (userDto.getEmail().equals(email))
                 return userDto;
             else
-                return null;
+                throw new RuntimeException("Email mismatch for user " + telephone);
         }
-        User user = existing.get();
         UserWebsiteUpdateDto dto = new UserWebsiteUpdateDto();
-        dto.setName(user.getName());
-        dto.setLast_name(user.getLast_name());
-        dto.setEmail(user.getEmail());
-        dto.setAddress(user.isAddress());
-        dto.setDateOfBirth(user.isDateOfBirth());
-        dto.setPostal_code(user.isPostal_code());
-        dto.setCity(user.isCity());
-        dto.setCountry(user.isCountry());
-        dto.setVat_number(user.isVat_number());
-        dto.setDriver_license(user.isDriver_license());
-        dto.setDriver_license_country(user.isDriver_license_country());
-        dto.setPassport(user.isPassport());
-        dto.setPassport_country(user.isPassport_country());
-        
-        dto.setCompany(user.isCompany());
-        dto.setCompany_name(user.isCompany_name());
+        dto.setName(existing.getName());
+        dto.setLast_name(existing.getLast_name());
+        dto.setEmail(existing.getEmail());
+        dto.setAddress(existing.isAddress());
+        dto.setDateOfBirth(existing.isDateOfBirth());
+        dto.setPostal_code(existing.isPostal_code());
+        dto.setCity(existing.isCity());
+        dto.setCountry(existing.isCountry());
+        dto.setVat_number(existing.isVat_number());
+        dto.setDriver_license(existing.isDriver_license());
+        dto.setDriver_license_country(existing.isDriver_license_country());
+        dto.setPassport(existing.isPassport());
+        dto.setPassport_country(existing.isPassport_country());
+
+        dto.setCompany(existing.isCompany());
+        dto.setCompany_name(existing.isCompany_name());
         if (dto.getEmail().equals(email))
             return dto;
         else
-            return null;
+            throw new RuntimeException("Email mismatch for user " + telephone);
     }
 
+    public boolean checkUserInternal(String cc, String telephone, String email) {
+        String fullTelephone = cc + telephone;
+        User user = userRepository.findById(telephone).orElse(userRepository.findById(fullTelephone).orElse(userRepository.findById("+" + fullTelephone).orElse(null)));
+
+        if (user != null) {
+            if (!user.getEmail().equals(email) && userRepository.existsByEmail(email))
+                throw new RuntimeException("Email mismatch for user " + telephone);
+        }
+
+        return true;
+    }
 }

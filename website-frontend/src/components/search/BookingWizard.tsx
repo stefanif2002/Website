@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from "react";
+// src/pages/booking/BookingWizard.tsx
+import React, { useState } from "react";
 import { Card, Col, Form, Row, Steps, Typography, message } from "antd";
-import {useLocation, useNavigate, useSearchParams} from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import AddonsStep from "./AddonsStep";
 import SummaryCard from "./SummaryCard";
 import { ADDONS } from "./addonsDef";
 import MyInfo from "./MyInfo";
 import Payment from "./Payment";
-import {getLangPrefix, myApi} from "../../resources/service.ts";
+import { myApi } from "../../resources/service.ts";
 import dayjs from "dayjs";
+import { withLang } from "../../resources/useLangRouter"; // ⬅️ use the lang-aware builder
 
 const { Title } = Typography;
 
@@ -47,7 +49,8 @@ const parseExtras = (s?: string | null) => {
     const checklist: Record<string, boolean> = {};
     const checklistQty: Record<string, number> = {};
     if (!s) return { checklist, checklistQty };
-    s.split(",")
+    s
+        .split(",")
         .filter(Boolean)
         .forEach((item) => {
             const [raw, q] = item.split(".");
@@ -74,7 +77,6 @@ export default function BookingWizard({
 
     const [sp, setSp] = useSearchParams();
     const { pathname } = useLocation();
-
     const navigate = useNavigate();
 
     type FormValues = { checklist?: Record<string, boolean>; checklistQty?: Record<string, number> };
@@ -93,7 +95,7 @@ export default function BookingWizard({
     };
 
     // Pull extras from URL into the form once
-    useEffect(() => {
+    React.useEffect(() => {
         const { checklist: urlCl, checklistQty: urlClq } = parseExtras(sp.get("extras"));
         const current = form.getFieldsValue(["checklist", "checklistQty"]) as any;
         const has = current?.checklist && Object.keys(current.checklist).length > 0;
@@ -105,7 +107,7 @@ export default function BookingWizard({
     }, [pathname]);
 
     // Initialize total
-    useEffect(() => {
+    React.useEffect(() => {
         const init = form.getFieldsValue(true) as FormValues;
         setAddonsTotal(calcAddonsTotal(init));
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -116,13 +118,11 @@ export default function BookingWizard({
     // Create booking BEFORE payment to acquire a bookingId
     const saveDraftAndGoToPayment = async () => {
         try {
-            // Minimal required fields before saving a draft
             await form.validateFields(["telephone", "email", "name", "last_name", "number_of_people"]);
 
-            // Read form values
             const values = form.getFieldsValue(true);
             const {
-                telephone,                  // -> BookingCreateDto.userId via @JsonProperty("telephone")
+                telephone,
                 email,
                 name,
                 last_name,
@@ -145,7 +145,6 @@ export default function BookingWizard({
                 checklistQty?: Record<string, number>;
             };
 
-            // Build drivers DTO [{ telephone, full_name }]
             const driverList: Driver[] = Array.isArray(drivers)
                 ? (drivers as Partial<Driver>[]).map((d) => ({
                     telephone: d?.telephone ?? "",
@@ -153,7 +152,6 @@ export default function BookingWizard({
                 }))
                 : [];
 
-            // Build extras DTO [{ item, quantity }]
             const entries: ChecklistEntryDto[] = [];
             for (const a of ADDONS) {
                 if (checklist[a.value]) {
@@ -181,24 +179,22 @@ export default function BookingWizard({
                 return;
             }
 
-            // Format as LocalDateTime (no timezone), e.g. 2025-01-31T14:30:00
             const startLdt = dayjs(startIso).format("YYYY-MM-DDTHH:mm:ss");
-            const endLdt   = dayjs(endIso).format("YYYY-MM-DDTHH:mm:ss");
+            const endLdt = dayjs(endIso).format("YYYY-MM-DDTHH:mm:ss");
 
-            // ---- EXACT SHAPE FOR BookingCreateDto ----
             const payload = {
-                telephone,                       // -> BookingCreateDto.userId (via @JsonProperty("telephone"))
-                category_id: categoryId,         // -> BookingCreateDto.categoryId (via @JsonProperty)
-                drivers: driverList,             // -> List<DriverDto>
-                start: startLdt,                 // -> LocalDateTime
-                end: endLdt,                     // -> LocalDateTime
-                price: Number(grandTotal.toFixed(2)), // -> Float
-                startLocation,                   // -> String
-                endLocation,                     // -> String
-                flight,                          // -> String
-                notes,                           // -> String
-                number_of_people: Number(number_of_people || 1), // -> Integer
-                checklist: entries,              // -> List<ChecklistItemDto> { item, quantity }
+                telephone,
+                category_id: categoryId,
+                drivers: driverList,
+                start: startLdt,
+                end: endLdt,
+                price: Number(grandTotal.toFixed(2)),
+                startLocation,
+                endLocation,
+                flight,
+                notes,
+                number_of_people: Number(number_of_people || 1),
+                checklist: entries,
             };
 
             const resp = await myApi.post("booking/create", payload);
@@ -213,43 +209,33 @@ export default function BookingWizard({
             next.set("bid", String(bookingId));
             setSp(next, { replace: true });
 
-            // --- Send Booking Confirmation Email (non-blocking for UX) ---
+            // (optional) send confirmation email – non-blocking
             const fullName = `${name ?? ""} ${last_name ?? ""}`.trim();
             const emailDto = {
                 email,
                 telephone,
                 name: fullName,
                 bookingId,
-                start: startLdt,          // LocalDateTime
-                end: endLdt,              // LocalDateTime
+                start: startLdt,
+                end: endLdt,
                 startLocation,
                 endLocation,
             };
-
             try {
-                // If your controller is @RequestMapping("/api/v1/email")
                 await myApi.post("email/sendBookingConfirmationEmail", emailDto);
-                // If your controller is @RequestMapping("/api/email") instead, use:
-                // await myApi.post("/api/email/sendBookingConfirmationEmail", emailDto);
             } catch (e) {
-                // Don’t block: just warn and keep going to payment
                 console.warn("Failed to send confirmation email", e);
             }
 
-            // Go to payment (ensure URL includes bid)
-            const langPrefix = getLangPrefix(pathname);          // <- "/el" if none found
-            const target = `${langPrefix}/book/${categoryId}/payment${
-                next.toString() ? `?${next.toString()}` : ""
-            }`;
+            // ✅ Go to payment with correct language prefix
+            const qs = next.toString() ? `?${next.toString()}` : "";
+            const target = withLang(`/book/${categoryId}/payment${qs}`);
             navigate(target, { replace: true });
-
         } catch (err: any) {
-            if (err?.errorFields) return; // AntD validation already shown
+            if (err?.errorFields) return;
             message.error("Αποτυχία δημιουργίας κράτησης. Προσπαθήστε ξανά.");
         }
     };
-
-
 
     // Keep ?extras in URL + keep totals
     const handleValuesChange = () => {
@@ -266,47 +252,21 @@ export default function BookingWizard({
 
     return (
         <div style={{ marginTop: 10, width: "90%", margin: "20px auto" }}>
-            <Steps
-                current={step}
-                items={[{ title: "Εξοπλισμός" }, { title: "Προσωπικά Στοιχεία" }, { title: "Πληρωμή" }]}
-                style={{ marginBottom: 16 }}
-            />
-
+            <Steps current={step} items={[{ title: "Εξοπλισμός" }, { title: "Προσωπικά Στοιχεία" }, { title: "Πληρωμή" }]} style={{ marginBottom: 16 }} />
             <Row gutter={16} align="top">
                 <Col xs={24} md={step === 2 ? 24 : 16}>
-                    <Form
-                        form={form}
-                        layout="vertical"
-                        initialValues={{ checklist: {}, checklistQty: {} }}
-                        onValuesChange={handleValuesChange}
-                    >
+                    <Form form={form} layout="vertical" initialValues={{ checklist: {}, checklistQty: {} }} onValuesChange={handleValuesChange}>
                         {routeStep === "extra" && (
-                            <AddonsStep
-                                form={form}
-                                onNext={() => goto("info")}
-                                onTotalsChange={(t) => setAddonsTotal(t)}
-                            />
+                            <AddonsStep form={form} onNext={() => goto("info")} onTotalsChange={(t) => setAddonsTotal(t)} />
                         )}
-
                         {routeStep === "info" && (
                             <Card style={{ borderRadius: 12 }} title={<Title level={4} style={{ margin: 0 }}>Η Πληροφορία Σου</Title>}>
-                                <MyInfo
-                                    form={form}
-                                    onPrev={() => goto("extra")}
-                                    onNext={saveDraftAndGoToPayment}   // <-- create booking first, then go to payment
-                                />
+                                <MyInfo form={form} onPrev={() => goto("extra")} onNext={saveDraftAndGoToPayment} />
                             </Card>
                         )}
-
                         {routeStep === "payment" && (
                             <Card style={{ borderRadius: 12 }} title={<Title></Title>}>
-                                <Payment
-                                    form={form}
-                                    amount={grandTotal}
-                                    currency={currency}
-                                    onPrev={() => goto("info")}
-                                    onPaid={() => goto("done")}        // booking already exists; just go to success
-                                />
+                                <Payment form={form} amount={grandTotal} currency={currency} onPrev={() => goto("info")} onPaid={() => goto("done")} />
                             </Card>
                         )}
                     </Form>

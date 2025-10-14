@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class UserDto {
     private String email;
+    private String cc;
     private String name;
     private String last_name;
     private String telephone;

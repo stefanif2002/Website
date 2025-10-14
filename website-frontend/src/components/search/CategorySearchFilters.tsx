@@ -6,12 +6,10 @@ import {
     Card,
     Divider,
     Form,
-    Input,
     message,
     Radio,
     Row,
     Col,
-    Segmented,
     Space,
     Tag,
     Tooltip,
@@ -159,7 +157,7 @@ const CategorySearchFilters: React.FC<Props> = ({ onFilterChange, clearAll, init
             >
                 <Space align="center" size={10}>
                     <FontAwesomeIcon icon={faCircleCheck} />
-                    <span style={{ fontWeight: 700, letterSpacing: 0.2 }}>Filters</span>
+                    <span style={{ fontWeight: 700, letterSpacing: 0.2 }}>Φίλτρα</span>
                     {activeChips.length > 0 && (
                         <Tag color="gold" style={{ borderRadius: 999, marginLeft: 6 }}>
                             {activeChips.length}
@@ -173,7 +171,7 @@ const CategorySearchFilters: React.FC<Props> = ({ onFilterChange, clearAll, init
                         icon={<FontAwesomeIcon icon={faBroom} />}
                         style={{ color: "#2F5AFF", background: "white", border: "none", fontWeight: 600 }}
                     >
-                        Clear
+                        Καθαρισμός
                     </Button>
                 </Tooltip>
             </div>
@@ -223,7 +221,7 @@ const CategorySearchFilters: React.FC<Props> = ({ onFilterChange, clearAll, init
                                 label={
                                     <Space size={6}>
                                         <FontAwesomeIcon icon={faCarSide} />
-                                        <span>Type</span>
+                                        <span>Τύπος</span>
                                     </Space>
                                 }
                                 name="type"
@@ -246,7 +244,7 @@ const CategorySearchFilters: React.FC<Props> = ({ onFilterChange, clearAll, init
                                 label={
                                     <Space size={6}>
                                         <FontAwesomeIcon icon={faGasPump} />
-                                        <span>Fuel</span>
+                                        <span>Καύσιμο</span>
                                     </Space>
                                 }
                                 name="fuelType"
@@ -269,7 +267,7 @@ const CategorySearchFilters: React.FC<Props> = ({ onFilterChange, clearAll, init
                                 label={
                                     <Space size={6}>
                                         <FontAwesomeIcon icon={faUsers} />
-                                        <span>Seats</span>
+                                        <span>Θέσεις</span>
                                     </Space>
                                 }
                                 name="numOfSeats"
@@ -303,7 +301,7 @@ const CategorySearchFilters: React.FC<Props> = ({ onFilterChange, clearAll, init
                                 label={
                                     <Space size={6}>
                                         <FontAwesomeIcon icon={faGears} />
-                                        <span>Transmission</span>
+                                        <span>Μετάδοση</span>
                                     </Space>
                                 }
                                 name="automatic"

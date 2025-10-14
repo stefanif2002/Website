@@ -24,8 +24,8 @@ public class UserController {
     }
 
     @GetMapping("checkUser/{telephone}")
-    public ResponseEntity<UserWebsiteUpdateDto> checkUser(@PathVariable String telephone, @RequestParam String email) {
-        return ResponseEntity.ok(service.checkUser(telephone, email));
+    public ResponseEntity<UserWebsiteUpdateDto> checkUser(@PathVariable String telephone, @RequestParam String cc, @RequestParam String email) {
+        return ResponseEntity.ok(service.checkUser(cc, telephone, email));
     }
 
 }
