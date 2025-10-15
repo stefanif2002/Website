@@ -45,7 +45,7 @@ export const mainMenuItems: NavItem[] = [
             { key: "luxury",           label: "Κατηγορία πολυτελείας", href: "/stolos/enoikiasi-politeleias-autokinito-thessaloniki" },
         ],
     },
-    { key: "offer-2025", label: "Προσφορά 2025!", href: "/prosfora-enoikiasi-autokinitou-thessaloniki" },
+    { key: "offer-2026", label: "Προσφορά 2026!", href: "/prosfora-enoikiasi-autokinitou-thessaloniki" },
     { key: "reviews",    label: "Κριτικές ★",     href: "/enoikiasi-autokinitou-thessaloniki-kritikes" },
     {
         key: "why-us",

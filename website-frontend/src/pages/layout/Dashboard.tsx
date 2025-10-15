@@ -12,6 +12,7 @@ import { useLocation } from 'react-router-dom';
 import FleetCategoriesPage from '../FleetCategoriesPage';
 import FleetCategoryView from '../FleetCategoryView';
 import { Trans, useTranslation } from 'react-i18next';
+import Offer2026Page from "../extra/Offer2026Page.tsx";
 
 const { Content, Sider } = Layout;
 
@@ -54,6 +55,11 @@ export default function Dashboard() {
     const isMainPagePath = strip(pathname) === `${langPrefix}` || strip(pathname) === '';
     const isSearchPath = strip(pathname) === `${langPrefix}/search`;
     const isBookPath = /^(\/(en|el-GR))?\/book(\/|$)/i.test(strip(pathname));
+    const isOfferPage =
+        strip(pathname).endsWith(`${langPrefix}/prosfora-enoikiasi-autokinitou-thessaloniki`) ||
+        strip(pathname) === `/el-GR/prosfora-enoikiasi-autokinitou-thessaloniki` ||
+        strip(pathname) === `/en/prosfora-enoikiasi-autokinitou-thessaloniki`; // tweak if you add an EN slug
+
 
     const stolosIdx = bodyParts.findIndex((p) => p === 'stolos');
     const fleetSlug = stolosIdx >= 0 ? bodyParts[stolosIdx + 1] : undefined;
@@ -135,6 +141,13 @@ export default function Dashboard() {
                                 {renderFleetCategory()}
                             </div>
                         )}
+
+                        {isOfferPage && (
+                            <div style={{ width: '100%', margin: '0 auto', padding: '0 16px' }}>
+                                <Offer2026Page />
+                            </div>
+                        )}
+
                     </div>
 
                     <MyFooter />
