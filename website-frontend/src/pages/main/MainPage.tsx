@@ -17,10 +17,6 @@ function MainPage() {
     const { go } = useLangRouter(); // <<-- lang-aware helpers
 
 
-    const handleOnClick = () => {
-        go("/search"); // navigates to "/el/search" (or current lang)
-    };
-
     return (
         <>
             <div
@@ -77,7 +73,7 @@ function MainPage() {
                     cursor: 'pointer',
                     marginTop: '80px', // Add spacing between the subtitle and the button
                 }}
-                onClick={() => handleOnClick()}
+                onClick={() => go("/search")}
             >
                 ΚΑΝΤΕ ΚΡΑΤΗΣΗ ΤΩΡΑ
             </Button>

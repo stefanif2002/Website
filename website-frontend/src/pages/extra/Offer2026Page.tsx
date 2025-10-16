@@ -1,6 +1,7 @@
 import React from "react";
 import { Button, Card, Col, Row, Space, Typography, Image, Divider } from "antd";
 import { useNavigate } from "react-router-dom";
+import {useLangRouter} from "../../resources/useLangRouter.ts";
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -16,6 +17,7 @@ const bullet = (text: React.ReactNode) => (
 
 export default function Offer2026Page() {
     const navigate = useNavigate();
+    const { go } = useLangRouter(); // <<-- lang-aware helpers
 
     return (
         <div style={{ width: "100%", margin: "0 auto", padding: "0 16px", maxWidth: 1140 }}>
@@ -127,18 +129,6 @@ export default function Offer2026Page() {
 
                     <Space wrap>
                         <Button
-                            size="large"
-                            style={{
-                                borderColor: brandBlue,
-                                color: brandBlue,
-                                fontWeight: 600,
-                            }}
-                            onClick={() => navigate("./search")}
-                        >
-                            Στην επισκόπηση τιμών
-                        </Button>
-
-                        <Button
                             type="primary"
                             size="large"
                             style={{
@@ -146,7 +136,7 @@ export default function Offer2026Page() {
                                 borderColor: brandRed,
                                 fontWeight: 600,
                             }}
-                            onClick={() => navigate("./search")}
+                            onClick={() => go("/search")}
                         >
                             Κάντε κράτηση
                         </Button>

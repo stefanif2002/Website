@@ -136,7 +136,7 @@ function AddBooking() {
         : `${prefix}/book/details${qp ? `?${qp}` : ""}`;
 
     return (
-        <div style={{ padding: isMobile ? "0px" : "20px" }}>
+        <div >
             {routeStep === "search" && <SearchPage onSubmit={onCategorySelect} />}
 
             {routeStep !== "search" && routeStep !== "done" && booking && (

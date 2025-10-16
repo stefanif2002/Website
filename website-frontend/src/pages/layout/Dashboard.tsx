@@ -13,6 +13,12 @@ import FleetCategoriesPage from '../FleetCategoriesPage';
 import FleetCategoryView from '../FleetCategoryView';
 import { Trans, useTranslation } from 'react-i18next';
 import Offer2026Page from "../extra/Offer2026Page.tsx";
+import ReviewsPage from "../extra/ReviewsPage.tsx";
+import FourRentVsCompetitorPage from "../extra/FourRentVsCompetitorPage.tsx";
+import PremiumServicePage from "../extra/PremiumServicePage.tsx";
+import CheapRentalsPage from "../extra/CheapRentalsPage.tsx";
+import MixedInsuranceNoDepositPage from "../extra/MixedInsuranceNoDepositPage.tsx";
+import FaqThessalonikiPage from "../extra/FaqThessalonikiPage.tsx";
 
 const { Content, Sider } = Layout;
 
@@ -52,13 +58,24 @@ export default function Dashboard() {
     const langPrefix = hasLang ? `/${parts[0]}` : '';
     const bodyParts = hasLang ? parts.slice(1) : parts;
 
-    const isMainPagePath = strip(pathname) === `${langPrefix}` || strip(pathname) === '';
-    const isSearchPath = strip(pathname) === `${langPrefix}/search`;
-    const isBookPath = /^(\/(en|el-GR))?\/book(\/|$)/i.test(strip(pathname));
-    const isOfferPage =
-        strip(pathname).endsWith(`${langPrefix}/prosfora-enoikiasi-autokinitou-thessaloniki`) ||
-        strip(pathname) === `/el-GR/prosfora-enoikiasi-autokinitou-thessaloniki` ||
-        strip(pathname) === `/en/prosfora-enoikiasi-autokinitou-thessaloniki`; // tweak if you add an EN slug
+    // utility: normalize and detect path segment
+    function isPath(pathname: string, langPrefix: string, slug: string | RegExp): boolean {
+        const clean = strip(pathname);
+        if (slug instanceof RegExp) return slug.test(clean);
+        return clean === `${langPrefix}/${slug}` || clean === `/el-GR/${slug}` || clean === `/en/${slug}`;
+    }
+
+    const isMainPagePath = strip(pathname) === `${langPrefix}` || strip(pathname) === "";
+    const isSearchPath = isPath(pathname, langPrefix, "search");
+    const isBookPath = isPath(pathname, langPrefix, /^\/?(book)(\/|$)/i);
+    const isOfferPage = isPath(pathname, langPrefix, "prosfora-enoikiasi-autokinitou-thessaloniki");
+    const isReviewPage = isPath(pathname, langPrefix, "enoikiasi-autokinitou-thessaloniki-kritikes");
+    const isFourRentVsCompetitorPage = isPath(pathname, langPrefix, "enoikiaseis-autokiniton-thessaloniki/4rent-vs-antagonistis");
+    const isPremiumPage = isPath(pathname, langPrefix, "enoikiaseis-autokiniton-thessaloniki/ypiresia-premium");
+    const isCheapCarsPage = isPath(pathname, langPrefix, "enoikiaseis-autokiniton-thessaloniki/fthina-enoikiazomena-aftokinita-thessaloniki");
+    const isFullInsurancePage = isPath(pathname, langPrefix, "enoikiaseis-autokiniton-thessaloniki/mikti-asfaleia-xoris-eggyisis");
+    const isCommonQuestionsPage = isPath(pathname, langPrefix, "enoikiaseis-autokiniton-thessaloniki/syxnes-erotiseis");
+
 
 
     const stolosIdx = bodyParts.findIndex((p) => p === 'stolos');
@@ -112,15 +129,21 @@ export default function Dashboard() {
                 <MyHeader />
                 <Content
                     ref={contentRef}
-                    style={{ position: 'relative', zIndex: 1, overflow: 'visible', paddingInlineStart: width < 4.4 ? 80 : 0 }}
+                    style={{
+                        position: 'relative',
+                        zIndex: 1,
+                        overflow: 'visible',
+                        paddingInlineStart: width < 4.4 ? 80 : 0,
+                        paddingTop: 26,              // ⬅️ add this line
+                    }}
                 >
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: 608 }}>
-                        <p>
-                            <Trans i18nKey="editCode">
-                                Edit <code>src/App.tsx</code> and save to test HMR
-                            </Trans>
-                        </p>
-                        <p>{t('clickLogos', 'Click on the logos!')}</p>
+                        {/*<p>*/}
+                        {/*    <Trans i18nKey="editCode">*/}
+                        {/*        Edit <code>src/App.tsx</code> and save to test HMR*/}
+                        {/*    </Trans>*/}
+                        {/*</p>*/}
+                        {/*<p>{t('clickLogos', 'Click on the logos!')}</p>*/}
 
                         {isMainPagePath ? <MainPage /> : null}
 
@@ -145,6 +168,42 @@ export default function Dashboard() {
                         {isOfferPage && (
                             <div style={{ width: '100%', margin: '0 auto', padding: '0 16px' }}>
                                 <Offer2026Page />
+                            </div>
+                        )}
+
+                        {isReviewPage && (
+                            <div style={{ width: '100%', margin: '0 auto', padding: '0 16px' }}>
+                                <ReviewsPage />
+                            </div>
+                        )}
+
+                        {isFourRentVsCompetitorPage && (
+                            <div style={{ width: '100%', margin: '0 auto', padding: '0 16px' }}>
+                                <FourRentVsCompetitorPage />
+                            </div>
+                        )}
+
+                        {isPremiumPage && (
+                            <div style={{ width: '100%', margin: '0 auto', padding: '0 16px' }}>
+                                <PremiumServicePage />
+                            </div>
+                        )}
+
+                        {isCheapCarsPage && (
+                            <div style={{ width: '100%', margin: '0 auto', padding: '0 16px' }}>
+                                <CheapRentalsPage />
+                            </div>
+                        )}
+
+                        {isFullInsurancePage && (
+                            <div style={{ width: '100%', margin: '0 auto', padding: '0 16px' }}>
+                                <MixedInsuranceNoDepositPage />
+                            </div>
+                        )}
+
+                        {isCommonQuestionsPage && (
+                            <div style={{ width: '100%', margin: '0 auto', padding: '0 16px' }}>
+                                <FaqThessalonikiPage />
                             </div>
                         )}
 
