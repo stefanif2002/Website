@@ -64,7 +64,12 @@ export default function Dashboard() {
     // utility: normalize and detect path segment
     function isPath(pathname: string, langPrefix: string, slug: string | RegExp): boolean {
         const clean = strip(pathname);
-        if (slug instanceof RegExp) return slug.test(clean);
+        if (slug instanceof RegExp) {
+            const withoutLang = langPrefix && clean.startsWith(langPrefix)
+                ? clean.slice(langPrefix.length) || "/"
+                : clean;
+            return slug.test(withoutLang);
+        }
         return clean === `${langPrefix}/${slug}` || clean === `/el-GR/${slug}` || clean === `/en/${slug}`;
     }
 

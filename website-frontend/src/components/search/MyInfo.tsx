@@ -45,6 +45,7 @@ import {
     EditOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
+import { withLang } from "../../resources/useLangRouter.ts";
 
 const { Title, Text } = Typography;
 
@@ -91,7 +92,6 @@ const MyInfo: React.FC<Props> = ({
                                      onNext,
                                      countryOptions = DEFAULT_COUNTRIES,
                                  }) => {
-    const termsHref = "/el/terms";
 
     const [checking, setChecking] = React.useState(false);
     const [verified, setVerified] = React.useState(false);
@@ -758,21 +758,24 @@ const MyInfo: React.FC<Props> = ({
             <Form.Item
                 name="acceptTerms"
                 valuePropName="checked"
-                rules={[
-                    {
-                        validator: (_, v) =>
-                            v ? Promise.resolve() : Promise.reject(new Error("Παρακαλώ αποδεχτείτε τους Όρους & Προϋποθέσεις")),
-                    },
-                ]}
+                rules={[{
+                    validator: (_, v) =>
+                        v ? Promise.resolve() : Promise.reject(new Error("Παρακαλώ αποδεχτείτε τους Όρους & Προϋποθέσεις")),
+                }]}
                 style={{ marginTop: 12 }}
             >
                 <Checkbox>
                     Αποδέχομαι τους{" "}
-                    <a href={termsHref} target="_blank" rel="noopener noreferrer">
+                    <a
+                        href={withLang("/epikoinonia/oroi-kai-proipotheseis")}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
                         Όρους & Προϋποθέσεις
                     </a>
                 </Checkbox>
             </Form.Item>
+
 
             {/* FOOTER ACTIONS */}
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 16 }}>
