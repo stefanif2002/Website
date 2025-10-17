@@ -63,11 +63,11 @@ export const mainMenuItems: NavItem[] = [
         key: "contact",
         label: "Επικοινωνία",
         children: [
-            { key: "contact-us",  label: "Επικοινωνήστε μαζί μας", href: "/epokoinonia/epikoinoniste-mazi-mas" },
-            { key: "terms",       label: "Όροι",                   href: "/epokoinonia/oroi-kai-proipotheseis" },
-            { key: "privacy",     label: "Πολιτική προστασίας δεδομένων", href: "/epokoinonia/politiki-prostasias-dedomenon" },
-            { key: "video-call",  label: "Επικοινωνία μέσω Video call",   href: "/epokoinonia/epikoinonia-meso-video-call" },
-            { key: "sitemap",     label: "Sitemap",                      href: "/epokoinonia/sitemap" },
+            { key: "contact-us",  label: "Επικοινωνήστε μαζί μας", href: "/epikoinonia/epikoinoniste-mazi-mas" },
+            { key: "terms",       label: "Όροι",                   href: "/epikoinonia/oroi-kai-proipotheseis" },
+            { key: "privacy",     label: "Πολιτική προστασίας δεδομένων", href: "/epikoinonia/politiki-prostasias-dedomenon" },
+            { key: "video-call",  label: "Επικοινωνία μέσω Video call",   href: "/epikoinonia/epikoinonia-meso-video-call" },
+            { key: "sitemap",     label: "Sitemap",                      href: "/epikoinonia/sitemap" },
             {
                 key: "partners",
                 label: "Συνεργάτες",

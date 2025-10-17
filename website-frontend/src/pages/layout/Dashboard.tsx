@@ -19,6 +19,9 @@ import PremiumServicePage from "../extra/PremiumServicePage.tsx";
 import CheapRentalsPage from "../extra/CheapRentalsPage.tsx";
 import MixedInsuranceNoDepositPage from "../extra/MixedInsuranceNoDepositPage.tsx";
 import FaqThessalonikiPage from "../extra/FaqThessalonikiPage.tsx";
+import ChalkidikiRentPage from "../extra/ChalkidikiRentPage.tsx";
+import ContactUsPage from "../extra/ContactUsPage.tsx";
+import TermsConditionsPage from "../extra/TermsConditionsPage.tsx";
 
 const { Content, Sider } = Layout;
 
@@ -75,6 +78,9 @@ export default function Dashboard() {
     const isCheapCarsPage = isPath(pathname, langPrefix, "enoikiaseis-autokiniton-thessaloniki/fthina-enoikiazomena-aftokinita-thessaloniki");
     const isFullInsurancePage = isPath(pathname, langPrefix, "enoikiaseis-autokiniton-thessaloniki/mikti-asfaleia-xoris-eggyisis");
     const isCommonQuestionsPage = isPath(pathname, langPrefix, "enoikiaseis-autokiniton-thessaloniki/syxnes-erotiseis");
+    const isChalkidikiRentPage = isPath(pathname, langPrefix, "enoikiaseis-autokiniton-thessaloniki/enoikiasi-aftokinitou-xalkidiki");
+    const isContactPage = isPath(pathname, langPrefix, "epikoinonia/epikoinoniste-mazi-mas");
+    const isTermsPage = isPath(pathname, langPrefix, "epikoinonia/oroi-kai-proipotheseis");
 
 
 
@@ -206,6 +212,25 @@ export default function Dashboard() {
                                 <FaqThessalonikiPage />
                             </div>
                         )}
+
+                        {isChalkidikiRentPage && (
+                            <div style={{ width: '100%', margin: '0 auto', padding: '0 16px' }}>
+                                <ChalkidikiRentPage />
+                            </div>
+                        )}
+
+                        {isContactPage && (
+                            <div style={{ width: '100%', margin: '0 auto', padding: '0 16px' }}>
+                                <ContactUsPage />
+                            </div>
+                        )}
+
+                        {isTermsPage && (
+                            <div style={{ width: '100%', margin: '0 auto', padding: '0 16px' }}>
+                                <TermsConditionsPage />
+                            </div>
+                        )}
+
 
                     </div>
 
