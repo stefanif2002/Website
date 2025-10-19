@@ -22,6 +22,7 @@ import FaqThessalonikiPage from "../extra/FaqThessalonikiPage.tsx";
 import ChalkidikiRentPage from "../extra/ChalkidikiRentPage.tsx";
 import ContactUsPage from "../extra/ContactUsPage.tsx";
 import TermsConditionsPage from "../extra/TermsConditionsPage.tsx";
+import PrivacyPolicyPage from "../extra/PrivacyPolicyPage.tsx";
 
 const { Content, Sider } = Layout;
 
@@ -86,6 +87,8 @@ export default function Dashboard() {
     const isChalkidikiRentPage = isPath(pathname, langPrefix, "enoikiaseis-autokiniton-thessaloniki/enoikiasi-aftokinitou-xalkidiki");
     const isContactPage = isPath(pathname, langPrefix, "epikoinonia/epikoinoniste-mazi-mas");
     const isTermsPage = isPath(pathname, langPrefix, "epikoinonia/oroi-kai-proipotheseis");
+    const isPrivacyPolicyPage = isPath(pathname, langPrefix, "epikoinonia/politiki-prostasias-dedomenon");
+
 
 
 
@@ -236,6 +239,11 @@ export default function Dashboard() {
                             </div>
                         )}
 
+                        {isPrivacyPolicyPage && (
+                            <div style={{ width: '100%', margin: '0 auto', padding: '0 16px' }}>
+                                <PrivacyPolicyPage />
+                            </div>
+                        )}
 
                     </div>
 
