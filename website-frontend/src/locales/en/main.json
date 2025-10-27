@@ -1,0 +1,37 @@
+{
+  "hero.title": "4Rent a Car<br/>Thessaloniki",
+  "hero.subtitle": "All the rental cars have full cover insurance WITHOUT self-participation - excess.",
+  "hero.bookNow": "BOOK NOW",
+
+  "section.airportTitle": "Rent a Car Thessaloniki without security deposit - excess & Credit Card",
+
+  "p.welcome": "Welcome to <b>4Rent!</b>",
+  "p.intro": "Our <b>Rent a Car Thessaloniki</b> Company offers a variety of new vehicle models at affordable prices, so you can choose the one that fully satisfies your needs <linkFleet>(Fleet)</linkFleet>. We guarantee excellent service, provided by our friendly, polite, courteous, and very helpful staff.",
+  "p.airportHotel": "You can pick up or drop off the car at the <b>International Airport Thessaloniki / SKG</b> (with the free shuttle service to the office, only 1.8 km away from the Airport) or at a Hotel (Airbnb) of your choice in Thessaloniki City. You can also <b>rent your car</b> in <b>Chalkidiki</b> (Kassandra, Sithonia).",
+  "p.insurance": "Every car is <b>equipped with full insurance</b>, to be more specific, <linkInsurance>no-fault insurance</linkInsurance> which includes damages to tires, the lower part of the car, and glasses. <b>No hidden costs</b>, no excess – no security deposit; we don't block money on your card and no credit card is required, with unlimited kilometers and additional drivers included.",
+  "p.deposit": "Book your desired category with only <b>€49.00 down payment</b>, and the rest will be paid upon arrival in cash or card (credit, debit).",
+  "p.premium": "Choosing the <linkPremium>Premium Member Service</linkPremium> (<b>€1.00/day</b>), you gain access to additional services such as <b>free cancellation</b>, rebooking, modifications, and a 10% discount on your next booking.",
+  "p.reviews": "If you would like to form a more complete opinion about us, take a look at our <linkReviews>Customer Reviews</linkReviews> ⭐️⭐️⭐️⭐️⭐️. You will have no doubt about your holidays in Greece.",
+
+  "smart.title": "THE SMART WAY TO BOOK YOUR CAR.",
+  "fleet.heading": "Rental Car Fleet from 4Rent Thessaloniki",
+  "fleet.desc": "A wide range of rental cars adapted to your needs, in all categories... and the best of all? Our fleet is one of the most modern in Thessaloniki!!",
+  "fleet.seeAll": "Check <linkHere>here</linkHere> our entire fleet.",
+
+  "btn.selectCategory": "CHOOSE CATEGORY",
+
+  "card.premium.text": "Premium Member only with €1.00 per day",
+  "card.premium.badge": "PREMIUM!",
+  "card.insurance.text": "No-fault Insurance - No Deposit ",
+  "card.insurance.badge": "EXAMPLE",
+  "card.unique.text": "Best Service",
+  "card.unique.badge": "REVIEWS",
+  "card.offers.text": "Save money on your car rental in Thessaloniki ",
+  "card.offers.badge": "OFFERS 2026",
+
+  "links.fleet": "/en/fleet/available-categories-our-fleet",
+  "links.insurance": "/en/car-rentals-thessaloniki/no-fault-insurance",
+  "links.premium": "/en/car-rentals-thessaloniki/premium-service",
+  "links.reviews": "/en/car-rental-thessaloniki-reviews",
+  "links.fleetHere": "/en/fleet/available-categories-our-fleet"
+}

@@ -1,0 +1,83 @@
+{
+  "loading": "Φόρτωση...",
+  "menu.review": "Αξιολογήστε μας",
+  "clickLogos": "Κάντε κλικ στα λογότυπα!",
+  "editCode": "Επεξεργαστείτε το <1>src/App.tsx</1> και αποθηκεύστε για HMR",
+
+  "nav": {
+    "booking": "Κάντε κράτηση!",
+    "fleet": {
+      "title": "Στόλος | Κατηγορίες",
+      "categories": "Κατηγορίες | Στόλος",
+      "small": "Μικρή Κατηγορία",
+      "medium": "Μεσαία κατηγορία",
+      "large": "Μεγάλη Κατηγορία",
+      "family": "Οικογενειακή κατηγορία",
+      "upper": "Ανώτερη κατηγορία",
+      "caravan": "Ανώτερη κατηγορία Καραβάν",
+      "suv": "SUV / Jeep",
+      "minivan7": "Μίνι Βαν 7 Θέσεων",
+      "minivan9": "Μίνι Βαν 9 Θέσεων",
+      "automatic": "Αυτόματο Kιβώτιο",
+      "diesel": "Πετρέλαιο (Diesel)",
+      "luxury": "Κατηγορία πολυτελείας"
+    },
+    "offer2026": "Προσφορά 2026!",
+    "reviews": "Κριτικές ★",
+    "whyus": {
+      "title": "Γιατί εμας;",
+      "vs": "4rent vs Ανταγωνιστής",
+      "premium": "Υπηρεσία Premium",
+      "cheap": "Φθηνά ενοικιαζόμενα αυτοκίνητα",
+      "insurance": "Μικτή ασφάλεια χωρίς εγγύηση",
+      "faq": "Συχνές Ερωτήσεις",
+      "chalkidiki": "Ενοικίαση στην Χαλκιδική"
+    },
+    "contact": {
+      "title": "Επικοινωνία",
+      "us": "Επικοινωνήστε μαζί μας",
+      "terms": "Όροι",
+      "privacy": "Πολιτική προστασίας δεδομένων",
+      "video": "Επικοινωνία μέσω Video call",
+      "sitemap": "Sitemap",
+      "partners": {
+        "title": "Συνεργάτες",
+        "be": "Γίνε συνεργάτης!",
+        "hotel": "Ξενοδοχείο ή Airbnb",
+        "agency": "Ταξιδιωτικό Γραφείο"
+      },
+      "careers": "Θέσεις Εργασίας 4rent Thessaloniki"
+    }
+  },
+
+  "footer": {
+    "info": {
+      "heading": "ΤΗΛ. ΠΛΗΡΟΦΟΡΙΕΣ",
+      "officePhone": "Τηλέφωνο Γραφείου",
+      "officePhoneValue": "+30 2310 460035",
+      "mobile": "Κινητό",
+      "mobileValue": "+30 6982 211 001",
+      "messagingTitle": "WhatsApp, Viber μόνο μηνύματα",
+      "messagingValue": "+30 697 3832 625"
+    },
+    "support": {
+      "heading": "ΚΕΝΤΡΟ ΕΞΥΠΗΡΕΤΗΣΗΣ ΠΕΛΑΤΩΝ",
+      "infoTitle": "Πληροφορίες",
+      "infoHours": "Δευ. - Σαβ. 08:00 - 22:00",
+      "pickDropTitle": "24ωρη παραλαβή - παράδοση",
+      "pickDropDesc": "Για παραλαβή και επιστροφή του ενοικιαζόμενου αυτοκινήτου",
+      "emailTitle": "E-mail"
+    },
+    "faq": {
+      "heading": "ΣΥΧΝΕΣ ΕΡΩΤΗΣΕΙΣ",
+      "faqTitle": "Απαντήσεις στις πιο συχνές ερωτήσεις",
+      "faqLabel": "FAQs",
+      "termsTitle": "Όροι και προϋποθέσεις",
+      "termsLabel": "Όροι",
+      "privacyTitle": "Πολιτική προστασίας δεδομένων (EU-GDPR)",
+      "privacyLabel": "Πολιτική Απορρήτου"
+    },
+    "copyright": "COPYRIGHT © 2017 - {{year}} — 4RENT THESSALONIKI | EOT 0933E81000827301",
+    "backToTop": "Πάνω"
+  }
+}

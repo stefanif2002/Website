@@ -1,0 +1,83 @@
+{
+  "loading": "Loading...",
+  "menu.review": "Review us",
+  "clickLogos": "Click on the logos!",
+  "editCode": "Edit <1>src/App.tsx</1> and save to test HMR",
+
+  "nav": {
+    "booking": "Book now!",
+    "fleet": {
+      "title": "Fleet | Categories",
+      "categories": "Categories | Fleet",
+      "small": "Small Category",
+      "medium": "Medium Category",
+      "large": "Large Category",
+      "family": "Family Category",
+      "upper": "Upper Category",
+      "caravan": "Upper Category Caravan",
+      "suv": "SUV / Jeep",
+      "minivan7": "Minivan 7 Seats",
+      "minivan9": "Minivan 9 Seats",
+      "automatic": "Automatic Transmission",
+      "diesel": "Diesel",
+      "luxury": "Luxury Category"
+    },
+    "offer2026": "Offer 2026!",
+    "reviews": "Reviews ★",
+    "whyus": {
+      "title": "Why us?",
+      "vs": "4rent vs Competitor",
+      "premium": "Premium Service",
+      "cheap": "Cheap rental cars",
+      "insurance": "Full insurance without deposit",
+      "faq": "Frequently Asked Questions",
+      "chalkidiki": "Rent a car in Chalkidiki"
+    },
+    "contact": {
+      "title": "Contact",
+      "us": "Contact us",
+      "terms": "Terms",
+      "privacy": "Data Protection Policy",
+      "video": "Contact via Video call",
+      "sitemap": "Sitemap",
+      "partners": {
+        "title": "Partners",
+        "be": "Become a partner!",
+        "hotel": "Hotel or Airbnb",
+        "agency": "Travel Agency"
+      },
+      "careers": "Jobs at 4rent Thessaloniki"
+    }
+  },
+
+  "footer": {
+    "info": {
+      "heading": "PHONE INFORMATION",
+      "officePhone": "Office Phone",
+      "officePhoneValue": "+30 2310 460035",
+      "mobile": "Mobile",
+      "mobileValue": "+30 6982 211 001",
+      "messagingTitle": "WhatsApp, Viber (messages only)",
+      "messagingValue": "+30 697 3832 625"
+    },
+    "support": {
+      "heading": "CUSTOMER SERVICE CENTER",
+      "infoTitle": "Information",
+      "infoHours": "Mon - Sat 08:00 - 22:00",
+      "pickDropTitle": "24h pick-up & drop-off",
+      "pickDropDesc": "For pick-up and return of the rental car",
+      "emailTitle": "E-mail"
+    },
+    "faq": {
+      "heading": "FAQs",
+      "faqTitle": "Answers to the most common questions",
+      "faqLabel": "FAQs",
+      "termsTitle": "Terms & Conditions",
+      "termsLabel": "Terms",
+      "privacyTitle": "Data Protection Policy (EU-GDPR)",
+      "privacyLabel": "Privacy Policy"
+    },
+    "copyright": "COPYRIGHT © 2017 - {{year}} — 4RENT THESSALONIKI | EOT 0933E81000827301",
+    "backToTop": "Top"
+  }
+}

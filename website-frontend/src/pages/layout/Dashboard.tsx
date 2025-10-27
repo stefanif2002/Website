@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import styles from './Dashboard.module.css';
-import type { MenuProps } from 'antd';
 import { Layout, Menu, Image } from 'antd';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import MainPage from '../main/MainPage';
@@ -11,7 +10,7 @@ import AddBooking from '../search/AddBooking';
 import { useLocation } from 'react-router-dom';
 import FleetCategoriesPage from '../FleetCategoriesPage';
 import FleetCategoryView from '../FleetCategoryView';
-import { Trans, useTranslation } from 'react-i18next';
+import {Trans, useTranslation} from 'react-i18next';
 import Offer2026Page from "../extra/Offer2026Page.tsx";
 import ReviewsPage from "../extra/ReviewsPage.tsx";
 import FourRentVsCompetitorPage from "../extra/FourRentVsCompetitorPage.tsx";
@@ -44,9 +43,9 @@ function strip(p: string) {
 export default function Dashboard() {
     const contentRef = useRef<HTMLDivElement>(null);
     const { pathname } = useLocation();
-    const { t, i18n } = useTranslation();
+    const { t, i18n } = useTranslation(['common']);
 
-    // ---- language from URL (once) ----
+    // ---- language from URL (once per path change) ----
     useEffect(() => {
         const parts = strip(pathname).split('/').filter(Boolean);
         const maybeLng = parts[0];
@@ -88,9 +87,6 @@ export default function Dashboard() {
     const isContactPage = isPath(pathname, langPrefix, "epikoinonia/epikoinoniste-mazi-mas");
     const isTermsPage = isPath(pathname, langPrefix, "epikoinonia/oroi-kai-proipotheseis");
     const isPrivacyPolicyPage = isPath(pathname, langPrefix, "epikoinonia/politiki-prostasias-dedomenon");
-
-
-
 
     const stolosIdx = bodyParts.findIndex((p) => p === 'stolos');
     const fleetSlug = stolosIdx >= 0 ? bodyParts[stolosIdx + 1] : undefined;
@@ -148,108 +144,108 @@ export default function Dashboard() {
                         zIndex: 1,
                         overflow: 'visible',
                         paddingInlineStart: width < 4.4 ? 80 : 0,
-                        paddingTop: 26,              // ⬅️ add this line
+                        paddingTop: 26,
                     }}
                 >
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: 608 }}>
-                        {/*<p>*/}
-                        {/*    <Trans i18nKey="editCode">*/}
-                        {/*        Edit <code>src/App.tsx</code> and save to test HMR*/}
-                        {/*    </Trans>*/}
-                        {/*</p>*/}
-                        {/*<p>{t('clickLogos', 'Click on the logos!')}</p>*/}
+                    {/*<div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: 608}}>*/}
+                    {/*    <p>*/}
+                    {/*        <Trans i18nKey="editCode">*/}
+                    {/*            Edit <code>src/App.tsx</code> and save to test HMR*/}
+                    {/*        </Trans>*/}
+                    {/*    </p>*/}
+                    {/*    <p>{t('clickLogos', 'Click on the logos!')}</p>*/}
+                    {/*</div>*/}
+                        <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: 608}}>
+                            {isMainPagePath ? <MainPage/> : null}
 
-                        {isMainPagePath ? <MainPage /> : null}
+                            {(isSearchPath || isBookPath) && (
+                                <div style={{width: '100%', margin: '0 auto', padding: '0 16px'}}>
+                                    <AddBooking/>
+                                </div>
+                            )}
 
-                        {(isSearchPath || isBookPath) && (
-                            <div style={{ width: '100%', margin: '0 auto', padding: '0 16px' }}>
-                                <AddBooking />
-                            </div>
-                        )}
+                            {isFleetIndex && (
+                                <div style={{width: '100%', margin: '0 auto', padding: '0 16px'}}>
+                                    <FleetCategoriesPage/>
+                                </div>
+                            )}
 
-                        {isFleetIndex && (
-                            <div style={{ width: '100%', margin: '0 auto', padding: '0 16px' }}>
-                                <FleetCategoriesPage />
-                            </div>
-                        )}
+                            {isFleetCategoryPage && !isFleetIndex && (
+                                <div style={{width: '100%', margin: '0 auto', padding: '0 16px'}}>
+                                    {renderFleetCategory()}
+                                </div>
+                            )}
 
-                        {isFleetCategoryPage && !isFleetIndex && (
-                            <div style={{ width: '100%', margin: '0 auto', padding: '0 16px' }}>
-                                {renderFleetCategory()}
-                            </div>
-                        )}
+                            {isOfferPage && (
+                                <div style={{width: '100%', margin: '0 auto', padding: '0 16px'}}>
+                                    <Offer2026Page/>
+                                </div>
+                            )}
 
-                        {isOfferPage && (
-                            <div style={{ width: '100%', margin: '0 auto', padding: '0 16px' }}>
-                                <Offer2026Page />
-                            </div>
-                        )}
+                            {isReviewPage && (
+                                <div style={{width: '100%', margin: '0 auto', padding: '0 16px'}}>
+                                    <ReviewsPage/>
+                                </div>
+                            )}
 
-                        {isReviewPage && (
-                            <div style={{ width: '100%', margin: '0 auto', padding: '0 16px' }}>
-                                <ReviewsPage />
-                            </div>
-                        )}
+                            {isFourRentVsCompetitorPage && (
+                                <div style={{width: '100%', margin: '0 auto', padding: '0 16px'}}>
+                                    <FourRentVsCompetitorPage/>
+                                </div>
+                            )}
 
-                        {isFourRentVsCompetitorPage && (
-                            <div style={{ width: '100%', margin: '0 auto', padding: '0 16px' }}>
-                                <FourRentVsCompetitorPage />
-                            </div>
-                        )}
+                            {isPremiumPage && (
+                                <div style={{width: '100%', margin: '0 auto', padding: '0 16px'}}>
+                                    <PremiumServicePage/>
+                                </div>
+                            )}
 
-                        {isPremiumPage && (
-                            <div style={{ width: '100%', margin: '0 auto', padding: '0 16px' }}>
-                                <PremiumServicePage />
-                            </div>
-                        )}
+                            {isCheapCarsPage && (
+                                <div style={{width: '100%', margin: '0 auto', padding: '0 16px'}}>
+                                    <CheapRentalsPage/>
+                                </div>
+                            )}
 
-                        {isCheapCarsPage && (
-                            <div style={{ width: '100%', margin: '0 auto', padding: '0 16px' }}>
-                                <CheapRentalsPage />
-                            </div>
-                        )}
+                            {isFullInsurancePage && (
+                                <div style={{width: '100%', margin: '0 auto', padding: '0 16px'}}>
+                                    <MixedInsuranceNoDepositPage/>
+                                </div>
+                            )}
 
-                        {isFullInsurancePage && (
-                            <div style={{ width: '100%', margin: '0 auto', padding: '0 16px' }}>
-                                <MixedInsuranceNoDepositPage />
-                            </div>
-                        )}
+                            {isCommonQuestionsPage && (
+                                <div style={{width: '100%', margin: '0 auto', padding: '0 16px'}}>
+                                    <FaqThessalonikiPage/>
+                                </div>
+                            )}
 
-                        {isCommonQuestionsPage && (
-                            <div style={{ width: '100%', margin: '0 auto', padding: '0 16px' }}>
-                                <FaqThessalonikiPage />
-                            </div>
-                        )}
+                            {isChalkidikiRentPage && (
+                                <div style={{width: '100%', margin: '0 auto', padding: '0 16px'}}>
+                                    <ChalkidikiRentPage/>
+                                </div>
+                            )}
 
-                        {isChalkidikiRentPage && (
-                            <div style={{ width: '100%', margin: '0 auto', padding: '0 16px' }}>
-                                <ChalkidikiRentPage />
-                            </div>
-                        )}
+                            {isContactPage && (
+                                <div style={{width: '100%', margin: '0 auto', padding: '0 16px'}}>
+                                    <ContactUsPage/>
+                                </div>
+                            )}
 
-                        {isContactPage && (
-                            <div style={{ width: '100%', margin: '0 auto', padding: '0 16px' }}>
-                                <ContactUsPage />
-                            </div>
-                        )}
+                            {isTermsPage && (
+                                <div style={{width: '100%', margin: '0 auto', padding: '0 16px'}}>
+                                    <TermsConditionsPage/>
+                                </div>
+                            )}
 
-                        {isTermsPage && (
-                            <div style={{ width: '100%', margin: '0 auto', padding: '0 16px' }}>
-                                <TermsConditionsPage />
-                            </div>
-                        )}
+                            {isPrivacyPolicyPage && (
+                                <div style={{width: '100%', margin: '0 auto', padding: '0 16px'}}>
+                                    <PrivacyPolicyPage/>
+                                </div>
+                            )}
+                        </div>
 
-                        {isPrivacyPolicyPage && (
-                            <div style={{ width: '100%', margin: '0 auto', padding: '0 16px' }}>
-                                <PrivacyPolicyPage />
-                            </div>
-                        )}
-
-                    </div>
-
-                    <MyFooter />
+                        <MyFooter/>
                 </Content>
             </Layout>
         </Layout>
-    );
+);
 }

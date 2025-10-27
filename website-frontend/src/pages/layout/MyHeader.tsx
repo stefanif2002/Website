@@ -3,8 +3,8 @@ import { Col, Image, Layout, Menu, MenuProps, Row, Select, Space } from "antd";
 import styles from "./Dashboard.module.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { mainMenuItems, type NavItem } from "./menuData";
-import {width} from "../../resources/service.ts";
+import { mainMenuItems } from "./menuData";
+import { width } from "../../resources/service";
 
 const { Header } = Layout;
 
@@ -21,7 +21,7 @@ function rePrefix(path: string, lang: SupportedLng) {
     if (!path) return `/${lang}/`;
     if (isExternal(path)) return path;
     const normalized = path.startsWith("/") ? path : `/${path}`;
-    const stripped = normalized.replace(LANG_PREFIX_RE, ""); // remove any existing /{lang}
+    const stripped = normalized.replace(LANG_PREFIX_RE, "");
     return `/${lang}${stripped || "/"}`;
 }
 
@@ -32,35 +32,28 @@ function replaceLangInPath(pathname: string, newLng: SupportedLng) {
     return "/" + next.join("/");
 }
 
-/** Map our simple NavItem[] to AntD Menu items */
 function mapNavToMenu(
-    items: NavItem[] | undefined,
+    items: ReturnType<typeof mainMenuItems>,
     navigate: ReturnType<typeof useNavigate>,
     currentLng: SupportedLng
 ): MenuProps["items"] {
-    return items?.map((it) => {
-        if (!it) return it as any;
-        const out: any = {
-            key: it.key,
-            label: it.label,
-        };
-        if (it.children) {
-            out.children = mapNavToMenu(it.children, navigate, currentLng);
-        }
-        if (it.href) {
-            out.onClick = () => navigate(rePrefix(it.href!, currentLng));
-        }
+    return items.map((it) => {
+        const out: any = { key: it.key, label: it.label };
+        if (it.children) out.children = mapNavToMenu(it.children, navigate, currentLng);
+        if (it.href) out.onClick = () => navigate(rePrefix(it.href, currentLng));
         return out;
     });
 }
 
 export default function MyHeader() {
-    const { i18n } = useTranslation();
+    const { i18n, t } = useTranslation("common");
     const navigate = useNavigate();
     const { pathname } = useLocation();
 
     const resolved = (i18n.resolvedLanguage || i18n.language) as SupportedLng | string;
-    const currentLng: SupportedLng = SUPPORTED.includes(resolved as SupportedLng) ? (resolved as SupportedLng) : "en";
+    const currentLng: SupportedLng = SUPPORTED.includes(resolved as SupportedLng)
+        ? (resolved as SupportedLng)
+        : "en";
 
     const options = [
         {
@@ -84,8 +77,8 @@ export default function MyHeader() {
     ];
 
     const langMenuItems: MenuProps["items"] = useMemo(
-        () => mapNavToMenu(mainMenuItems, navigate, currentLng),
-        [navigate, currentLng]
+        () => mapNavToMenu(mainMenuItems(t), navigate, currentLng),
+        [navigate, currentLng, t]
     );
 
     const onChange = async (lng: SupportedLng) => {
@@ -95,29 +88,42 @@ export default function MyHeader() {
     };
 
     return (
-        <Header style={{ padding: 10, background: 'white', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-            <Row justify="space-between" align="middle" style={{ width: '100%', marginInlineEnd: 17 }}>
-                <Col/>
-                {width<4.4 ? width<4 ? <Col/> : <Col/> : <Col xs={3} >
-                    <div className={styles.logo}>
-                        <Image
-
-                            src={`https://4rent-thessaloniki.com/images/Logo_White.png`}
-                            style={{maxWidth: '55px', height: 'auto'}} // Ensures responsiveness
-
-                        />
-                    </div>
-                </Col> }
+        <Header
+            style={{
+                padding: 10,
+                background: "white",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+            }}
+        >
+            <Row justify="space-between" align="middle" style={{ width: "100%", marginInlineEnd: 17 }}>
+                <Col />
+                {width < 4.4 ? (
+                    width < 4 ? (
+                        <Col />
+                    ) : (
+                        <Col />
+                    )
+                ) : (
+                    <Col xs={3}>
+                        <div className={styles.logo}>
+                            <Image
+                                src={`https://4rent-thessaloniki.com/images/Logo_White.png`}
+                                style={{ maxWidth: "55px", height: "auto" }}
+                            />
+                        </div>
+                    </Col>
+                )}
 
                 <Col span={12}>
                     <Menu mode="horizontal" items={langMenuItems} selectable={false} />
                 </Col>
 
-                <Col style={{ display: 'flex', alignItems: 'center'}}>
+                <Col style={{ display: "flex", alignItems: "center" }}>
                     <Space>
                         <Select value={currentLng} onChange={onChange} options={options} style={{ width: 140 }} />
                     </Space>
-
                 </Col>
             </Row>
         </Header>
