@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { Button, Card, Col, InputNumber, Row, Space, Typography } from "antd";
-import { ADDONS } from "./addonsDef";
+import { useAddons } from "./addonsDef";
 import type { FormInstance } from "antd/es/form";
 import type { AddonDef } from "./types";
+import { useTranslation } from "react-i18next";
 
 const { Title, Text } = Typography;
 
@@ -17,6 +18,9 @@ type QtyMap = Record<string, number>;
 
 export default function AddonsStep({ form, onNext, currency = "EUR", onTotalsChange }: Props) {
     const [qty, setQty] = useState<QtyMap>({});
+    const { t } = useTranslation("booking");
+    const ADDONS = useAddons();
+
 
     // Initialize local qty map and form fields once
     useEffect(() => {
@@ -81,7 +85,7 @@ export default function AddonsStep({ form, onNext, currency = "EUR", onTotalsCha
     };
 
     return (
-        <Card style={{ borderRadius: 12 }} title="Πρόσθετος εξοπλισμός">
+        <Card style={{ borderRadius: 12 }} title={t("addons.title")}>
             <Space direction="vertical" style={{ width: "100%" }} size={12}>
                 {ADDONS.map((a) => {
                     const isSelected = (qty[a.value] ?? 0) > 0;
@@ -106,14 +110,14 @@ export default function AddonsStep({ form, onNext, currency = "EUR", onTotalsCha
                                         )}
 
                                         <div style={{ textAlign: "right", minWidth: 110 }}>
-                                            <Text type="secondary">Σύνολο:</Text>
+                                            <Text type="secondary">{t("addons.totalLabel")}</Text>
                                             <div style={{ fontWeight: 600 }}>
                                                 {a.price.toFixed(2)} {currency}
                                             </div>
                                         </div>
 
                                         <Button type={isSelected ? "default" : "primary"} onClick={() => toggle(a)}>
-                                            {isSelected ? "ΑΦΑΙΡΕΣΗ" : "ΕΠΙΛΟΓΗ"}
+                                            {isSelected ? t("addons.remove") : t("addons.select")}
                                         </Button>
                                     </Space>
                                 </Col>
@@ -124,7 +128,7 @@ export default function AddonsStep({ form, onNext, currency = "EUR", onTotalsCha
             </Space>
 
             <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>
-                <Button type="primary" onClick={onNext}>ΣΥΝΕΧΕΙΑ</Button>
+                <Button type="primary" onClick={onNext}>{t("addons.continue")}</Button>
             </div>
         </Card>
     );

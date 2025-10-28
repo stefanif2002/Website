@@ -3,6 +3,7 @@ import { Card, Row, Col, Image, Typography, Space, Button, Divider } from "antd"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGasPump, faGears, faUsers, faEuroSign } from "@fortawesome/free-solid-svg-icons";
 import { url, width } from "../../../resources/service.ts";
+import { useTranslation } from "react-i18next";
 
 const { Title, Text } = Typography;
 
@@ -36,10 +37,11 @@ const AvailabilityCard: React.FC<Props> = ({
                                                onSelect,
                                                isSoldOut = false,
                                            }) => {
+    const { t } = useTranslation("booking");
     const cat = av.category;
 
-    const daily = av.averagePricePerDay;        // from your API
-    const total = av.totalPrice;                // from your API
+    const daily = av.averagePricePerDay; // from your API
+    const total = av.totalPrice;         // from your API
 
     // const hasDiscount = !!discountPercent && discountPercent > 0 && discountPercent < 100;
 
@@ -75,8 +77,6 @@ const AvailabilityCard: React.FC<Props> = ({
     const shortFromLongName = (longName?: string) =>
         longName ? LONG_TO_SHORT[longName] : undefined;
 
-
-
     return (
         <Card
             hoverable={!isSoldOut}
@@ -86,9 +86,9 @@ const AvailabilityCard: React.FC<Props> = ({
                 opacity: isSoldOut ? 0.35 : 1,
                 borderRadius: 12,
                 boxShadow: "0 2px 10px rgba(0,0,0,0.06)",
-                border: '1px solid rgba(0,0,0,0.25)',
+                border: "1px solid rgba(0,0,0,0.25)",
             }}
-            bodyStyle={{padding: 16}}
+            bodyStyle={{ padding: 16 }}
             onClick={() => !isSoldOut && onSelect(cat.id)}
         >
             <div
@@ -104,71 +104,74 @@ const AvailabilityCard: React.FC<Props> = ({
                     src={imgSrc}
                     alt={cat.name}
                     preview={false}
-                    style={{width: "100%", maxHeight: isWide ? 220 : 180, objectFit: "contain"}}
+                    style={{ width: "100%", maxHeight: isWide ? 220 : 180, objectFit: "contain" }}
                 />
             </div>
+
             {/* Title + subtitle */}
-            <div >
+            <div>
                 <Title level={4}>
-                    {`Category ${shortFromLongName(cat.name) ?? cat.name}`}
+                    {`${t("cards.availability.titlePrefix")} ${shortFromLongName(cat.name) ?? cat.name}`}
                 </Title>
             </div>
 
-            <div style={{marginBottom: 8}}>
-                <Text strong style={{marginBottom: 4}}>
-                    {cat.description ?? "Citroën C3"} ή παρόμοιο
+            <div style={{ marginBottom: 8 }}>
+                <Text strong style={{ marginBottom: 4 }}>
+                    {cat.description ?? "Citroën C3"} {t("cards.availability.orSimilar")}
                 </Text>
             </div>
 
             {/* Specs */}
-            <Row gutter={[12, 8]} style={{marginBottom: 12, justifyContent: 'center'}}>
-
+            <Row gutter={[12, 8]} style={{ marginBottom: 12, justifyContent: "center" }}>
                 <Col>
                     <Space>
-                        <FontAwesomeIcon icon={faGasPump}/>
+                        <FontAwesomeIcon icon={faGasPump} />
                         <Text>{cat.fuel}</Text>
                     </Space>
                 </Col>
                 <Col>
                     <Space>
-                        <FontAwesomeIcon icon={faGears}/>
-                        <Text>{cat.automatic ? "Auto" : "Manual"}</Text>
+                        <FontAwesomeIcon icon={faGears} />
+                        <Text>{cat.automatic ? t("cards.availability.specs.auto") : t("cards.availability.specs.manual")}</Text>
                     </Space>
                 </Col>
                 <Col>
                     <Space>
-                        <FontAwesomeIcon icon={faUsers}/>
+                        <FontAwesomeIcon icon={faUsers} />
                         <Text>{cat.numOfSeats}</Text>
                     </Space>
                 </Col>
             </Row>
 
             {/* Price blocks */}
-            <Row gutter={16} style={{marginBottom: 12}}>
+            <Row gutter={16} style={{ marginBottom: 12 }}>
                 <Col xs={12}>
-                    <Text type="secondary" style={{display: "block"}}>
-                        Ανά ημέρα:
+                    <Text type="secondary" style={{ display: "block" }}>
+                        {t("cards.availability.price.perDay")}
                     </Text>
-                    <Title level={4} style={{margin: 0}}>
-                        {daily.toFixed(2)} <FontAwesomeIcon icon={faEuroSign} style={{fontSize: 14}}/>{" "}
-                        <Text type="secondary" style={{fontSize: 12}}>EUR</Text>
+                    <Title level={4} style={{ margin: 0 }}>
+                        {daily.toFixed(2)} <FontAwesomeIcon icon={faEuroSign} style={{ fontSize: 14 }} />{" "}
+                        <Text type="secondary" style={{ fontSize: 12 }}>
+                            {t("cards.availability.price.currencyShort")}
+                        </Text>
                     </Title>
                 </Col>
                 <Col xs={12}>
-                    <Text type="secondary" style={{display: "block"}}>
-                        Σύνολο:
+                    <Text type="secondary" style={{ display: "block" }}>
+                        {t("cards.availability.price.total")}
                     </Text>
-                    <div style={{display: "flex", flexDirection: "column"}}>
-                        <Title level={3} style={{margin: 0}}>
-                            {total.toFixed(2)} <Text style={{fontSize: 12}}>EUR</Text>
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                        <Title level={3} style={{ margin: 0 }}>
+                            {total.toFixed(2)}{" "}
+                            <Text style={{ fontSize: 12 }}>{t("cards.availability.price.currencyShort")}</Text>
                         </Title>
                     </div>
                 </Col>
             </Row>
 
-            <Divider style={{margin: "8px 0 12px"}}/>
+            <Divider style={{ margin: "8px 0 12px" }} />
 
-            <div style={{justifyContent: 'center'}}>
+            <div style={{ justifyContent: "center" }}>
                 <Button
                     block
                     disabled={isSoldOut}
@@ -178,60 +181,32 @@ const AvailabilityCard: React.FC<Props> = ({
                     }}
                     size="large"
                     style={{
-                        width: '50%',
+                        width: "50%",
                         borderRadius: 999,
                         background: "linear-gradient(180deg, #028523 0%, #028523 100%)",
                         border: 0,
                         fontWeight: 600,
                         lineHeight: 1,
-                        color: 'white'
+                        color: "white",
                     }}
                 >
-                    Κράτηση Τώρα
+                    {t("cards.availability.actions.bookNow")}
                 </Button>
             </div>
 
-            {/* CTAs */}
-            {/*<Row gutter={12}>*/}
-
-            {/*    <Col xs={24} sm={12}>*/}
-            {/*        <Button*/}
-            {/*            block*/}
-            {/*            disabled={isSoldOut}*/}
-            {/*            onClick={(e) => {*/}
-            {/*                e.stopPropagation();*/}
-            {/*                onSelect(cat.id);*/}
-            {/*            }}*/}
-            {/*        >*/}
-            {/*            Pay only advance 49.00 EUR*/}
-            {/*        </Button>*/}
-            {/*    </Col>*/}
-            {/*    <Col xs={24} sm={12}>*/}
-            {/*        <Button*/}
-            {/*            type="primary"*/}
-            {/*            block*/}
-            {/*            disabled={isSoldOut}*/}
-            {/*            onClick={(e) => {*/}
-            {/*                e.stopPropagation();*/}
-            {/*                onSelect(cat.id);*/}
-            {/*            }}*/}
-            {/*        >*/}
-            {/*            Pay Now*/}
-            {/*        </Button>*/}
-            {/*    </Col>*/}
-            {/*</Row>*/}
-
             {/* Sold out overlay button (optional look-alike) */}
             {isSoldOut && (
-                <div style={{
-                    position: "absolute",
-                    inset: 0,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center"
-                }}>
-                    <Button disabled size="large" style={{opacity: 1}}>
-                        ΕΞΑΝΤΛΗΜΕΝΟ
+                <div
+                    style={{
+                        position: "absolute",
+                        inset: 0,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                    }}
+                >
+                    <Button disabled size="large" style={{ opacity: 1 }}>
+                        {t("cards.availability.soldOut")}
                     </Button>
                 </div>
             )}

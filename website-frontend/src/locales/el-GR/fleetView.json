@@ -1,0 +1,210 @@
+{
+  "fleetCategories": {
+    "title": "Διαθέσιμες Κατηγορίες — Ο Στόλος μας",
+    "subtitle": "Επιλέξτε την κατηγορία που ταιριάζει στις ανάγκες σας και κάντε κράτηση με προκαταβολή 49€. Όλα τα αυτοκίνητα διαθέτουν μικτή ασφάλεια χωρίς απαλλαγή.",
+    "more": "Περισσότερα",
+    "searchAvailability": "Αναζήτηση Διαθεσιμότητας",
+    "list": [
+      {
+        "key": "a",
+        "title": "Μικρή Κατηγορία",
+        "href": "/stolos/mikri-katigoria-enoikiaseis-autokiniton-thessaloniki",
+        "img": "https://4rent-thessaloniki.com/images/fleet/aygox.png",
+        "tags": ["Πόλη", "Οικονομικό", "A/C"],
+        "desc": "Ευέλικτο και οικονομικό — ιδανικό για 2–4 άτομα."
+      },
+      {
+        "key": "b",
+        "title": "Μεσαία Κατηγορία",
+        "href": "/stolos/mesaia-katigoria-enoikiaseis-autokiniton-thessaloniki",
+        "img": "https://4rent-thessaloniki.com/images/fleet/ibiza.png",
+        "tags": ["Άνεση", "A/C"],
+        "desc": "Περισσότερος χώρος & άνεση για καθημερινές και εκδρομές."
+      },
+      {
+        "key": "c",
+        "title": "Compact / Hatchback",
+        "href": "/stolos/megali-katigoria-enoikiaseis-autokiniton-thessaloniki",
+        "img": "https://4rent-thessaloniki.com/images/fleet/golf.png",
+        "tags": ["Οικογένεια", "A/C"],
+        "desc": "Ισορροπία χώρου/οικονομίας — ιδανικό για μικρές αποδράσεις."
+      },
+      {
+        "key": "suv",
+        "title": "SUV / Crossover",
+        "href": "/stolos/suv-jeep-enoikiaseis-autokiniton-thessaloniki",
+        "img": "https://4rent-thessaloniki.com/images/fleet/arona-site-2.png",
+        "tags": ["Ψηλή θέση", "Ασφάλεια"],
+        "desc": "Υψηλή ορατότητα & άνεση — τέλειο για οικογενειακές διακοπές."
+      },
+      {
+        "key": "sed",
+        "title": "Sedan / Hybrid",
+        "href": "/stolos/automato-autokinito-enoikiaseis-thessaloniki",
+        "img": "https://4rent-thessaloniki.com/images/fleet/corolla.png",
+        "tags": ["Υβριδικό", "Άνεση"],
+        "desc": "Άνεση, τεχνολογία και οικονομία καυσίμου."
+      },
+      {
+        "key": "van",
+        "title": "7θέσια / Van",
+        "href": "/stolos/minivan-7theseis-enoikiaseis-autokiniton-thessaloniki",
+        "img": "https://4rent-thessaloniki.com/images/fleet/caddy.png",
+        "tags": ["Χώρος", "Οικογένεια"],
+        "desc": "Μεγάλοι χώροι αποσκευών & καθισμάτων για 6–7 άτομα."
+      }
+    ]
+  },
+
+  "fleetCategory": {
+    "notFound": "Η κατηγορία δεν βρέθηκε.",
+    "allCategories": "Όλες οι κατηγορίες",
+    "bookNow": "Κράτηση τώρα",
+    "features": "Βασικά χαρακτηριστικά",
+    "models": "Ενδεικτικά μοντέλα",
+    "clickToZoom": "Κλικ για μεγέθυνση",
+    "whyChoose": "Γιατί να επιλέξω αυτή την κατηγορία;",
+    "why1": "Άνεση & ασφάλεια για τις καθημερινές σας ανάγκες",
+    "why2": "Σύγχρονα μοντέλα με οικονομία καυσίμου",
+    "why3": "Προσαρμοσμένες επιλογές για Θεσσαλονίκη & αποδράσεις",
+    "includes": "Περιλαμβάνονται",
+    "insurance": "Μικτή ασφάλεια χωρίς απαλλαγή",
+    "unlimitedKm": "Απεριόριστα χιλιόμετρα",
+    "secondDriver": "2ος οδηγός χωρίς χρέωση",
+
+    "details": {
+      "mikri-katigoria-enoikiaseis-autokiniton-thessaloniki": {
+        "title": "Μικρή Κατηγορία — Ενοικιάσεις Αυτοκινήτων Θεσσαλονίκη",
+        "description": "Οικονομική & ευέλικτη επιλογή για την πόλη: εύκολο παρκάρισμα, χαμηλή κατανάλωση και άνεση για 2–4 άτομα.",
+        "tags": ["4–5 Θέσεις", "3–5 Πόρτες", "A/C", "Οικονομική κατανάλωση", "Ιδανικό για πόλη"],
+        "models": ["SEAT Mii", "Toyota Aygo", "Citroën C1"],
+        "gallery": [
+          "https://4rent-thessaloniki.com/images/fleet/aygox.png",
+          "https://4rent-thessaloniki.com/images/fleet/ibiza.png",
+          "https://4rent-thessaloniki.com/images/fleet/golf.png"
+        ]
+      },
+      "mesaia-katigoria-enoikiaseis-autokiniton-thessaloniki": {
+        "title": "Μεσαία κατηγορία — Ενοικιάσεις Αυτοκινήτων Θεσσαλονίκη",
+        "description": "Ισορροπία άνεσης και χώρου για οικογένειες ή παρέες. Ιδανική για μικρές αποδράσεις και καθημερινές μετακινήσεις.",
+        "tags": ["5 Θέσεις", "Μεγαλύτερος χώρος αποσκευών", "A/C", "Άνεση"],
+        "models": ["VW Polo", "Opel Corsa", "Ford Fiesta"],
+        "gallery": [
+          "https://4rent-thessaloniki.com/images/fleet/golf.png",
+          "https://4rent-thessaloniki.com/images/fleet/corolla.png",
+          "https://4rent-thessaloniki.com/images/fleet/ibiza.png"
+        ]
+      },
+      "megali-katigoria-enoikiaseis-autokiniton-thessaloniki": {
+        "title": "Μεγάλη Κατηγορία — Ενοικιάσεις Αυτοκινήτων Θεσσαλονίκη",
+        "description": "Χώρος, άνεση και επιπλέον εξοπλισμός για ξεκούραστα ταξίδια εντός και εκτός πόλης.",
+        "tags": ["5 Θέσεις", "Μεγάλος χώρος", "A/C", "Άνεση ταξιδιού"],
+        "models": ["VW Passat", "Toyota Corolla", "Skoda Octavia"],
+        "gallery": [
+          "https://4rent-thessaloniki.com/images/fleet/corolla.png",
+          "https://4rent-thessaloniki.com/images/fleet/golf.png",
+          "https://4rent-thessaloniki.com/images/fleet/jogger.png"
+        ]
+      },
+      "oikogeniaki-katigoria-enoikiaseis-autokiniton-thessaloniki": {
+        "title": "Οικογενειακή κατηγορία — Ενοικιάσεις Αυτοκινήτων Θεσσαλονίκη",
+        "description": "Άνεση και ασφάλεια για οικογένειες, με πρακτικούς αποθηκευτικούς χώρους και ευκολίες.",
+        "tags": ["5 Θέσεις", "Μεγάλος χώρος αποσκευών", "Isofix", "A/C"],
+        "models": ["Dacia Jogger", "Toyota Corolla TS", "Skoda Scala"],
+        "gallery": [
+          "https://4rent-thessaloniki.com/images/fleet/jogger.png",
+          "https://4rent-thessaloniki.com/images/fleet/corolla.png",
+          "https://4rent-thessaloniki.com/images/fleet/golf.png"
+        ]
+      },
+      "anoteri-katigoria-enoikiaseis-autokiniton-thessaloniki": {
+        "title": "Ανώτερη κατηγορία — Ενοικιάσεις Αυτοκινήτων Θεσσαλονίκη",
+        "description": "Πλούσιος εξοπλισμός, αναβαθμισμένη ποιότητα κύλισης και επιπλέον άνεση.",
+        "tags": ["Premium εσωτερικό", "Ασφάλεια", "A/C", "Άνεση"],
+        "models": ["VW Golf", "Toyota C-HR", "Mazda 3"],
+        "gallery": [
+          "https://4rent-thessaloniki.com/images/fleet/golf.png",
+          "https://4rent-thessaloniki.com/images/fleet/chr.png",
+          "https://4rent-thessaloniki.com/images/fleet/corolla.png"
+        ]
+      },
+      "karaban-katigoria-enoikiaseis-autokiniton-thessaloniki": {
+        "title": "Ανώτερη κατηγορία Καραβάν — Ενοικιάσεις Θεσσαλονίκη",
+        "description": "Μεγαλύτερος χώρος και πρακτικότητα για οικογένειες και εξορμήσεις με αποσκευές.",
+        "tags": ["Μεγάλος χώρος", "Άνεση", "A/C", "Ευελιξία"],
+        "models": ["VW Caddy", "Dacia Jogger", "Toyota Corolla TS"],
+        "gallery": [
+          "https://4rent-thessaloniki.com/images/fleet/caddy.png",
+          "https://4rent-thessaloniki.com/images/fleet/jogger.png",
+          "https://4rent-thessaloniki.com/images/fleet/corolla.png"
+        ]
+      },
+      "suv-jeep-enoikiaseis-autokiniton-thessaloniki": {
+        "title": "SUV / Jeep — Ενοικιάσεις Αυτοκινήτων Θεσσαλονίκη",
+        "description": "Υψηλή θέση οδήγησης, άνεση και πρακτικότητα για την πόλη και τις αποδράσεις.",
+        "tags": ["SUV", "Άνεση", "A/C", "Υψηλή θέση οδήγησης"],
+        "models": ["SEAT Arona", "Toyota C-HR", "Dacia Duster"],
+        "gallery": [
+          "https://4rent-thessaloniki.com/images/fleet/arona-site-2.png",
+          "https://4rent-thessaloniki.com/images/fleet/chr.png",
+          "https://4rent-thessaloniki.com/images/fleet/jogger.png"
+        ]
+      },
+      "minivan-7theseis-enoikiaseis-autokiniton-thessaloniki": {
+        "title": "Μίνι Βαν 7 Θέσεων — Ενοικιάσεις Θεσσαλονίκη",
+        "description": "Ιδανικό για μεγάλες παρέες ή οικογένειες με αυξημένες ανάγκες μεταφοράς.",
+        "tags": ["7 Θέσεις", "Μεγάλος χώρος", "A/C"],
+        "models": ["Dacia Jogger 7S", "VW Caddy 7S"],
+        "gallery": [
+          "https://4rent-thessaloniki.com/images/fleet/jogger.png",
+          "https://4rent-thessaloniki.com/images/fleet/caddy.png",
+          "https://4rent-thessaloniki.com/images/fleet/chr.png"
+        ]
+      },
+      "minivan-9theseis-enoikiaseis-autokiniton-thessaloniki": {
+        "title": "Μίνι Βαν 9 Θέσεων — Ενοικιάσεις Θεσσαλονίκη",
+        "description": "Μετακινήσεις ομάδων με άνεση και ασφάλεια. Τέλειο για εταιρικά ή group ταξίδια.",
+        "tags": ["9 Θέσεις", "Μεγάλος χώρος αποσκευών", "A/C"],
+        "models": ["VW Transporter 9S", "Ford Transit 9S"],
+        "gallery": [
+          "https://4rent-thessaloniki.com/images/fleet/caddy.png",
+          "https://4rent-thessaloniki.com/images/fleet/jogger.png",
+          "https://4rent-thessaloniki.com/images/fleet/golf.png"
+        ]
+      },
+      "automato-autokinito-enoikiaseis-thessaloniki": {
+        "title": "Αυτόματο κιβώτιο — Ενοικιάσεις Θεσσαλονίκη",
+        "description": "Χαλαρή οδήγηση στην πόλη και ταξίδι χωρίς κούραση με αυτόματο κιβώτιο.",
+        "tags": ["Αυτόματο", "A/C", "Άνεση"],
+        "models": ["Toyota C-HR Auto", "VW Golf DSG", "SEAT Arona DSG"],
+        "gallery": [
+          "https://4rent-thessaloniki.com/images/fleet/chr.png",
+          "https://4rent-thessaloniki.com/images/fleet/golf.png",
+          "https://4rent-thessaloniki.com/images/fleet/arona-site-2.png"
+        ]
+      },
+      "petrelaio-autokinito-enoikiaseis-thessaloniki": {
+        "title": "Πετρέλαιο (Diesel) — Ενοικιάσεις Θεσσαλονίκη",
+        "description": "Μεγάλη αυτονομία και χαμηλή κατανάλωση για όσους γράφουν χιλιόμετρα.",
+        "tags": ["Diesel", "Οικονομία", "A/C"],
+        "models": ["VW Golf TDI", "Toyota Corolla Diesel"],
+        "gallery": [
+          "https://4rent-thessaloniki.com/images/fleet/golf.png",
+          "https://4rent-thessaloniki.com/images/fleet/corolla.png",
+          "https://4rent-thessaloniki.com/images/fleet/jogger.png"
+        ]
+      },
+      "enoikiasi-politeleias-autokinito-thessaloniki": {
+        "title": "Κατηγορία πολυτελείας — Ενοικιάσεις Θεσσαλονίκη",
+        "description": "Ανώτερη άνεση, τεχνολογία και κύρος για μοναδικές εμπειρίες.",
+        "tags": ["Luxury", "Premium", "A/C"],
+        "models": ["BMW 3 Series", "Audi A4", "Mercedes C-Class"],
+        "gallery": [
+          "https://4rent-thessaloniki.com/images/fleet/chr.png",
+          "https://4rent-thessaloniki.com/images/fleet/corolla.png",
+          "https://4rent-thessaloniki.com/images/fleet/golf.png"
+        ]
+      }
+    }
+  }
+}

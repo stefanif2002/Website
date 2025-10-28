@@ -1,24 +1,13 @@
-// src/pages/booking/SearchPage.tsx
 import { useCallback, useEffect, useMemo, useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
-import {
-    AutoComplete,
-    Card,
-    Col,
-    DatePicker,
-    Form,
-    Input,
-    List,
-    message,
-    Row,
-    Grid,
-} from "antd";
+import { AutoComplete, Card, Col, DatePicker, Form, Input, List, message, Row, Grid } from "antd";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { myApi } from "../../resources/service"; // ⬅ removed getLangPrefix
+import { myApi } from "../../resources/service";
 import DateForm, { myDateForm } from "../../components/search/search/DateForm";
 import AvailabilityCard from "../../components/search/search/AvailabilityCard";
 import CategorySearchFilters from "../../components/search/CategorySearchFilters";
-import { withLang } from "../../resources/useLangRouter"; // ⬅ add this
+import { withLang } from "../../resources/useLangRouter";
+import { useTranslation } from "react-i18next";
 
 const { RangePicker } = DatePicker;
 const { useBreakpoint } = Grid;
@@ -81,6 +70,7 @@ function SearchPage({ onSubmit }: Props) {
     const [sp, setSp] = useSearchParams();
     const navigate = useNavigate();
     const screens = useBreakpoint();
+    const { t } = useTranslation("booking");
 
     const readParams = useCallback(() => {
         const startIso = sp.get("start");
@@ -112,11 +102,11 @@ function SearchPage({ onSubmit }: Props) {
 
     const locationOptions: OptionType[] = useMemo(
         () => [
-            { value: "Skypark", label: "Skypark" },
-            { value: "4Rent Office", label: "4Rent Office" },
-            { value: "Thessaloniki Hotel/Airnbnb", label: "Thessaloniki Hotel/Airnbnb" },
+            { value: "Skypark", label: t("searchPage.locations.skypark") },
+            { value: "4Rent Office", label: t("searchPage.locations.office") },
+            { value: "Thessaloniki Hotel/Airnbnb", label: t("searchPage.locations.hotel") },
         ],
-        []
+        [t]
     );
 
     const writeParams = useCallback(
@@ -183,10 +173,10 @@ function SearchPage({ onSubmit }: Props) {
             setAvailabilities(Array.isArray(data) ? data : []);
         } catch (e) {
             console.error(e);
-            message.error("Failed to fetch availabilities");
+            message.error(t("searchPage.messages.failedAvailabilities"));
             setAvailabilities([]);
         }
-    }, [dateParams, filters]);
+    }, [dateParams, filters, t]);
 
     useEffect(() => {
         const { start, end, startLocation, endLocation } = readParams();
@@ -212,14 +202,13 @@ function SearchPage({ onSubmit }: Props) {
     const handleSelect = (id: number) => {
         const { start, end, startLocation, endLocation } = readParams();
         if (!start || !end || !startLocation || !endLocation) {
-            message.warning("Please select dates and locations first.");
+            message.warning(t("searchPage.messages.pleaseSelectDates"));
             return;
         }
         const selected = availabilities.find((a) => a.category.id === id);
-        if (!selected) return message.error("Selected category not found.");
+        if (!selected) return message.error(t("searchPage.messages.selectedCategoryNotFound"));
 
         const params = new URLSearchParams(sp);
-        // ✅ Prefix with current language automatically (supports en / el-GR)
         const target = withLang(`/book/${id}/extra?${params.toString()}`);
         navigate(target);
 

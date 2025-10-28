@@ -1,15 +1,15 @@
-// src/pages/booking/BookingWizard.tsx
 import React, { useState } from "react";
 import { Card, Col, Form, Row, Steps, Typography, message } from "antd";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import AddonsStep from "./AddonsStep";
 import SummaryCard from "./SummaryCard";
-import { ADDONS } from "./addonsDef";
+import { useAddons } from "./addonsDef";
 import MyInfo from "./MyInfo";
 import Payment from "./Payment";
 import { myApi } from "../../resources/service.ts";
 import dayjs from "dayjs";
 import { withLang } from "../../resources/useLangRouter"; // ⬅️ use the lang-aware builder
+import { useTranslation } from "react-i18next"; // ✅ added
 
 const { Title } = Typography;
 
@@ -72,8 +72,10 @@ export default function BookingWizard({
                                           routeStep,
                                           goto,
                                       }: Props) {
+    const { t } = useTranslation("booking"); // ✅ added
     const [form] = Form.useForm();
     const [addonsTotal, setAddonsTotal] = useState<number>(0);
+    const ADDONS = useAddons();
 
     const [sp, setSp] = useSearchParams();
     const { pathname } = useLocation();
@@ -175,7 +177,7 @@ export default function BookingWizard({
             const endLocation = sp.get("dl") || "";
 
             if (!categoryId || !startIso || !endIso) {
-                message.error("Λείπουν δεδομένα κράτησης (ημερομηνίες/όχημα). Επιστρέψτε στην αναζήτηση.");
+                message.error(t("wizard.errors.missingBookingData")); // ✅ translated
                 return;
             }
 
@@ -200,7 +202,7 @@ export default function BookingWizard({
             const resp = await myApi.post("booking/create", payload);
             const bookingId = resp?.data;
             if (!bookingId) {
-                message.error("Δεν ελήφθη bookingId από τον διακομιστή.");
+                message.error(t("wizard.errors.noBookingId")); // ✅ translated
                 return;
             }
 
@@ -233,7 +235,7 @@ export default function BookingWizard({
             navigate(target, { replace: true });
         } catch (err: any) {
             if (err?.errorFields) return;
-            message.error("Αποτυχία δημιουργίας κράτησης. Προσπαθήστε ξανά.");
+            message.error(t("wizard.errors.creationFailed")); // ✅ translated
         }
     };
 
@@ -252,7 +254,7 @@ export default function BookingWizard({
 
     return (
         <div style={{ marginTop: 10, width: "90%", margin: "20px auto" }}>
-            <Steps current={step} items={[{ title: "Εξοπλισμός" }, { title: "Προσωπικά Στοιχεία" }, { title: "Πληρωμή" }]} style={{ marginBottom: 16 }} />
+            <Steps current={step} items={[{ title: t("wizard.steps.addons") }, { title: t("wizard.steps.info") }, { title: t("wizard.steps.payment") }]} style={{ marginBottom: 16 }} />  {/* ✅ translated */}
             <Row gutter={16} align="top">
                 <Col xs={24} md={step === 2 ? 24 : 16}>
                     <Form form={form} layout="vertical" initialValues={{ checklist: {}, checklistQty: {} }} onValuesChange={handleValuesChange}>
@@ -260,12 +262,12 @@ export default function BookingWizard({
                             <AddonsStep form={form} onNext={() => goto("info")} onTotalsChange={(t) => setAddonsTotal(t)} />
                         )}
                         {routeStep === "info" && (
-                            <Card style={{ borderRadius: 12 }} title={<Title level={4} style={{ margin: 0 }}>Η Πληροφορία Σου</Title>}>
+                            <Card style={{ borderRadius: 12 }} title={<Title level={4} style={{ margin: 0 }}>{t("wizard.infoTitle")}</Title>}> {/* ✅ translated */}
                                 <MyInfo form={form} onPrev={() => goto("extra")} onNext={saveDraftAndGoToPayment} />
                             </Card>
                         )}
                         {routeStep === "payment" && (
-                            <Card style={{ borderRadius: 12 }} title={<Title></Title>}>
+                            <Card style={{ borderRadius: 12 }} title={<Title>{t("wizard.paymentTitle")}</Title>}> {/* ✅ translated */}
                                 <Payment form={form} amount={grandTotal} currency={currency} onPrev={() => goto("info")} onPaid={() => goto("done")} />
                             </Card>
                         )}

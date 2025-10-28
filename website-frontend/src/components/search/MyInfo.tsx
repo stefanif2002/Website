@@ -1,4 +1,3 @@
-// src/components/search/MyInfo.tsx
 import React from "react";
 import {
     Alert,
@@ -46,6 +45,7 @@ import {
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { withLang } from "../../resources/useLangRouter.ts";
+import { useTranslation } from "react-i18next";
 
 const { Title, Text } = Typography;
 
@@ -98,6 +98,7 @@ const MyInfo: React.FC<Props> = ({
     const [filled, setFilled] = React.useState<FilledMap>({});
     const [forceShowAll, setForceShowAll] = React.useState(false);
     const [warnNoUser, setWarnNoUser] = React.useState(false);
+    const { t } = useTranslation("booking");
 
     // watch login fields to reset state
     const telLocal = Form.useWatch("telephone", form);
@@ -153,7 +154,7 @@ const MyInfo: React.FC<Props> = ({
                 setVerified(false);
                 setFilled({});
                 setWarnNoUser(true);
-                message.warning("Δεν βρέθηκε λογαριασμός. Συνεχίστε με συμπλήρωση των πεδίων.");
+                message.warning(t("info.messages.userNotFound"));
                 return;
             }
 
@@ -185,13 +186,13 @@ const MyInfo: React.FC<Props> = ({
             setFilled(nextFilled);
             setVerified(true);
 
-            message.success("Επιτυχής αναγνώριση — τώρα εμφανίζονται μόνο τα πεδία που λείπουν.");
+            message.success(t("info.messages.recognized"));
         } catch (e) {
             console.error(e);
             setVerified(false);
             setFilled({});
             setWarnNoUser(true);
-            message.error("Λάθος email, βρέθηκε το τηλέφωνο αλλά αντιστοιχεί σε άλλο email. Συνεχίστε με συμπλήρωση των πεδίων.");
+            message.error(t("info.messages.emailMismatch"));
         } finally {
             setChecking(false);
         }
@@ -200,7 +201,7 @@ const MyInfo: React.FC<Props> = ({
     const handleNext = async () => {
         await form.validateFields();
         if (isAgeBlocked) {
-            return message.error("Δεν μπορείτε να προχωρήσετε. Η ηλικία πρέπει να είναι από 21 έως 72.");
+            return message.error(t("info.validation.ageBlocked"));
         }
 
         const values = form.getFieldsValue(true) as any;
@@ -274,11 +275,11 @@ const MyInfo: React.FC<Props> = ({
 
         try {
             await myApi.post("booking/createUser", payload);
-            message.success("Τα στοιχεία σας αποθηκεύτηκαν.");
+            message.success(t("info.messages.saved"));
             onNext?.();
         } catch (e) {
             console.log(e);
-            message.error("Αποτυχία αποθήκευσης στοιχείων. To email είναι συνδεδεμένο με άλλο τηλέφωνο.");
+            message.error(t("info.messages.saveFailed"));
         }
     };
 
@@ -302,14 +303,14 @@ const MyInfo: React.FC<Props> = ({
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
                     <UnlockOutlined style={{ color: "#2F5AFF" }} />
                     <Title level={5} style={{ margin: 0 }}>
-                        Σύνδεση για αυτόματη συμπλήρωση
+                        {t("info.login.title")}
                     </Title>
                     {verified ? (
                         <Badge
                             count={
                                 <Space size={4}>
                                     <CheckCircleTwoTone twoToneColor="#52c41a" />
-                                    <span>Επιβεβαιώθηκε</span>
+                                    <span>{t("info.login.verified")}</span>
                                 </Space>
                             }
                             style={{ background: "transparent" }}
@@ -321,14 +322,14 @@ const MyInfo: React.FC<Props> = ({
                     <Col xs={24} md={10}>
                         <Form.Item
                             name="telephone"
-                            label="Τηλέφωνο"
+                            label={t("info.fields.telephone.label")}
                             rules={[
-                                { required: true, message: "Υποχρεωτικό" },
-                                { pattern: /^\d{10}$/, message: "Εισάγετε ακριβώς 10 ψηφία." },
+                                { required: true, message: t("info.common.required") },
+                                { pattern: /^\d{10}$/, message: t("info.fields.telephone.tenDigits") },
                             ]}
                             extra={
                                 <Text type="secondary">
-                                    Κωδικός χώρας (2 ψηφία) και τοπικό τηλέφωνο (10 ψηφία).
+                                    {t("info.fields.telephone.extra")}
                                 </Text>
                             }
                         >
@@ -357,8 +358,8 @@ const MyInfo: React.FC<Props> = ({
                                             noStyle
                                             initialValue="30"
                                             rules={[
-                                                { required: true, message: "Κωδικός χώρας" },
-                                                { pattern: /^\d{2}$/, message: "2 ψηφία" },
+                                                { required: true, message: t("info.fields.cc.label") },
+                                                { pattern: /^\d{2}$/, message: t("info.fields.cc.twoDigits") },
                                             ]}
                                         >
                                             <Input
@@ -380,8 +381,8 @@ const MyInfo: React.FC<Props> = ({
                             name="email"
                             label="Email"
                             rules={[
-                                { required: true, message: "Υποχρεωτικό" },
-                                { type: "email", message: "Μη έγκυρο" },
+                                { required: true, message: t("info.common.required") },
+                                { type: "email", message: t("info.common.invalid") },
                             ]}
                         >
                             <Input size="large" placeholder="name@example.com" prefix={<MailOutlined />} disabled={checking} />
@@ -397,17 +398,17 @@ const MyInfo: React.FC<Props> = ({
                                 icon={checking ? <LoadingOutlined /> : <UnlockOutlined />}
                                 block
                             >
-                                Συνέχεια
+                                {t("info.login.continue")}
                             </Button>
                             {verified && (
-                                <Tooltip title="Επεξεργασία στοιχείων εισόδου">
+                                <Tooltip title={t("info.login.editTooltip")}>
                                     <Button
                                         size="large"
                                         icon={<EditOutlined />}
                                         onClick={() => {
                                             setVerified(false);
                                             setForceShowAll(false);
-                                            message.info("Τροποποιήστε τηλέφωνο/email και πατήστε Συνέχεια.");
+                                            message.info(t("info.login.editHint"));
                                         }}
                                     />
                                 </Tooltip>
@@ -421,10 +422,10 @@ const MyInfo: React.FC<Props> = ({
                         type="warning"
                         showIcon
                         style={{ marginTop: 6 }}
-                        message="Δεν βρέθηκε λογαριασμός με αυτά τα στοιχεία."
+                        message={t("info.messages.userNotFoundShort")}
                         description={
                             <Text type="secondary">
-                                Συνεχίστε συμπληρώνοντας τα παρακάτω πεδία για να δημιουργήσουμε νέο προφίλ μαζί με την κράτηση.
+                                {t("info.messages.userNotFoundDesc")}
                             </Text>
                         }
                     />
@@ -432,13 +433,13 @@ const MyInfo: React.FC<Props> = ({
 
                 {verified && (
                     <div style={{ marginTop: 8, display: "flex", gap: 12, alignItems: "center" }}>
-                        <Text type="secondary">Εμφανίζονται μόνο τα πεδία που λείπουν.</Text>
+                        <Text type="secondary">{t("info.login.showingMissing")}</Text>
                         <Button
                             type={forceShowAll ? "primary" : "default"}
                             onClick={() => setForceShowAll((s) => !s)}
                             size="small"
                         >
-                            {forceShowAll ? "Εμφάνιση μόνο ελλιπών" : "Εμφάνιση όλων"}
+                            {forceShowAll ? t("info.login.showMissingOnly") : t("info.login.showAll")}
                         </Button>
                     </div>
                 )}
@@ -448,16 +449,16 @@ const MyInfo: React.FC<Props> = ({
             <Row gutter={[16, 16]}>
                 {isVisible("name") && (
                     <Col xs={24} md={12}>
-                        <Form.Item name="name" label="Όνομα" rules={[{ required: true, message: "Υποχρεωτικό" }]}>
-                            <Input placeholder="Όνομα" prefix={<UserOutlined />} />
+                        <Form.Item name="name" label={t("info.fields.name")} rules={[{ required: true, message: t("info.common.required") }]}>
+                            <Input placeholder={t("info.fields.name")} prefix={<UserOutlined />} />
                         </Form.Item>
                     </Col>
                 )}
 
                 {isVisible("last_name") && (
                     <Col xs={24} md={12}>
-                        <Form.Item name="last_name" label="Επώνυμο" rules={[{ required: true, message: "Υποχρεωτικό" }]}>
-                            <Input placeholder="Επώνυμο" prefix={<UserOutlined />} />
+                        <Form.Item name="last_name" label={t("info.fields.lastName")} rules={[{ required: true, message: t("info.common.required") }]}>
+                            <Input placeholder={t("info.fields.lastName")} prefix={<UserOutlined />} />
                         </Form.Item>
                     </Col>
                 )}
@@ -466,15 +467,15 @@ const MyInfo: React.FC<Props> = ({
                     <Col xs={24} md={12}>
                         <Form.Item
                             name="date_of_birth"
-                            label="Ημερομηνία γέννησης"
+                            label={t("info.fields.dob")}
                             rules={[
-                                { required: true, message: "Υποχρεωτικό" },
+                                { required: true, message: t("info.common.required") },
                                 {
                                     validator: (_, value) => {
                                         const a = calcAge(value);
                                         if (a === null) return Promise.resolve();
                                         if (a < 21 || a > 72) {
-                                            return Promise.reject(new Error("Ηλικία 21–72"));
+                                            return Promise.reject(new Error(t("info.validation.ageRange")));
                                         }
                                         return Promise.resolve();
                                     },
@@ -483,8 +484,8 @@ const MyInfo: React.FC<Props> = ({
                             extra={
                                 (() => {
                                     if (age === null) return null;
-                                    if (isAgeBlocked) return <Text type="danger">Εκτός ορίων ηλικίας (21–72).</Text>;
-                                    if (requiresExtraInsurance) return <Text type="warning">Απαιτείται πρόσθετη ασφάλιση.</Text>;
+                                    if (isAgeBlocked) return <Text type="danger">{t("info.validation.ageOutOfRange")}</Text>;
+                                    if (requiresExtraInsurance) return <Text type="warning">{t("info.validation.extraInsurance")}</Text>;
                                     return null;
                                 })()
                             }
@@ -501,7 +502,7 @@ const MyInfo: React.FC<Props> = ({
 
                 {isVisible("vat_number") && (
                     <Col xs={24} md={12}>
-                        <Form.Item name="vat_number" label="ΑΦΜ" rules={[{ required: true, message: "Υποχρεωτικό" }]}>
+                        <Form.Item name="vat_number" label={t("info.fields.vat")} rules={[{ required: true, message: t("info.common.required") }]}>
                             <Input placeholder="π.χ. EL123456789" prefix={<NumberOutlined />} />
                         </Form.Item>
                     </Col>
@@ -509,34 +510,34 @@ const MyInfo: React.FC<Props> = ({
             </Row>
 
             {/* ADDRESS */}
-            <Title level={5} style={{ marginTop: 24 }}>Διεύθυνση</Title>
+            <Title level={5} style={{ marginTop: 24 }}>{t("info.sections.address")}</Title>
             <Row gutter={[16, 16]}>
                 {isVisible("address") && (
                     <Col xs={24} md={12}>
-                        <Form.Item name="address" label="Διεύθυνση" rules={[{ required: true, message: "Υποχρεωτικό" }]}>
-                            <Input placeholder="Οδός & αριθμός" prefix={<HomeOutlined />} />
+                        <Form.Item name="address" label={t("info.fields.address")} rules={[{ required: true, message: t("info.common.required") }]}>
+                            <Input placeholder={t("info.placeholders.street")} prefix={<HomeOutlined />} />
                         </Form.Item>
                     </Col>
                 )}
                 {isVisible("city") && (
                     <Col xs={24} md={12}>
-                        <Form.Item name="city" label="Πόλη" rules={[{ required: true, message: "Υποχρεωτικό" }]}>
-                            <Input placeholder="Πόλη" prefix={<EnvironmentOutlined />} />
+                        <Form.Item name="city" label={t("info.fields.city")} rules={[{ required: true, message: t("info.common.required") }]}>
+                            <Input placeholder={t("info.fields.city")} prefix={<EnvironmentOutlined />} />
                         </Form.Item>
                     </Col>
                 )}
                 {isVisible("postal_code") && (
                     <Col xs={24} md={12}>
-                        <Form.Item name="postal_code" label="Τ.Κ." rules={[{ required: true, message: "Υποχρεωτικό" }]}>
-                            <Input placeholder="ΤΚ" prefix={<NumberOutlined />} />
+                        <Form.Item name="postal_code" label={t("info.fields.postal")} rules={[{ required: true, message: t("info.common.required") }]}>
+                            <Input placeholder={t("info.placeholders.postal")} prefix={<NumberOutlined />} />
                         </Form.Item>
                     </Col>
                 )}
                 {isVisible("country") && (
                     <Col xs={24} md={12}>
-                        <Form.Item name="country" label="Χώρα" rules={[{ required: true, message: "Υποχρεωτικό" }]}>
+                        <Form.Item name="country" label={t("info.fields.country")} rules={[{ required: true, message: t("info.common.required") }]}>
                             <Select
-                                placeholder="Επιλέξτε χώρα"
+                                placeholder={t("info.placeholders.selectCountry")}
                                 options={countryOptions}
                                 optionFilterProp="label"
                                 showSearch
@@ -548,20 +549,20 @@ const MyInfo: React.FC<Props> = ({
             </Row>
 
             {/* DRIVING */}
-            <Title level={5} style={{ marginTop: 24 }}>Οδήγηση</Title>
+            <Title level={5} style={{ marginTop: 24 }}>{t("info.sections.driving")}</Title>
             <Row gutter={[16, 16]}>
                 {isVisible("driver_license") && (
                     <Col xs={24} md={12}>
-                        <Form.Item name="driver_license" label="Δίπλωμα οδήγησης">
-                            <Input placeholder="Αριθμός διπλώματος" prefix={<IdcardOutlined />} />
+                        <Form.Item name="driver_license" label={t("info.fields.license")}>
+                            <Input placeholder={t("info.placeholders.licenseNo")} prefix={<IdcardOutlined />} />
                         </Form.Item>
                     </Col>
                 )}
                 {isVisible("driver_license_country") && (
                     <Col xs={24} md={12}>
-                        <Form.Item name="driver_license_country" label="Χώρα διπλώματος">
+                        <Form.Item name="driver_license_country" label={t("info.fields.licenseCountry")}>
                             <Select
-                                placeholder="Επιλέξτε χώρα"
+                                placeholder={t("info.placeholders.selectCountry")}
                                 options={countryOptions}
                                 optionFilterProp="label"
                                 showSearch
@@ -573,20 +574,20 @@ const MyInfo: React.FC<Props> = ({
             </Row>
 
             {/* IDENTITY */}
-            <Title level={5} style={{ marginTop: 24 }}>Διαβατήριο / Ταυτότητα</Title>
+            <Title level={5} style={{ marginTop: 24 }}>{t("info.sections.identity")}</Title>
             <Row gutter={[16, 16]}>
                 {isVisible("passport") && (
                     <Col xs={24} md={12}>
-                        <Form.Item name="passport" label="Διαβατήριο / Ταυτότητα">
-                            <Input placeholder="Αριθμός" prefix={<IdcardOutlined />} />
+                        <Form.Item name="passport" label={t("info.fields.passport")}>
+                            <Input placeholder={t("info.placeholders.number")} prefix={<IdcardOutlined />} />
                         </Form.Item>
                     </Col>
                 )}
                 {isVisible("passport_country") && (
                     <Col xs={24} md={12}>
-                        <Form.Item name="passport_country" label="Χώρα έκδοσης">
+                        <Form.Item name="passport_country" label={t("info.fields.passportCountry")}>
                             <Select
-                                placeholder="Επιλέξτε χώρα"
+                                placeholder={t("info.placeholders.selectCountry")}
                                 options={countryOptions}
                                 optionFilterProp="label"
                                 showSearch
@@ -600,7 +601,7 @@ const MyInfo: React.FC<Props> = ({
             <Divider />
 
             {/* COMPANY */}
-            <Title level={5} style={{ marginTop: 0 }}>Εταιρεία (προαιρετικό)</Title>
+            <Title level={5} style={{ marginTop: 0 }}>{t("info.sections.companyOptional")}</Title>
             {isVisible("company") && (
                 <>
                     <Row gutter={[16, 8]} align="middle">
@@ -610,7 +611,7 @@ const MyInfo: React.FC<Props> = ({
                                 label={
                                     <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
                     <BankOutlined />
-                    Τιμολόγιο σε εταιρεία;
+                                        {t("info.fields.invoiceCompany")}
                   </span>
                                 }
                                 valuePropName="checked"
@@ -627,14 +628,14 @@ const MyInfo: React.FC<Props> = ({
                                 <Row gutter={[16, 16]}>
                                     {isVisible("company_name") && (
                                         <Col xs={24} md={12}>
-                                            <Form.Item name="company_name" label="Επωνυμία (προαιρετικό)">
-                                                <Input placeholder="Επωνυμία" prefix={<ApartmentOutlined />} />
+                                            <Form.Item name="company_name" label={t("info.fields.companyNameOptional")}>
+                                                <Input placeholder={t("info.fields.companyName")} prefix={<ApartmentOutlined />} />
                                             </Form.Item>
                                         </Col>
                                     )}
                                     {isVisible("vat_number") && (
                                         <Col xs={24} md={12}>
-                                            <Form.Item name="vat_number" label="ΑΦΜ">
+                                            <Form.Item name="vat_number" label={t("info.fields.vat")}>
                                                 <Input placeholder="EL123456789" prefix={<NumberOutlined />} />
                                             </Form.Item>
                                         </Col>
@@ -649,10 +650,10 @@ const MyInfo: React.FC<Props> = ({
             <Divider />
 
             {/* BOOKING EXTRAS */}
-            <Title level={5} style={{ marginTop: 24 }}>Έξτρα στοιχεία κράτησης</Title>
+            <Title level={5} style={{ marginTop: 24 }}>{t("info.sections.bookingExtras")}</Title>
             <Row gutter={[16, 16]}>
                 <Col xs={24} md={12}>
-                    <Form.Item name="flight" label="Πτήση (προαιρετικό)">
+                    <Form.Item name="flight" label={t("info.fields.flightOptional")}>
                         <Input placeholder="π.χ. A3 123" prefix={<SendOutlined />} />
                     </Form.Item>
                 </Col>
@@ -662,10 +663,10 @@ const MyInfo: React.FC<Props> = ({
                         label={
                             <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
                 <UsergroupAddOutlined />
-                Αριθμός ατόμων
+                                {t("info.fields.peopleCount")}
               </span>
                         }
-                        rules={[{ required: true, message: "Υποχρεωτικό" }]}
+                        rules={[{ required: true, message: t("info.common.required") }]}
                     >
                         <InputNumber min={1} style={{ width: "100%" }} placeholder="1" />
                     </Form.Item>
@@ -677,7 +678,7 @@ const MyInfo: React.FC<Props> = ({
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
                     <TeamOutlined />
                     <Title level={5} style={{ margin: 0 }}>
-                        Επιπλέον οδηγοί (προαιρετικό)
+                        {t("info.sections.extraDriversOptional")}
                     </Title>
                 </div>
 
@@ -714,7 +715,7 @@ const MyInfo: React.FC<Props> = ({
                                                 shape="circle"
                                                 icon={<CloseOutlined />}
                                                 onClick={() => remove(field.name)}
-                                                aria-label="Αφαίρεση οδηγού"
+                                                aria-label={t("info.drivers.remove")}
                                             />
                                         </div>
 
@@ -722,19 +723,19 @@ const MyInfo: React.FC<Props> = ({
                                             <Col span={24}>
                                                 <Form.Item
                                                     name={[field.name, "telephone"]}
-                                                    label="Τηλέφωνο οδηγού"
-                                                    rules={[{ required: true, message: "Υποχρεωτικό" }]}
+                                                    label={t("info.drivers.driverPhone")}
+                                                    rules={[{ required: true, message: t("info.common.required") }]}
                                                 >
-                                                    <Input placeholder="Τηλέφωνο" prefix={<PhoneOutlined />} />
+                                                    <Input placeholder={t("info.placeholders.phone")} prefix={<PhoneOutlined />} />
                                                 </Form.Item>
                                             </Col>
                                             <Col span={24}>
                                                 <Form.Item
                                                     name={[field.name, "name"]}
-                                                    label="Όνομα οδηγού"
-                                                    rules={[{ required: true, message: "Υποχρεωτικό" }]}
+                                                    label={t("info.drivers.driverName")}
+                                                    rules={[{ required: true, message: t("info.common.required") }]}
                                                 >
-                                                    <Input placeholder="Όνομα" prefix={<UserOutlined />} />
+                                                    <Input placeholder={t("info.fields.name")} prefix={<UserOutlined />} />
                                                 </Form.Item>
                                             </Col>
                                         </Row>
@@ -742,7 +743,7 @@ const MyInfo: React.FC<Props> = ({
                                 ))}
 
                                 <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
-                                    Προσθήκη οδηγού
+                                    {t("info.drivers.addDriver")}
                                 </Button>
                             </>
                         )}
@@ -750,8 +751,8 @@ const MyInfo: React.FC<Props> = ({
                 </div>
             </div>
 
-            <Form.Item name="notes" label="Σημειώσεις (προαιρετικό)" style={{ marginTop: 24 }}>
-                <Input.TextArea rows={3} placeholder="Οδηγίες, ειδικές ανάγκες κ.λπ." />
+            <Form.Item name="notes" label={t("info.fields.notesOptional")} style={{ marginTop: 24 }}>
+                <Input.TextArea rows={3} placeholder={t("info.placeholders.notes")} />
             </Form.Item>
 
             {/* TERMS */}
@@ -760,18 +761,18 @@ const MyInfo: React.FC<Props> = ({
                 valuePropName="checked"
                 rules={[{
                     validator: (_, v) =>
-                        v ? Promise.resolve() : Promise.reject(new Error("Παρακαλώ αποδεχτείτε τους Όρους & Προϋποθέσεις")),
+                        v ? Promise.resolve() : Promise.reject(new Error(t("info.validation.acceptTerms"))),
                 }]}
                 style={{ marginTop: 12 }}
             >
                 <Checkbox>
-                    Αποδέχομαι τους{" "}
+                    {t("info.terms.accept")}{" "}
                     <a
                         href={withLang("/epikoinonia/oroi-kai-proipotheseis")}
                         target="_blank"
                         rel="noopener noreferrer"
                     >
-                        Όρους & Προϋποθέσεις
+                        {t("info.terms.link")}
                     </a>
                 </Checkbox>
             </Form.Item>
@@ -780,7 +781,7 @@ const MyInfo: React.FC<Props> = ({
             {/* FOOTER ACTIONS */}
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 16 }}>
                 <Space>
-                    <Button onClick={onPrev}>ΠΙΣΩ</Button>
+                    <Button onClick={onPrev}>{t("info.actions.back")}</Button>
                 </Space>
                 <Space>
                     <Button
@@ -789,7 +790,7 @@ const MyInfo: React.FC<Props> = ({
                         disabled={!accepted || isAgeBlocked}
                         icon={<CheckCircleTwoTone twoToneColor="#ffffff" />}
                     >
-                        ΟΛΟΚΛΗΡΩΣΗ & ΠΛΗΡΩΜΗ
+                        {t("info.actions.completePayment")}
                     </Button>
                 </Space>
             </div>

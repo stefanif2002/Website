@@ -1,0 +1,250 @@
+{
+  "add": {
+    "stripeConfirm": {
+      "success": "Payment confirmed.",
+      "error": "Payment confirmation failed. Please contact us."
+    },
+    "done": {
+      "title": "Your booking was submitted successfully!",
+      "subTitle": "You will soon receive an email with all booking details and the payment receipt.",
+      "btnDetails": "View booking details",
+      "btnHome": "Go to homepage"
+    }
+  },
+
+  "searchPage": {
+    "messages": {
+      "failedAvailabilities": "Failed to fetch availabilities.",
+      "pleaseSelectDates": "Please select dates and locations first.",
+      "selectedCategoryNotFound": "Selected category not found."
+    },
+    "locations": {
+      "skypark": "Skypark",
+      "office": "4Rent Office",
+      "hotel": "Thessaloniki Hotel/Airbnb"
+    }
+  },
+
+  "dateForm": {
+    "labels": {
+      "pickupWhere": "Where will you pick it up?",
+      "dropoffWhere": "Where will you return it?",
+      "pickupDate": "Pick-up date",
+      "dropoffDate": "Drop-off date"
+    },
+    "placeholders": {
+      "pickup": "Thessaloniki (SKG)",
+      "dropoff": "Destination or address"
+    },
+    "validation": {
+      "pickupRequired": "Please select a pick-up date",
+      "dropoffRequired": "Please select a drop-off date"
+    },
+    "actions": {
+      "search": "Search"
+    }
+  },
+
+  "filters": {
+    "title": "Filters",
+    "clearAll": "Clear",
+    "tooltipClear": "Clear all filters",
+
+    "type": {
+      "label": "Type",
+      "placeholder": "Hatchback, SUV, ..."
+    },
+    "fuel": {
+      "label": "Fuel",
+      "placeholder": "Petrol, Diesel, Hybrid..."
+    },
+    "seats": {
+      "label": "Seats",
+      "chipSuffix": "seats"
+    },
+    "transmission": {
+      "label": "Transmission",
+      "all": "All",
+      "manual": "Manual",
+      "auto": "Auto",
+      "chipAuto": "Auto",
+      "chipManual": "Manual"
+    }
+  },
+
+  "cards": {
+    "availability": {
+      "titlePrefix": "Category",
+      "orSimilar": "or similar",
+      "specs": {
+        "fuel": "Fuel",
+        "auto": "Auto",
+        "manual": "Manual",
+        "seats": "Seats"
+      },
+      "price": {
+        "perDay": "Per day:",
+        "total": "Total:",
+        "currencyShort": "EUR"
+      },
+      "actions": {
+        "bookNow": "Book Now"
+      },
+      "soldOut": "SOLD OUT"
+    }
+  },
+
+  "wizard": {
+    "steps": {
+      "addons": "Add-ons",
+      "info": "Personal Info",
+      "payment": "Payment"
+    },
+    "infoTitle": "Your Information",
+    "paymentTitle": "Payment",
+    "errors": {
+      "missingBookingData": "Missing booking data (dates/vehicle). Please return to search.",
+      "noBookingId": "No bookingId received from server.",
+      "creationFailed": "Failed to create booking. Try again."
+    }
+  },
+  "addons": {
+    "title": "Additional equipment",
+    "totalLabel": "Total:",
+    "select": "Select",
+    "remove": "Remove",
+    "continue": "Continue",
+    "items": {
+      "GPS": {
+        "title": "Navigation system (GPS)",
+        "desc": "Easy orientation and traffic avoidance."
+      },
+      "CHAINS_FOR_SNOW": {
+        "title": "Snow chains",
+        "desc": "For difficult weather conditions."
+      },
+      "BS1": {
+        "title": "Baby seat (3–14 kg)",
+        "desc": "Extra protection for babies."
+      },
+      "BS2": {
+        "title": "Child booster seat (14kg+)",
+        "desc": "Comfort and safety for older children."
+      }
+    }
+  },
+  "info": {
+    "login": {
+      "title": "Login for automatic fill-in",
+      "verified": "Verified",
+      "continue": "Continue",
+      "editTooltip": "Edit login details",
+      "editHint": "Edit phone/email and press Continue.",
+      "showingMissing": "Only missing fields are displayed.",
+      "showAll": "Show all",
+      "showMissingOnly": "Show missing only"
+    },
+    "fields": {
+      "telephone": { "label": "Telephone", "tenDigits": "Enter exactly 10 digits.", "extra": "Country code (2 digits) and local number (10 digits)." },
+      "cc": { "label": "Country code", "twoDigits": "2 digits" },
+      "name": "First name",
+      "lastName": "Last name",
+      "dob": "Date of birth",
+      "vat": "VAT Number",
+      "address": "Address",
+      "city": "City",
+      "postal": "Postal code",
+      "country": "Country",
+      "license": "Driver’s licence",
+      "licenseCountry": "Licence country",
+      "passport": "Passport / ID",
+      "passportCountry": "Issuing country",
+      "invoiceCompany": "Invoice to company?",
+      "companyName": "Company name",
+      "companyNameOptional": "Company name (optional)",
+      "flightOptional": "Flight (optional)",
+      "peopleCount": "Number of people",
+      "notesOptional": "Notes (optional)"
+    },
+    "sections": {
+      "address": "Address",
+      "driving": "Driving",
+      "identity": "Passport / ID",
+      "companyOptional": "Company (optional)",
+      "bookingExtras": "Booking extras",
+      "extraDriversOptional": "Additional drivers (optional)"
+    },
+    "placeholders": {
+      "street": "Street & number",
+      "postal": "Postal code",
+      "selectCountry": "Select country",
+      "licenseNo": "Licence number",
+      "number": "Number",
+      "phone": "Phone number",
+      "notes": "Instructions / special needs"
+    },
+    "common": { "required": "Required", "invalid": "Invalid email" },
+    "validation": {
+      "ageRange": "Age 21–72",
+      "ageOutOfRange": "Out of age range (21–72)",
+      "extraInsurance": "Extra insurance required.",
+      "ageBlocked": "Age must be between 21 and 72.",
+      "acceptTerms": "Please accept the Terms & Conditions"
+    },
+    "messages": {
+      "userNotFound": "No account found. Fill in the fields to create a new profile.",
+      "userNotFoundShort": "Account not found",
+      "userNotFoundDesc": "Continue filling the fields to create a profile with your booking.",
+      "recognized": "User recognized — showing only missing fields.",
+      "emailMismatch": "Wrong email for this phone. Continue filling fields.",
+      "saved": "Your details have been saved.",
+      "saveFailed": "Failed to save details. Email is linked to another phone."
+    },
+    "terms": { "accept": "I accept the", "link": "Terms & Conditions" },
+    "actions": { "back": "Back", "completePayment": "Complete & Pay" },
+    "drivers": {
+      "remove": "Remove driver",
+      "driverPhone": "Driver phone",
+      "driverName": "Driver name",
+      "addDriver": "Add driver"
+    }
+  },
+  "payment": {
+    "title": "Payment",
+    "secureLabel": "Secure Stripe Checkout",
+    "totalLabel": "Total payment",
+    "discountApplied": "Coupon: -{{pct}}% ({{diff}} {{currency}})",
+    "couponTitle": "Discount coupon",
+    "couponPlaceholder": "Add code (e.g. SUMMER25)",
+    "applyCoupon": "Apply",
+    "clearCoupon": "Clear coupon",
+    "couponAppliedShort": "Applied (-{{pct}}%)",
+    "advanceButton": "Pay advance",
+    "fullButton": "Pay full amount",
+    "back": "Back",
+    "advanceTooltip": "Pay a small deposit to secure your booking.",
+    "finalNote": "Your booking will be confirmed only after completing the payment (full or advance).",
+    "cancelledTitle": "Payment interrupted",
+    "cancelledDesc": "You interrupted the payment process. To complete your booking, please finalize the payment.",
+    "messages": {
+      "enterCoupon": "Please enter a coupon code.",
+      "invalidCoupon": "Invalid coupon.",
+      "appliedButNotSynced": "Coupon applied but not synced with server.",
+      "couponApplied": "Coupon applied: -{{pct}}%",
+      "couponCheckFailed": "Failed to validate coupon.",
+      "missingStripe": "Stripe key is missing. Contact support.",
+      "missingBooking": "Booking ID is missing. Go back to previous step.",
+      "stripeFailed": "Failed to create Stripe payment."
+    }
+  },
+  "summary": {
+    "title": "Cost summary",
+    "statusOpen": "Open",
+    "baseTotal": "Base total",
+    "addonsTotal": "Equipment",
+    "grandTotal": "Total:",
+    "freeCancel": "Free cancellation"
+  }
+
+
+}

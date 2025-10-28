@@ -6,6 +6,7 @@ import dayjs, { Dayjs } from "dayjs";
 import { width, myApi } from "../../resources/service";
 import SearchPage from "./SearchPage";
 import BookingWizard from "../../components/search/BookingWizard";
+import { useTranslation } from "react-i18next";
 
 interface DriverDto { telephone: string; name: string; }
 interface Booking {
@@ -27,6 +28,7 @@ function AddBooking() {
     const navigate = useNavigate();
     const { pathname } = useLocation();
     const [sp] = useSearchParams();
+    const { t } = useTranslation("booking");
 
     // --- find "/book" in the path (works with language prefixes) ---
     const parts = useMemo(() => pathname.replace(/\/+$/, "").split("/"), [pathname]);
@@ -121,22 +123,22 @@ function AddBooking() {
                 setConfirming(true);
                 await myApi.post(`booking/${bid}/confirm-payment`, {}); // <- no session id
                 setConfirmed(true);
-                message.success("Η πληρωμή επιβεβαιώθηκε.");
+                message.success(t("add.stripeConfirm.success"));
             } catch (e) {
-                console.log(e)
-                message.error("Δεν ήταν δυνατή η επιβεβαίωση πληρωμής. Επικοινωνήστε μαζί μας.");
+                console.log(e);
+                message.error(t("add.stripeConfirm.error"));
             } finally {
                 setConfirming(false);
             }
         })();
-    }, [isStripeSuccess, bid, confirmed, confirming]);
+    }, [isStripeSuccess, bid, confirmed, confirming, t]);
 
     const detailsHref = bid
         ? `${prefix}/book/details/${bid}`
         : `${prefix}/book/details${qp ? `?${qp}` : ""}`;
 
     return (
-        <div >
+        <div>
             {routeStep === "search" && <SearchPage onSubmit={onCategorySelect} />}
 
             {routeStep !== "search" && routeStep !== "done" && booking && (
@@ -155,14 +157,14 @@ function AddBooking() {
             {routeStep === "done" && (
                 <Result
                     status="success"
-                    title="Η κράτηση σας καταχωρήθηκε επιτυχως!"
-                    subTitle="Προσεχώς Θα σας αποσταλεί ανάλογο email με όλες τις πληροφορίες της κράτησής σας καθώς και την απόδειξη της πληρωμής."
+                    title={t("add.done.title")}
+                    subTitle={t("add.done.subTitle")}
                     extra={[
                         <Button type="primary" key="details" onClick={() => navigate(detailsHref)}>
-                            Προβολή λεπτομερειών κράτησης
+                            {t("add.done.btnDetails")}
                         </Button>,
                         <Button key="home" onClick={() => navigate("/")} icon={<HomeOutlined />}>
-                            Μετάβαση στην αρχικη
+                            {t("add.done.btnHome")}
                         </Button>,
                     ]}
                 />

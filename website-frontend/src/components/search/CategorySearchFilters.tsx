@@ -1,4 +1,3 @@
-// src/components/search/CategorySearchFilters.tsx
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { myApi, width } from "../../resources/service";
 import {
@@ -26,6 +25,7 @@ import {
     faBroom,
     faCircleCheck,
 } from "@fortawesome/free-solid-svg-icons";
+import { useTranslation } from "react-i18next";
 
 interface Props {
     // unchanged: we’ll send comma-separated strings for multi-values
@@ -50,6 +50,7 @@ const headerGradient =
 
 const CategorySearchFilters: React.FC<Props> = ({ onFilterChange, clearAll, initialFilters }) => {
     const [form] = Form.useForm();
+    const { t } = useTranslation("booking");
 
     const [typeOptions, setTypeOptions] = useState<OptionType[]>([]);
     const [fuelTypeOptions, setFuelTypeOptions] = useState<OptionType[]>([]);
@@ -123,7 +124,7 @@ const CategorySearchFilters: React.FC<Props> = ({ onFilterChange, clearAll, init
             chips.push({ key: "automatic", label: <><FontAwesomeIcon icon={faGears}/> {active.automatic==="true"?"Auto":"Manual"}</>,
                 onClear: () => { form.setFieldsValue({ automatic: "off" }); handleAutomatic("off"); } });
         return chips;
-    }, [active]);
+    }, [active, form]);
 
     const clearFilters = () => {
         form.resetFields();
@@ -157,21 +158,21 @@ const CategorySearchFilters: React.FC<Props> = ({ onFilterChange, clearAll, init
             >
                 <Space align="center" size={10}>
                     <FontAwesomeIcon icon={faCircleCheck} />
-                    <span style={{ fontWeight: 700, letterSpacing: 0.2 }}>Φίλτρα</span>
+                    <span style={{ fontWeight: 700, letterSpacing: 0.2 }}>{t("filters.title")}</span>
                     {activeChips.length > 0 && (
                         <Tag color="gold" style={{ borderRadius: 999, marginLeft: 6 }}>
                             {activeChips.length}
                         </Tag>
                     )}
                 </Space>
-                <Tooltip title="Clear all filters">
+                <Tooltip title={t("filters.tooltipClear")}>
                     <Button
                         size="small"
                         onClick={clearFilters}
                         icon={<FontAwesomeIcon icon={faBroom} />}
                         style={{ color: "#2F5AFF", background: "white", border: "none", fontWeight: 600 }}
                     >
-                        Καθαρισμός
+                        {t("filters.clearAll")}
                     </Button>
                 </Tooltip>
             </div>
@@ -221,7 +222,7 @@ const CategorySearchFilters: React.FC<Props> = ({ onFilterChange, clearAll, init
                                 label={
                                     <Space size={6}>
                                         <FontAwesomeIcon icon={faCarSide} />
-                                        <span>Τύπος</span>
+                                        <span>{t("filters.type.label")}</span>
                                     </Space>
                                 }
                                 name="type"
@@ -231,7 +232,7 @@ const CategorySearchFilters: React.FC<Props> = ({ onFilterChange, clearAll, init
                                     allowClear
                                     showSearch
                                     options={typeOptions}
-                                    placeholder="Hatchback, SUV, ..."
+                                    placeholder={t("filters.type.placeholder")}
                                     onChange={(vals) => handleTypeMulti(vals as string[])}
                                     tokenSeparators={[","]}
                                 />
@@ -244,7 +245,7 @@ const CategorySearchFilters: React.FC<Props> = ({ onFilterChange, clearAll, init
                                 label={
                                     <Space size={6}>
                                         <FontAwesomeIcon icon={faGasPump} />
-                                        <span>Καύσιμο</span>
+                                        <span>{t("filters.fuel.label")}</span>
                                     </Space>
                                 }
                                 name="fuelType"
@@ -254,20 +255,20 @@ const CategorySearchFilters: React.FC<Props> = ({ onFilterChange, clearAll, init
                                     allowClear
                                     showSearch
                                     options={fuelTypeOptions}
-                                    placeholder="Petrol, Diesel, Hybrid..."
+                                    placeholder={t("filters.fuel.placeholder")}
                                     onChange={(vals) => handleFuelMulti(vals as string[])}
                                     tokenSeparators={[","]}
                                 />
                             </Form.Item>
                         </Col>
 
-                        {/* Seats (MULTI) – pills via Checkbox.Group */}
+                        {/* Seats (MULTI) */}
                         <Col xs={24}>
                             <Form.Item
                                 label={
                                     <Space size={6}>
                                         <FontAwesomeIcon icon={faUsers} />
-                                        <span>Θέσεις</span>
+                                        <span>{t("filters.seats.label")}</span>
                                     </Space>
                                 }
                                 name="numOfSeats"
@@ -295,13 +296,13 @@ const CategorySearchFilters: React.FC<Props> = ({ onFilterChange, clearAll, init
                             </Form.Item>
                         </Col>
 
-                        {/* Transmission (single) */}
+                        {/* Transmission */}
                         <Col xs={24}>
                             <Form.Item
                                 label={
                                     <Space size={6}>
                                         <FontAwesomeIcon icon={faGears} />
-                                        <span>Μετάδοση</span>
+                                        <span>{t("filters.transmission.label")}</span>
                                     </Space>
                                 }
                                 name="automatic"
@@ -313,13 +314,13 @@ const CategorySearchFilters: React.FC<Props> = ({ onFilterChange, clearAll, init
                                     style={{ display: "flex", gap: 8 }}
                                 >
                                     <Radio.Button value="off" style={{ flex: 1, textAlign: "center" }}>
-                                        All
+                                        {t("filters.transmission.all")}
                                     </Radio.Button>
                                     <Radio.Button value="false" style={{ flex: 1, textAlign: "center" }}>
-                                        Manual
+                                        {t("filters.transmission.manual")}
                                     </Radio.Button>
                                     <Radio.Button value="true" style={{ flex: 1, textAlign: "center" }}>
-                                        Auto
+                                        {t("filters.transmission.auto")}
                                     </Radio.Button>
                                 </Radio.Group>
                             </Form.Item>

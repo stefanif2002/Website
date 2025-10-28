@@ -1,16 +1,9 @@
-import React, {useCallback, useEffect, useState} from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
-import {
-    Button,
-    Col,
-    DatePicker,
-    Form,
-    Grid,
-    Row,
-    Select,
-} from "antd";
+import { Button, Col, DatePicker, Form, Grid, Row, Select } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendar, faLocationDot } from "@fortawesome/free-solid-svg-icons";
+import { useTranslation } from "react-i18next";
 
 interface DateFormProps {
     onDateFormSubmit: (dateForm: myDateForm) => void;
@@ -54,15 +47,16 @@ const { useBreakpoint } = Grid;
 const DateForm: React.FC<DateFormProps> = ({ onDateFormSubmit }) => {
     const [form] = Form.useForm();
     const screens = useBreakpoint();
+    const { t } = useTranslation("booking");
 
     // dynamic heights/spacing per breakpoint
     const fieldHeight = screens.xs ? 52 : 64;
     const fieldBoxStyle = { ...baseFieldBox, height: fieldHeight };
 
     const locationOptions: OptionType[] = [
-        { value: "Skypark", label: "Skypark" },
-        { value: "4Rent Office", label: "4Rent Office" },
-        { value: "Thessaloniki Hotel/Airnbnb", label: "Thessaloniki Hotel/Airnbnb" },
+        { value: "Skypark", label: t("searchPage.locations.skypark") },
+        { value: "4Rent Office", label: t("searchPage.locations.office") },
+        { value: "Thessaloniki Hotel/Airnbnb", label: t("searchPage.locations.hotel") },
     ];
 
     const [startLocation, setStartLocation] = useState<string | null>(null);
@@ -117,7 +111,7 @@ const DateForm: React.FC<DateFormProps> = ({ onDateFormSubmit }) => {
                     <Row gutter={[12, 12]} justify="center" wrap>
                         <Col xs={12} xl={6} xxl={5}>
                             <div style={{ position: "relative" }}>
-                                <span style={tinyLabel}>Πού θα το παραλάβετε;</span>
+                                <span style={tinyLabel}>{t("dateForm.labels.pickupWhere")}</span>
                                 <div style={fieldBoxStyle}>
                                     <FontAwesomeIcon color={aeBlue} icon={faLocationDot} />
                                     <Form.Item name="startLocation" noStyle rules={[{ required: true }]}>
@@ -126,7 +120,7 @@ const DateForm: React.FC<DateFormProps> = ({ onDateFormSubmit }) => {
                                             options={locationOptions}
                                             onChange={setStartLocation}
                                             style={{ width: "100%" }}
-                                            placeholder="Θεσσαλονίκη (SKG)"
+                                            placeholder={t("dateForm.placeholders.pickup")}
                                             showSearch
                                             optionFilterProp="label"
                                         />
@@ -137,7 +131,7 @@ const DateForm: React.FC<DateFormProps> = ({ onDateFormSubmit }) => {
 
                         <Col xs={12} xl={6} xxl={5}>
                             <div style={{ position: "relative" }}>
-                                <span style={tinyLabel}>Πού θα το επιστρέψετε;</span>
+                                <span style={tinyLabel}>{t("dateForm.labels.dropoffWhere")}</span>
                                 <div style={fieldBoxStyle}>
                                     <FontAwesomeIcon color={aeBlue} icon={faLocationDot} />
                                     <Form.Item name="endLocation" noStyle rules={[{ required: true }]}>
@@ -146,7 +140,7 @@ const DateForm: React.FC<DateFormProps> = ({ onDateFormSubmit }) => {
                                             options={locationOptions}
                                             onChange={setEndLocation}
                                             style={{ width: "100%" }}
-                                            placeholder="Προορισμός ή διεύθυνση"
+                                            placeholder={t("dateForm.placeholders.dropoff")}
                                             showSearch
                                             optionFilterProp="label"
                                         />
@@ -157,13 +151,13 @@ const DateForm: React.FC<DateFormProps> = ({ onDateFormSubmit }) => {
 
                         <Col xs={24} lg={12} xl={6} xxl={5}>
                             <div style={{ position: "relative" }}>
-                                <span style={tinyLabel}>Ημερομηνία παραλαβής</span>
+                                <span style={tinyLabel}>{t("dateForm.labels.pickupDate")}</span>
                                 <div style={fieldBoxStyle}>
                                     <FontAwesomeIcon color={aeBlue} icon={faCalendar} />
                                     <Form.Item
                                         name="startDate"
                                         noStyle
-                                        rules={[{ required: true, message: "Επιλέξτε ημερομηνία παραλαβής" }]}
+                                        rules={[{ required: true, message: t("dateForm.validation.pickupRequired") }]}
                                     >
                                         <DatePicker
                                             bordered={false}
@@ -183,13 +177,13 @@ const DateForm: React.FC<DateFormProps> = ({ onDateFormSubmit }) => {
 
                         <Col xs={24} lg={12} xl={6} xxl={5}>
                             <div style={{ position: "relative" }}>
-                                <span style={tinyLabel}>Ημερομηνία επιστροφής</span>
+                                <span style={tinyLabel}>{t("dateForm.labels.dropoffDate")}</span>
                                 <div style={fieldBoxStyle}>
                                     <FontAwesomeIcon color={aeBlue} icon={faCalendar} />
                                     <Form.Item
                                         name="endDate"
                                         noStyle
-                                        rules={[{ required: true, message: "Επιλέξτε ημερομηνία επιστροφής" }]}
+                                        rules={[{ required: true, message: t("dateForm.validation.dropoffRequired") }]}
                                     >
                                         <DatePicker
                                             bordered={false}
@@ -240,7 +234,7 @@ const DateForm: React.FC<DateFormProps> = ({ onDateFormSubmit }) => {
                                     width: screens.xs ? "100%" : "auto",
                                 }}
                             >
-                                Αναζήτηση
+                                {t("dateForm.actions.search")}
                             </Button>
                         </Col>
                     </Row>
