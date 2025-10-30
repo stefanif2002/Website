@@ -1,8 +1,9 @@
 // src/pages/cheap/CheapRentalsTruthPage.tsx
 import React from "react";
-import {Card, Typography, Row, Col, Space, Divider, Tag, Button} from "antd";
-import {CarOutlined, CheckCircleFilled, CloseCircleFilled} from "@ant-design/icons";
-import {useLangRouter} from "../../resources/useLangRouter.ts";
+import { Card, Typography, Row, Col, Space, Divider, Tag, Button } from "antd";
+import { CarOutlined, CheckCircleFilled, CloseCircleFilled } from "@ant-design/icons";
+import { useLangRouter } from "../../resources/useLangRouter.ts";
+import { Trans, useTranslation } from "react-i18next";
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -39,13 +40,7 @@ const SectionHeader = ({ index, title }: { index: number; title: string }) => (
     </div>
 );
 
-function SideBadge({
-                       ok,
-                       label,
-                   }: {
-    ok: boolean;
-    label: "4rent" | "Ανταγωνιστής";
-}) {
+function SideBadge({ ok, label }: { ok: boolean; label: string }) {
     return (
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
             {ok ? (
@@ -60,13 +55,7 @@ function SideBadge({
     );
 }
 
-function CompareRow({
-                        left,
-                        right,
-                    }: {
-    left: React.ReactNode;
-    right: React.ReactNode;
-}) {
+function CompareRow({ left, right }: { left: React.ReactNode; right: React.ReactNode }) {
     return (
         <Row gutter={[16, 16]}>
             <Col xs={24} md={12}>
@@ -79,8 +68,7 @@ function CompareRow({
                     }}
                     bodyStyle={{ padding: 16 }}
                 >
-                    <SideBadge ok={false} label="Ανταγωνιστής" />
-                    <div style={{ lineHeight: 1.6 }}>{left}</div>
+                    {left}
                 </Card>
             </Col>
             <Col xs={24} md={12}>
@@ -93,8 +81,7 @@ function CompareRow({
                     }}
                     bodyStyle={{ padding: 16 }}
                 >
-                    <SideBadge ok={true} label="4rent" />
-                    <div style={{ lineHeight: 1.6, fontWeight: 700 }}>{right}</div>
+                    {right}
                 </Card>
             </Col>
         </Row>
@@ -102,7 +89,8 @@ function CompareRow({
 }
 
 export default function CheapRentalsTruthPage() {
-    const { go } = useLangRouter(); // <<-- lang-aware helpers
+    const { go } = useLangRouter();
+    const { t } = useTranslation("extraPages");
 
     return (
         <div style={{ width: "100%", margin: "0 auto", padding: "0 16px", maxWidth: 1140 }}>
@@ -127,24 +115,20 @@ export default function CheapRentalsTruthPage() {
                 >
                     <Space direction="vertical" size={6} style={{ width: "100%" }}>
                         <Title level={2} style={{ color: "white", margin: 0 }}>
-                            Φθηνά ενοικιαζόμενα αυτοκίνητα
+                            {t("cheapTruth.heroTitle")}
                         </Title>
                     </Space>
                 </div>
 
-                <div style={{padding: 20}}>
-                    <Paragraph style={{maxWidth: 900, margin: "0 auto 8px", textAlign: "center"}}>
-                        Δεν θα βρείτε φθηνά ενοικιαζόμενα αυτοκίνητα σε εμάς! Με 1,00€, 2,00€ ή 5,00€ ανά ημέρα δεν
-                        ενοικιάζουμε αυτοκίνητα! Ένα ενοικιαζόμενο αυτοκίνητο που αρχικά κοστίζει π.χ. 5,00€ την ημέρα,
-                        ΠΟΤΕ δεν είναι και η τελική τιμή. Αυτά τα “κόλπα” χρησιμοποιούνται από άλλες εταιρείες
-                        ενοικίασης
-                        αυτοκινήτων σε όλο τον κόσμο και ένα παράδειγμα θα σας το δείξουμε στο παρακάτω γράφημα.
+                <div style={{ padding: 20 }}>
+                    <Paragraph style={{ maxWidth: 900, margin: "0 auto 8px", textAlign: "center" }}>
+                        <Trans i18nKey="cheapTruth.intro" ns="extraPages" components={{ br: <br /> }} />
                     </Paragraph>
 
-                    <Bar/>
+                    <Bar />
 
-                    {/* Big price comparison block (styled like the other pages but same info) */}
-                    <div style={{textAlign: "center", marginTop: 4, marginBottom: 8}}>
+                    {/* Big price comparison block */}
+                    <div style={{ textAlign: "center", marginTop: 4, marginBottom: 8 }}>
                         <div
                             style={{
                                 display: "inline-block",
@@ -156,15 +140,17 @@ export default function CheapRentalsTruthPage() {
                                 boxShadow: "0 6px 18px rgba(0,0,0,0.06)",
                             }}
                         >
-                            <div style={{fontSize: 36, fontWeight: 900, lineHeight: 1}}>
-                                4rent Thessaloniki
+                            <div style={{ fontSize: 36, fontWeight: 900, lineHeight: 1 }}>
+                                {t("cheapTruth.priceBlock.left.title")}
                             </div>
-                            <div style={{fontSize: 40, fontWeight: 900, lineHeight: 1.1}}>
-                                13,00€ / την ημέρα
+                            <div style={{ fontSize: 40, fontWeight: 900, lineHeight: 1.1 }}>
+                                {t("cheapTruth.priceBlock.left.price")}
                             </div>
                         </div>
 
-                        <div style={{fontSize: 28, fontWeight: 900, margin: "10px 0"}}>vs</div>
+                        <div style={{ fontSize: 28, fontWeight: 900, margin: "10px 0" }}>
+                            {t("cheapTruth.priceBlock.vs")}
+                        </div>
 
                         <div
                             style={{
@@ -175,133 +161,154 @@ export default function CheapRentalsTruthPage() {
                                 fontWeight: 900,
                             }}
                         >
-                            Ανταγωνιστής — 1,00€ / την ημέρα
+                            {t("cheapTruth.priceBlock.right")}
                         </div>
                     </div>
 
-                    {/* 1. ΜΙΚΤΗ ΑΣΦΑΛΕΙΑ */}
-                    <SectionHeader index={1} title="ΜΙΚΤΗ ΑΣΦΑΛΕΙΑ"/>
+                    {/* 1. */}
+                    <SectionHeader index={1} title={t("cheapTruth.s1.title")} />
                     <CompareRow
                         left={
                             <>
-                                <div style={{fontWeight: 700, marginBottom: 4}}>
-                                    Με απαλλαγή ή μικτή ασφάλεια!?
+                                <SideBadge ok={false} label={t("cheapTruth.badges.competitor")} />
+                                <div style={{ lineHeight: 1.6 }}>
+                                    <Trans i18nKey="cheapTruth.s1.left" ns="extraPages" components={{ br: <br />, b: <strong /> }} />
                                 </div>
-                                Μικτή ασφάλεια: <strong>+10,00€ / ημέρα</strong>
-                                <br/>
-                                Ελαστικά, κάτω μέρος &amp; περιοχή τζαμιού:
-                                <br/>
-                                <strong>+5,00€ / ημέρα</strong>
                             </>
                         }
                         right={
                             <>
-                                Μικτή ασφάλεια <br/>
-                                χωρίς συμμετοχή <br/>
-                                <Text strong style={{color: "#0d1"}}>
-                                    +0,00€
-                                </Text>
+                                <SideBadge ok={true} label={t("cheapTruth.badges.fourRent")} />
+                                <div style={{ lineHeight: 1.6, fontWeight: 700 }}>
+                                    <Trans
+                                        i18nKey="cheapTruth.s1.right"
+                                        ns="extraPages"
+                                        components={{ br: <br />, b: <Text strong style={{ color: "#0d1" }} /> }}
+                                    />
+                                </div>
                             </>
                         }
                     />
 
-                    {/* 2. ΕΠΙΛΟΓΕΣ ΠΛΗΡΩΜΗΣ - ΠΙΣΤΩΤΙΚΗ ΚΑΡΤΑ */}
-                    <SectionHeader index={2} title="ΕΠΙΛΟΓΕΣ ΠΛΗΡΩΜΗΣ - ΠΙΣΤΩΤΙΚΗ ΚΑΡΤΑ"/>
+                    {/* 2. */}
+                    <SectionHeader index={2} title={t("cheapTruth.s2.title")} />
                     <CompareRow
                         left={
                             <>
-                                Προπληρωμή όλο το ποσό; Με ή χωρίς πιστωτική κάρτα;
-                                <br/>
-                                Προκαταβολή: <strong>Υποχρεωτικό</strong>
-                                <br/>
-                                Δεν διαθέτετε κάρτα ή η κάρτα είναι του 2ου οδηγού:
-                                <br/>
-                                <strong>+5,00€ / ημέρα</strong>
+                                <SideBadge ok={false} label={t("cheapTruth.badges.competitor")} />
+                                <div style={{ lineHeight: 1.6 }}>
+                                    <Trans i18nKey="cheapTruth.s2.left" ns="extraPages" components={{ br: <br />, b: <strong /> }} />
+                                </div>
                             </>
                         }
                         right={
                             <>
-                                Με προκαταβολή μόνο <strong>49,00€</strong>
-                                <br/>
-                                Χωρίς πιστωτική κάρτα
+                                <SideBadge ok={true} label={t("cheapTruth.badges.fourRent")} />
+                                <div style={{ lineHeight: 1.6, fontWeight: 700 }}>
+                                    <Trans
+                                        i18nKey="cheapTruth.s2.right"
+                                        ns="extraPages"
+                                        components={{ br: <br />, b: <strong /> }}
+                                    />
+                                </div>
                             </>
                         }
                     />
 
-                    {/* 3. ΑΕΡΟΔΡΟΜΙΟ SKG */}
-                    <SectionHeader index={3} title="ΑΕΡΟΔΡΟΜΙΟ SKG"/>
+                    {/* 3. */}
+                    <SectionHeader index={3} title={t("cheapTruth.s3.title")} />
                     <CompareRow
                         left={
                             <>
-                                Απευθείας στο Αεροδρόμιο;
-                                <br/>
-                                Shuttle Service: <strong>+0,00€ / ημέρα</strong>
-                                <br/>
-                                Απευθείας στο Αεροδρόμιο: <strong>+7,00€ / ημέρα</strong>
+                                <SideBadge ok={false} label={t("cheapTruth.badges.competitor")} />
+                                <div style={{ lineHeight: 1.6 }}>
+                                    <Trans i18nKey="cheapTruth.s3.left" ns="extraPages" components={{ br: <br />, b: <strong /> }} />
+                                </div>
                             </>
                         }
                         right={
                             <>
-                                Δωρεάν υπηρεσία μεταφοράς με <em>“Shuttle bus”</em>
-                                <br/>
-                                <Text strong style={{color: "#0d1"}}>
-                                    +0,00€
-                                </Text>
+                                <SideBadge ok={true} label={t("cheapTruth.badges.fourRent")} />
+                                <div style={{ lineHeight: 1.6, fontWeight: 700 }}>
+                                    <Trans
+                                        i18nKey="cheapTruth.s3.right"
+                                        ns="extraPages"
+                                        components={{ br: <br />, em: <em />, b: <Text strong style={{ color: "#0d1" }} /> }}
+                                    />
+                                </div>
                             </>
                         }
                     />
 
-                    {/* 4. ΔΩΡΕΑΝ ΑΚΥΡΩΣΗ */}
-                    <SectionHeader index={4} title="ΔΩΡΕΑΝ ΑΚΥΡΩΣΗ"/>
+                    {/* 4. */}
+                    <SectionHeader index={4} title={t("cheapTruth.s4.title")} />
                     <CompareRow
                         left={
                             <>
-                                Αλλαγή ή ακύρωση;
-                                <br/>
-                                Δωρεάν αλλαγή: <strong>+0,00€ / ημέρα</strong>
-                                <br/>
-                                Χρέωση ακύρωσης: <strong>+3,00€ / ημέρα</strong>
+                                <SideBadge ok={false} label={t("cheapTruth.badges.competitor")} />
+                                <div style={{ lineHeight: 1.6 }}>
+                                    <Trans i18nKey="cheapTruth.s4.left" ns="extraPages" components={{ br: <br />, b: <strong /> }} />
+                                </div>
                             </>
                         }
                         right={
                             <>
-                                Premium Υπηρεσία
-                                <br/>
-                                <Text strong style={{color: brandRed}}>+1,00€ / την ημέρα</Text>
+                                <SideBadge ok={true} label={t("cheapTruth.badges.fourRent")} />
+                                <div style={{ lineHeight: 1.6, fontWeight: 700 }}>
+                                    <Trans
+                                        i18nKey="cheapTruth.s4.right"
+                                        ns="extraPages"
+                                        components={{ br: <br />, b: <Text strong style={{ color: brandRed }} /> }}
+                                    />
+                                </div>
                             </>
                         }
                     />
 
-                    {/* 5. ΚΑΙΝΟΥΡΓΙΑ ΑΥΤΟΚΙΝΗΤΑ */}
-                    <SectionHeader index={5} title="ΚΑΙΝΟΥΡΓΙΑ ΑΥΤΟΚΙΝΗΤΑ"/>
-                    <CompareRow
-                        left={<>Μεγάλη παλαιότητα στόλου • Περιορισμένος εξοπλισμός</>}
-                        right={
-                            <>
-                                Καινούργια &amp; προσεγμένα οχήματα
-                                <br/>
-                                <Text strong style={{color: "#0d1"}}>+0,00€</Text>
-                            </>
-                        }
-                    />
-
-                    {/* 6. ΠΡΩΤΟΚΟΛΛΟ ΕΠΙΣΤΡΟΦΗΣ */}
-                    <SectionHeader index={6} title="ΠΡΩΤΟΚΟΛΛΟ ΕΠΙΣΤΡΟΦΗΣ"/>
+                    {/* 5. */}
+                    <SectionHeader index={5} title={t("cheapTruth.s5.title")} />
                     <CompareRow
                         left={
                             <>
-                                Αυστηρός έλεγχος ή όχι;
-                                <br/>
-                                Τα ενοικιαζόμενα αυτοκίνητα ελέγχονται!
-                                <br/>
-                                Ακριβή χρέωση σε περίπτωση ζημιάς!
+                                <SideBadge ok={false} label={t("cheapTruth.badges.competitor")} />
+                                <div style={{ lineHeight: 1.6 }}>{t("cheapTruth.s5.left")}</div>
                             </>
                         }
                         right={
                             <>
-                                Άνετη επιστροφή
-                                <br/>
-                                <Text strong style={{color: "#0d1"}}>+0,00€</Text>
+                                <SideBadge ok={true} label={t("cheapTruth.badges.fourRent")} />
+                                <div style={{ lineHeight: 1.6, fontWeight: 700 }}>
+                                    <Trans
+                                        i18nKey="cheapTruth.s5.right"
+                                        ns="extraPages"
+                                        components={{ br: <br />, b: <Text strong style={{ color: "#0d1" }} /> }}
+                                    />
+                                </div>
+                            </>
+                        }
+                    />
+
+                    {/* 6. */}
+                    <SectionHeader index={6} title={t("cheapTruth.s6.title")} />
+                    <CompareRow
+                        left={
+                            <>
+                                <SideBadge ok={false} label={t("cheapTruth.badges.competitor")} />
+                                <div style={{ lineHeight: 1.6 }}>
+                                    <Trans i18nKey="cheapTruth.s6.left" ns="extraPages" components={{ br: <br /> }} />
+                                </div>
+                            </>
+                        }
+                        right={
+                            <>
+                                <SideBadge ok={true} label={t("cheapTruth.badges.fourRent")} />
+                                <div style={{ lineHeight: 1.6, fontWeight: 700 }}>
+                                    <Trans
+                                        i18nKey="cheapTruth.s6.right"
+                                        ns="extraPages"
+                                        components={{ br: <br />, b: <Text strong style={{ color: "#0d1" }} /> }}
+                                    />
+                                </div>
                             </>
                         }
                     />
@@ -314,7 +321,7 @@ export default function CheapRentalsTruthPage() {
                             boxShadow: "0 8px 24px rgba(0,0,0,0.05)",
                             marginTop: 24,
                         }}
-                        bodyStyle={{padding: 18}}
+                        bodyStyle={{ padding: 18 }}
                     >
                         <div
                             style={{
@@ -327,41 +334,39 @@ export default function CheapRentalsTruthPage() {
                                 marginBottom: 12,
                             }}
                         >
-                            ΤΕΛΙΚΗ ΤΙΜΗ
+                            {t("cheapTruth.final.title")}
                         </div>
 
                         <Row gutter={[16, 16]}>
                             <Col xs={24} md={12}>
-                                <Card size="small" bodyStyle={{padding: 14}} style={{borderRadius: 10}}>
-                                    <SideBadge ok={false} label="Ανταγωνιστής"/>
-                                    Τιμή ανταγωνιστή χωρίς ζημιά: <strong>30,00€ / ημέρα</strong>
-                                    <br/>
-                                    + τη ζημιά! (αν προκληθεί)
+                                <Card size="small" bodyStyle={{ padding: 14 }} style={{ borderRadius: 10 }}>
+                                    <SideBadge ok={false} label={t("cheapTruth.badges.competitor")} />
+                                    <Trans i18nKey="cheapTruth.final.left" ns="extraPages" components={{ br: <br />, b: <strong /> }} />
                                 </Card>
                             </Col>
                             <Col xs={24} md={12}>
-                                <Card size="small" bodyStyle={{padding: 14}} style={{borderRadius: 10}}>
-                                    <SideBadge ok={true} label="4rent"/>
-                                    <div style={{fontSize: 18, fontWeight: 800, lineHeight: 1.25}}>
-                                        4rent Τιμή
-                                        <br/>
-                                        <span style={{fontSize: 30}}>13,00€ / την ημέρα!</span>
+                                <Card size="small" bodyStyle={{ padding: 14 }} style={{ borderRadius: 10 }}>
+                                    <SideBadge ok={true} label={t("cheapTruth.badges.fourRent")} />
+                                    <div style={{ fontSize: 18, fontWeight: 800, lineHeight: 1.25 }}>
+                                        {t("cheapTruth.final.right.title")}
+                                        <br />
+                                        <span style={{ fontSize: 30 }}>{t("cheapTruth.final.right.price")}</span>
                                     </div>
                                 </Card>
                             </Col>
                         </Row>
                     </Card>
 
-                    <Divider/>
+                    <Divider />
 
-                    <Title level={4} style={{textAlign: "center", marginTop: 0}}>
-                        Η ειλικρίνεια μας κάνει τη διαφορά!
+                    <Title level={4} style={{ textAlign: "center", marginTop: 0 }}>
+                        {t("cheapTruth.honestyTitle")}
                     </Title>
-                    <div style={{textAlign: "center", marginTop: 24, marginBottom: 8}}>
+                    <div style={{ textAlign: "center", marginTop: 24, marginBottom: 8 }}>
                         <Button
                             type="primary"
                             size="large"
-                            icon={<CarOutlined/>}
+                            icon={<CarOutlined />}
                             onClick={() => go("/search")}
                             style={{
                                 backgroundColor: brandRed,
@@ -370,7 +375,7 @@ export default function CheapRentalsTruthPage() {
                                 borderRadius: 8,
                             }}
                         >
-                            Κάντε Κράτηση Τώρα
+                            {t("cheapTruth.cta")}
                         </Button>
                     </div>
                 </div>

@@ -11,7 +11,8 @@ import {
     Image,
 } from "antd";
 import { CarOutlined, EnvironmentOutlined, CheckCircleTwoTone } from "@ant-design/icons";
-import {useLangRouter} from "../../resources/useLangRouter.ts";
+import { useLangRouter } from "../../resources/useLangRouter.ts";
+import { useTranslation } from "react-i18next";
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -20,7 +21,8 @@ const brandBlue = "#075eff";
 const heroGradient = `linear-gradient(135deg, ${brandBlue} 0%, ${brandBlue} 60%, ${brandRed} 100%)`;
 
 export default function ChalkidikiRentPage() {
-    const { go } = useLangRouter(); // <<-- lang-aware helpers
+    const { go } = useLangRouter();
+    const { t } = useTranslation("extraPages");
 
     return (
         <div style={{ width: "100%", margin: "0 auto", padding: "0 16px", maxWidth: 1140 }}>
@@ -42,7 +44,7 @@ export default function ChalkidikiRentPage() {
                     }}
                 >
                     <Title level={2} style={{ color: "white", margin: 0 }}>
-                        Ενοικιάσεις Αυτοκινήτων Χαλκιδική
+                        {t("chalkidiki.heroTitle")}
                     </Title>
                 </div>
 
@@ -52,7 +54,7 @@ export default function ChalkidikiRentPage() {
                         <Col xs={24} md={9}>
                             <Image
                                 src="https://4rent-thessaloniki.com/images/Logos/4Rent_Chalkidiki.jpg"
-                                alt="4rent Chalkidiki"
+                                alt={t("chalkidiki.heroImageAlt")}
                                 style={{ borderRadius: 12, width: "100%" }}
                                 preview={false}
                             />
@@ -61,18 +63,21 @@ export default function ChalkidikiRentPage() {
                         <Col xs={24} md={15}>
                             <Space direction="vertical" size={12} style={{ width: "100%", textAlign: "left" }}>
                                 <Paragraph style={{ marginBottom: 4 }}>
-                                    Με την ενοικίαση αυτοκινήτων 4rent στη Χαλκιδική, θα περάστε υπέροχες διακοπές στην Κασσάνδρα ή Σιθωνία.
+                                    {t("chalkidiki.p1")}
                                 </Paragraph>
 
                                 <Space direction="vertical" size={8} style={{ width: "100%" }}>
-                                    <div><CheckCircleTwoTone twoToneColor="#52c41a" />{" "}
-                                        <Text>Παράδοση και παραλαβή απευθείας στο ξενοδοχείο σας.</Text>
+                                    <div>
+                                        <CheckCircleTwoTone twoToneColor="#52c41a" />{" "}
+                                        <Text>{t("chalkidiki.b1")}</Text>
                                     </div>
-                                    <div><CheckCircleTwoTone twoToneColor="#52c41a" />{" "}
-                                        <Text>Με εμάς έχετε επίσης τη δυνατότητα να παραλάβετε το αυτοκίνητό σας στη Χαλκιδική και να το επιστρέψετε στο Αεροδρόμιο Θεσσαλονίκη.</Text>
+                                    <div>
+                                        <CheckCircleTwoTone twoToneColor="#52c41a" />{" "}
+                                        <Text>{t("chalkidiki.b2")}</Text>
                                     </div>
-                                    <div><CheckCircleTwoTone twoToneColor="#52c41a" />{" "}
-                                        <Text>Όλα τα αυτοκίνητα ενοικίασης είναι πλήρως ασφαλισμένα ώστε να αισθάνεστε απολύτως ασφαλείς στις διακοπές σας.</Text>
+                                    <div>
+                                        <CheckCircleTwoTone twoToneColor="#52c41a" />{" "}
+                                        <Text>{t("chalkidiki.b3")}</Text>
                                     </div>
                                 </Space>
                             </Space>
@@ -85,7 +90,7 @@ export default function ChalkidikiRentPage() {
                         <Col xs={24} md={9}>
                             <Image
                                 src="https://4rent-thessaloniki.com/images/Logos/chalkidiki-map.png"
-                                alt="Χάρτης Χαλκιδικής"
+                                alt={t("chalkidiki.mapAlt")}
                                 style={{ borderRadius: 12, width: "100%" }}
                                 preview={false}
                             />
@@ -93,29 +98,28 @@ export default function ChalkidikiRentPage() {
 
                         <Col xs={24} md={15} style={{ textAlign: "left" }}>
                             <Title level={4} style={{ marginTop: 0 }}>
-                                <EnvironmentOutlined /> Σημεία εξυπηρέτησης:
+                                <EnvironmentOutlined /> {t("chalkidiki.pointsTitle")}
                             </Title>
 
                             <Space direction="vertical" size={14} style={{ width: "100%" }}>
                                 <div>
-                                    <Text strong>✓ Χαλκιδική - Ακτίνα 50 χλμ. από το αεροδρόμιο Θεσσαλονίκης</Text>
+                                    <Text strong>{t("chalkidiki.r50.title")}</Text>
                                     <Paragraph style={{ marginTop: 6, marginBottom: 0 }}>
-                                        → Επανωμή, Φλογητά, Μηχανιώνα, Νέα Καλλικράτεια, Νέα Μουδανιά, Νέα Πλάγια, Νέα Ποτίδαια, Παραλία Διονυσίου
+                                        {t("chalkidiki.r50.list")}
                                     </Paragraph>
                                 </div>
 
                                 <div>
-                                    <Text strong>✓ Χαλκιδική - Ακτίνα 100 χλμ. από το αεροδρόμιο Θεσσαλονίκης</Text>
+                                    <Text strong>{t("chalkidiki.r100.title")}</Text>
                                     <Paragraph style={{ marginTop: 6, marginBottom: 0 }}>
-                                        → Άφυτος, Αρναία, Ελιά, Γερακινή, Χανιώτη, Καλλιθέα, Κρυοπηγή, Μεταμόρφωση, Νέα Σκιώνη, Νικήτη, Παλιούρι,
-                                        Πευκοχώρι, Πολυχρόνος, Ποσείδι, Όρμος Παναγίας, Σάνη, Ριζόπουλο, Σιβηρή, Βατοπέδι
+                                        {t("chalkidiki.r100.list")}
                                     </Paragraph>
                                 </div>
 
                                 <div>
-                                    <Text strong>✓ Χαλκιδική - Ακτίνα 120 χλμ. από το αεροδρόμιο Θεσσαλονίκης</Text>
+                                    <Text strong>{t("chalkidiki.r120.title")}</Text>
                                     <Paragraph style={{ marginTop: 6, marginBottom: 0 }}>
-                                        → Ουρανούπολη, Καλαμίτσι, Σάρτη, Βουρβουρού, Ιερισσός, Νέος Μαρμαράς, Πυργαδίκια, Τορώνη
+                                        {t("chalkidiki.r120.list")}
                                     </Paragraph>
                                 </div>
                             </Space>
@@ -138,7 +142,7 @@ export default function ChalkidikiRentPage() {
                                     borderRadius: 8,
                                 }}
                             >
-                                Κάντε Κράτηση Τώρα
+                                {t("chalkidiki.bookNow")}
                             </Button>
                         </Col>
                     </Row>

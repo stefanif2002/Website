@@ -1,0 +1,56 @@
+{
+  "heroTitle": "EU-GDPR Privacy Policy",
+
+  "company": {
+    "email": "info@4rent-thessaloniki.com"
+  },
+
+  "intro": {
+    "p1": "This privacy policy has been drafted in accordance with the new European General Data Protection Regulation EU/2016/679 and aims to inform you about the processing of your personal data by “4rent Thessaloniki”.",
+    "p2": "“4rent Thessaloniki” may amend this policy at any time without notice, announcing any such amendment on the website www.4rent-thessaloniki.com. By browsing and using the website <b> info@4rent-thessaloniki.com</b> of “4rent Thessaloniki”, visitors/users acknowledge that they have read, understood and unreservedly accepted the <b>Personal Data Protection Policy</b>. In the terms below you will find important information regarding the type of personal data we keep on file, their processing and retention time, as well as your rights as data subjects. For any clarification regarding the processing of your personal data by “4rent Thessaloniki” and/or your related rights, you may contact us at <a>info@4rent-thessaloniki.com</a>."
+  },
+
+  "controller": {
+    "title": "Data Controller",
+    "p1": "The personal data that you disclose to us are processed by “4rent Thessaloniki” as the data controller (contact details <a>info@4rent-thessaloniki.com</a>, address: 14km Thessaloniki–Moudania, Thermi, ZIP 57001, Tel: +30 2310460035) strictly and only within the context of your cooperation with “4rent Thessaloniki” or for the purpose of browsing our website or subscribing to the newsletters service."
+  },
+
+  "gps": {
+    "block": "<b>Geolocation (GPS) Data:</b> In the fleet of 4rent Thessaloniki, a geolocation (GPS) system has been installed. These systems are activated exclusively in the event of vehicle theft and only after relevant notification by the renter or driver. The legal basis for this processing lies in the legitimate interest of protecting the company’s property."
+  },
+
+  "collected": {
+    "title": "Personal data of the internet user that we collect and keep on file",
+    "p1": "From the information you disclose to us electronically (e.g. by browsing our website, subscribing to the newsletters service, etc.), we keep on file—accessible by the employees and/or partners of “4rent Thessaloniki”—only the personal data linked to your browsing on the website www.4rent-thessaloniki.com or on the pages we maintain on social media (facebook etc.), and to your possible subscription to the newsletters service, in which case we ask you to declare and we keep registered from your details: name, surname, father’s name, full address, email address and contact telephone number. It is noted that “4rent Thessaloniki” does not exercise and cannot exercise influence and control as to the nature and extent of personal data collected and kept by social networking platforms as a term or result of their use and bears no responsibility for the collection and processing of personal data carried out by them. For more information, consult the privacy policy of each social networking platform."
+  },
+
+  "newsletter": {
+    "block": "<b>Sending a “Newsletter”.</b> With the completed car rental request through our system, you are automatically entered into our newsletters database. We also give you the option to subscribe via a manual newsletter entry. You will receive advertisements via email from us (for example, regarding new products and/or available services, special offers, new car rental stations, etc.). <u>Unsubscribe from the newsletter?</u> Write us an email with the subject “Unsubscribe from Newsletter” and you will no longer receive the newsletter."
+  },
+
+  "cookies": {
+    "title": "Cookies Policy",
+    "p1": "In particular, while browsing the website www.4rent-thessaloniki.com, “4rent Thessaloniki” may collect user identification data using corresponding technologies, such as cookies and/or tracking Internet Protocol (IP) addresses."
+  },
+
+  "purpose": {
+    "title": "Purpose of processing and retention period",
+    "p1": "Processing is necessary for your browsing on the internet and the use of our electronic services and will be carried out until you request its cessation."
+  },
+
+  "rights": {
+    "title": "Your rights",
+    "list": [
+      "receive confirmation as to whether or not personal data concerning you are (and where) processed.",
+      "request access to your personal data and to information regarding their processing.",
+      "request a copy of your personal data in a simple or structured, commonly used and machine-readable format.",
+      "request the rectification of inaccurate or the completion of incomplete personal data.",
+      "request the erasure of personal data concerning you.",
+      "request that the processing of your personal data be stopped.",
+      "transmit your personal data to another controller, without objection from “4rent Thessaloniki”.",
+      "request the direct transmission of your data to another controller, if technically feasible.",
+      "lodge a complaint with the Data Protection Authority.",
+      "object at any time to the processing of your personal data, including for commercial promotion."
+    ]
+  }
+}

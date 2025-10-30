@@ -1,0 +1,220 @@
+{
+  "heroTitle": "Terms and Conditions",
+
+  "booking": {
+    "title": "Booking / Rental",
+    "intro": "You can make a reservation with our company in the following ways:",
+    "list": [
+      "Online via our website, by E-Mail, or by phone.",
+      "Reservations apply only to the selected category and not to a specific model.",
+      "For bookings via our website or by E-Mail you will also receive confirmation by E-Mail within 24 hours.",
+      "Bookings within 24 hours can only be made by phone."
+    ]
+  },
+
+  "payment": {
+    "title": "Payment Method",
+    "list": [
+      "Deposit payment by Card (Credit, Debit, Apple Pay, or Google Pay)",
+      "Deposit payment via PayPal",
+      "The remaining payment amount upon pickup, in cash or by card (credit or debit)"
+    ]
+  },
+
+  "insurance": {
+    "title": "Insurance and Guarantees",
+    "p1": "The insurance we provide is full (comprehensive) with no deductible and no deposit. It includes damage to tires, the underbody, glass, and mirrors."
+  },
+
+  "exclusions": {
+    "title": "Not Covered by Insurance",
+    "p1": "Under no circumstances does insurance cover damages due to malicious handling of the vehicle, driving on unauthorized roads, violations of the Highway Code, intoxication, or drug use and other substances.",
+    "p2": "Insurance coverage also does not apply if the following steps are not followed:",
+    "steps": [
+      "In the event of damage or an accident, the driver must call our company so that the accident care (insurance company) can attend, and immediately call the traffic police (100).",
+      "If the rules are not followed, the customer is charged the full amount of the damage. They must also wait for the arrival of the insurance company and the police so that an accident report can be created, a copy of which must be delivered upon return of the vehicle. If car rentals refrain from calling the police and do not comply with state law requirements, insurance does not cover damages and the renter is responsible for all resulting costs. Car rental must be informed IMMEDIATELY, otherwise there will be a charge. Even in the case of other damages to the rented vehicle, the car rental service must be informed IMMEDIATELY. In case of damage to a parked vehicle, the car rental must be informed before moving the vehicle. In the event of damage, it is your obligation to report the damage directly to us at the location where it occurred, otherwise there will be a damage charge."
+    ]
+  },
+
+  "clientLiability": {
+    "intro": "The customer is responsible for the following damages:",
+    "list": [
+      "Loss or damage of keys and spare keys.",
+      "Damage to seats or extreme dirt in the car.",
+      "Fuel issues caused by defective or incorrect fuel (e.g., unleaded gasoline placed in a diesel car or vice versa); the cost is borne entirely by the renter.",
+      "Damaging child seats.",
+      "Car battery power loss due to forgetting to switch off electrical equipment.",
+      "Personal items stolen from the car or damaged in the event of an accident."
+    ],
+    "pRadio": "4rent Thessaloniki has no obligation to replace a vehicle due to a tire puncture (FLAT) or damage to the radio or lighter. (We can, of course, assist you via our 24-hour Roadside Assistance service).",
+    "pIntox": "We are also not responsible for damages or accidents that occur due to driver impaired consciousness from alcohol, medicines, and/or drugs. The same applies to damages or accidents caused arbitrarily by the customer on-road or off-road. In such cases, the customer is solely responsible.",
+    "pPolice": "The police report must also state whether any of the drivers involved was under the influence of alcohol and/or drugs.",
+    "pTheft": "In case of theft, the customer must immediately inform the car rental and deliver the vehicle key and the police report as soon as possible. In general, the customer is obliged to report any vehicle damage to the car rental company.",
+    "pBig_prefix": "If this does not happen, the customer is responsible for all expenses. Compliance with the Highway Code rests exclusively with the renter and ",
+    "pBig_strong_DEN": "DOES NOT",
+    "pBig_mid1": " fall under insurance coverage. All rental cars are insured for the maximum number of passengers; for safety reasons, this cannot be exceeded, otherwise the insurance will be canceled. If damage occurs to the vehicle, regardless of fault, a one-off fee of ",
+    "pBig_strong_fee": "€25.00",
+    "pBig_suffix": " will be charged for handling the relevant file. If additional damages occur under the same rental, these are not covered by comprehensive insurance and responsibility, including payment of the deposit/deductible amount, rests solely with the renter. The first damage is covered by comprehensive insurance with no deductible and no additional charge for the renter. It is considered a “first damage” only if the renter is responsible or if the offender is not found. If the renter is not responsible, then it is not considered first damage. In case of a second or subsequent damage, insurance coverage remains in effect, with all benefits still applying. However, collision damage to the rental vehicle and related repair costs are not covered. If the renter is responsible or if the offender cannot be identified, collision repairs are charged to the renter up to the resulting deposit amount. A refundable deposit is required, the amount of which depends on the vehicle category. Whether due to renter fault or unknown offender and replacement or stay with the same vehicle is required, the renter is obliged to pay or accept in writing the activation of the deductible, the amount corresponding to the vehicle category, as a deductible guarantee. Pickup of the new vehicle will take place at our headquarters. Alternatively, upon arrangement, delivery can be made at another location with an additional transport fee. In case of non-acceptance, the rental is automatically terminated and no claim may be asserted against the company."
+  },
+
+  "replacementNoFault": {
+    "title": "Vehicle replacement without technical fault or unnecessary replacement",
+    "p1": "In any case of replacement of the rented vehicle not due to technical fault, malfunction or other vehicle error, all transport costs and other related charges, including VAT, are borne exclusively by the renter. Otherwise, the free replacement will be carried out at our office in Thessaloniki."
+  },
+
+  "smoking": {
+    "title": "Smoking",
+    "prefix": "Please note that smoking is strictly prohibited in all our vehicles. In case of violation of this policy, a minimum charge of ",
+    "amount": "€150",
+    "suffix": " will be applied to cover cleaning costs and restoration of any damage caused by smoking."
+  },
+
+  "fines": {
+    "title": "Fines",
+    "p1_prefix": "Fines and damages caused by non-compliance with traffic regulations are borne exclusively by the renter and are not covered by insurance. If a fine is not paid directly by the customer, we charge a processing fee of ",
+    "percent": "20%",
+    "p1_suffix": " on top of the fine amount. Regarding license plate removal from the customer’s vehicle or towing, this process is associated with specific costs of ",
+    "amount150": "€150.00",
+    "p1_tail": ", if we handle the process. The fine, towing, and storage are NOT included."
+  },
+
+  "gps": {
+    "title": "Geolocation Application Data",
+    "p1": "4rent Thessaloniki has installed a Geolocation (GPS) device in its vehicles. The system is activated to locate the vehicle in cases of theft or misappropriation, or when the vehicle is not returned on time and communication with the renter is not possible. The application provides data for: • Vehicle checks (Smart Check-in): Assessing usage and data such as mileage and fuel level. • Information on the vehicle’s maintenance status. • Management of incidents with significant vehicle damage. • Asset inventory: Accurate location and recording of the company’s vehicles for management and reporting. This technology is also used to ensure compliance with the Highway Code and to check whether the driver is an authorized person according to the rental contract. In case of violation of the rental terms or legislation, the insurance coverages provided by the company cease to apply. The legal basis for this processing is the legitimate interest in protecting property and the safe operation of the company’s vehicles."
+  },
+
+  "replacementAfterAccident": {
+    "title": "Vehicle replacement",
+    "p1": "Replacement after a breakdown or accident is negotiated within 24 hours. During the season, from approximately early June to early September, we provide a replacement time of up to 48 hours."
+  },
+
+  "driverAge": {
+    "title": "Driver age",
+    "p1": "The minimum driver age is 23 years and in any case the license must have been held for at least 2 years. The maximum age for each category is 72 years. We can also set the minimum age limit to 21 and increase over 72 years with additional insurance of €5.00 per day. The maximum age for each category is 80 years."
+  },
+
+  "license": {
+    "title": "Driving license / Passport or ID",
+    "p1": "Driving licenses from the EU, United States of America (USA), Australia, Canada and Russia are accepted; all others require an International Driving Permit to rent a vehicle. The renter is responsible for carrying valid IDs. If documents or copies are missing, we are under no obligation to rent and no refunds will be made for payments already made."
+  },
+
+  "extraCharges": {
+    "title": "Additional charges",
+    "list": [
+      "Child seat €10.00 / booking (No daily charge)",
+      "Mobile Internet €40.00 / booking (No daily charge)",
+      "Snow chains or snow socks. Only if used, a €19.00 / booking charge applies (no daily calculation)"
+    ]
+  },
+
+  "outOfHours": {
+    "title": "Vehicle delivery and return outside normal business hours (included in the online price):",
+    "list": [
+      "For vehicle pickups between 21:45 and 01:30 an additional fee of €19.00 is charged.",
+      "For vehicle pickups between 01:45 and 06:45 an additional fee of €35.00 is charged.",
+      "Any vehicle return outside normal business hours (21:45 to 06:45) is charged an additional fee of €13.00."
+    ]
+  },
+
+  "extras": {
+    "title": "Extras",
+    "p1": "If any additional service (e.g., Wi-Fi) malfunctions or is not provided as agreed, our sole obligation is to refund the amount corresponding exclusively to that service."
+  },
+
+  "shipAbroad": {
+    "title": "Transport by ship and outside Greece",
+    "prefix": "Transport by ship is only permitted after consultation with our company. Crossing borders is strictly prohibited, regardless of participation in the Schengen area. If our fleet management system detects a violation of this term, a one-off charge of ",
+    "amount": "€200 + VAT",
+    "suffix": " will be imposed. In addition, in this case the vehicle is not covered by comprehensive insurance, theft insurance, or any other insurance coverage. All insurance terms are canceled and the renter bears full responsibility for any damage or loss incurred."
+  },
+
+  "fuel": {
+    "title": "Fuel",
+    "p1_label": "Return as received:",
+    "p1_body": " The vehicle is delivered to the customer with a given fuel level and should be returned likewise.",
+    "p2_label": "Full-Empty Tank:",
+    "p2_prefix": " With the \"FE\" (Full-Empty) option, we deliver the tank full and you return it empty. Prices by Category are A, B ",
+    "priceAB": "€79.00",
+    "p2_mid1": " | C, D ",
+    "priceCD": "€89.00",
+    "p2_mid2": " | E, STW ",
+    "priceE": "€109.00",
+    "p2_mid3": " | L, M ",
+    "priceLM": "€139.00",
+    "p2_suffix": ". (If you do not choose it, “return as received” applies, meaning the car will be returned with the amount of fuel it had when you received it)."
+  },
+
+  "cancellations": {
+    "title": "Cancellations / Changes",
+    "p1_label": "With the Premium option (€1.00 per day):",
+    "p1_body": " Free booking change (price adjustment +/- difference with current price list; applies only to date or rental category changes). Free cancellation up to 48 hours before pickup.",
+    "p2_label": "Without the Premium option (€1.00 per day):",
+    "p2_body": " Free booking change (price adjustment +/- difference with current price list; applies only to date or rental category changes). In case of cancellation, payment is non-refundable.",
+    "p3": "If you cancel 48 hours before the start of the rental, 50% of the total amount will be retained.",
+    "p4": "Cancellations, changes, or early returns during the rental period are possible only after consultation with our office and subject to availability; no refund will be made. You can contact us by phone or email as available. If unavailable, the car must be returned to our headquarters (or agreed drop-off location) on the agreed date and time, otherwise additional costs will arise."
+  },
+
+  "noShow": {
+    "title": "No show",
+    "p1": "If you cannot pick up the vehicle at the appointed time, please inform us in time, otherwise the reservation will be canceled after 3 hours (after your plane has landed). No refund or credit applies for a reservation not fulfilled due to no-show or lack of driving license."
+  },
+
+  "flightDelay": {
+    "title": "What if our flight is delayed?",
+    "p1": "We have our own Flightradar system and can see exactly when you land. In case of delay we will of course wait for you at no extra charge, unless arrival is after 23:00. In that case, only the usual out-of-hours fee applies."
+  },
+
+  "deliveryPickup": {
+    "title": "Delivery – Pickup",
+    "p1": "If you have chosen pickup/drop-off at the Airport, at Thessaloniki Airport (SKG), depending on your flight arrival time, the 4rent team awaits you at Parking No. 5. Our free shuttle-bus will pick you up from there and take you to our nearby office (1.8 km from Thessaloniki Airport). Vehicle pickup takes place at our 4rent Thessaloniki office (if you want to find the address on Google Maps).",
+    "p2": "Other locations are calculated based on the distance from our headquarters. If the pickup location differs from the drop-off location, the minimum charge is €50.00 (applies to out-of-prefecture pickups &amp; drop-offs). After returning the car, we are not responsible for any forgotten or lost items."
+  },
+
+  "forceMajeure": {
+    "title": "Force majeure",
+    "p1": "Our company bears no responsibility for failure to pick up or deliver the car, its cancellation or theft, if these arise from force majeure events (such as war, terrorist acts, epidemics/viruses, natural disasters, strikes, etc.). In such cases, the premium package is canceled; no compensation or refund is provided, regardless of whether it is a deposit or prepayment. Furthermore, the company has no further obligation or liability to the customer for any loss or damage arising due to these events."
+  },
+
+  "acceptedCountries": {
+    "title": "Countries from which driving licenses are accepted.",
+    "p1": "Austria, Belgium, Bulgaria, France, Germany,  Denmark, Greece, Estonia, United Kingdom, Ireland, Spain, Italy, Cyprus, Latvia, Lithuania, Luxembourg, Malta, Netherlands, Hungary, Poland, Portugal, Romania, Slovakia, Slovenia, Sweden, Czechia, Finland, Croatia, United States of America, Canada*  Australia, United Kingdom, Gibraltar, Switzerland, Serbia, Norway, Iceland, Liechtenstein, Moldova, Israel (details must be in Latin characters), Ukraine, Russia (details must be in Latin characters), Turkey (details must be in Latin characters), United Arab Emirates (details must be in Latin characters).",
+    "p2": "*If the Canadian National driving license is in French, it must be accompanied by an official government translation into English or Greek, certified by a competent authority.",
+    "p3": "For all other countries, an International Driving Permit is strictly required."
+  },
+
+  "consent": "By submitting the request, you accept the Terms and the data protection policy",
+
+  "contact": {
+    "title": "Contact",
+    "phones": "+30 2310 460035 & (+30) 6982 211001",
+    "emailLabel": "E-Mail",
+    "emailAddress": "info@4rent-thessaloniki.com"
+  },
+
+  "blackFriday": {
+    "title": "Black Friday 2024 Terms",
+    "intro": "The following services are included in our offer:",
+    "list": [
+      "For a new reservation, you will receive a 30% discount on the desired category and the current offer for 2025.",
+      "Free upgrade to the following categories: ✓ A -> B or ✓ B -> C or ✓ C -> D (including the Automatic category)",
+      "Premium Package ✓ Free booking change (price adjustment +/- difference in the current price list; applies only to date or rental category changes) ✓ Free cancellation up to 48 hours before arrival. ✓ Insurance for cross-border sea route (e.g., Thassos) ✓ Membership card = 10% discount on your next booking",
+      "Child seats (if you wish, please add them in the last booking step)",
+      "Age Limit Insurance (Minimum age from 21 to 23 with a valid driving license of at least 2 years or maximum age 72 must select this insurance.)"
+    ],
+    "pay_label": "Payment Methods:",
+    "pay_body": "PayPal or by card (credit card, debit, Google Pay, Apple Pay). Fill in the form and then proceed to pay €70.00. After successful payment, you will immediately receive your coupon code by email.",
+    "terms_label": "Terms:",
+    "termsList": [
+      "The coupon is available from 29 November 2024, 12:01 a.m. to 2 December 2024, 11:59 p.m.",
+      "The coupon validity extends throughout 2024/2025.",
+      "Applies to all available categories, except Category L1 (7-seater) and Category M (9-seater).",
+      "The coupon can be transferred or gifted to third parties.",
+      "You can use the coupon code for new bookings.",
+      "Each code is unique and can be used for one booking.",
+      "The coupon cannot be combined with other offers, such as customer discount or privilege code.",
+      "The coupon is non-refundable in case of cancellation.",
+      "If you booked before 29/11/2024, you can use this Code only if you booked with the Premium package. However, all combinations, such as regular customer discount or premium code, are excluded.",
+      "Upon completion of your booking, we will process it and add the benefits, the price will be adjusted, and you will immediately receive a new confirmation via E-mail."
+    ]
+  }
+}

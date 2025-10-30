@@ -1,4 +1,3 @@
-// src/pages/reviews/ReviewsPage.tsx
 import React, { useMemo, useState } from "react";
 import {
     Card,
@@ -15,6 +14,7 @@ import {
     message,
 } from "antd";
 import { MessageOutlined, SendOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 
 const { Title, Paragraph, Text, Link } = Typography;
 const { TextArea } = Input;
@@ -25,61 +25,45 @@ const heroGradient = `linear-gradient(135deg, ${brandBlue} 0%, ${brandBlue} 60%,
 
 type Review = { text: string; author?: string };
 
-const REVIEWS: Review[] = [
-    // ... (unchanged list you already have)
-    { text: "Γεια σου ομάδα 4rent νοικιάσαμε ένα αυτοκίνητο για 3 εβδομάδες. Όλα ήταν υπέροχα! Το αυτοκίνητο ήταν υπέροχο, η επαφή ήταν πολύ φιλική και απλή και η αναλογία τιμής/απόδοσης ήταν πολύ καλή! Μπορούμε μόνο να προτείνουμε αυτήν την εταιρεία και θα κάνουμε κράτηση ξανά και ξανά! Τις καλύτερες ευχές" },
-    { text: "Ρουθ και Τσαρλς" },
-    { text: "Γεια σας αγαπητοί υπάλληλοι της 4rent, ενοικίασα ένα αυτοκινητο από εσάς μεσαιας κατηγορίας για πρώτη φορά! Αυτοκίνητο υπέροχο Υπέροχη εξυπηρέτηση Παραλαβή - Παράδοση εξαιρετική Καλή διακοπές σε όλους!", author: "Σουσανα Μ." },
-    { text: "Η καλύτερη ενοικίαση αυτοκινήτου που είχα ποτέ στη Θεσσαλονίκη. Άψογη εξυπηρέτηση, άψογη επικοινωνία! Συνιστούμε!", author: "Μιχαλης Κ." },
-    { text: "Πολύ καλή εξυπηρέτηση με χαμόγελο και ευγένεια. Τα παιδιά συνεπέστατα και πολύ καλό αυτοκίνητο.", author: "Ειρήνη Θ." },
-    { text: "Σε σύγκριση με άλλες μεγάλες εταιρείες ενοικίασης αυτοκινήτων, αυτή η εταιρεία εντυπωσιάζει με τον απόλυτα επαγγελματικό, απλό χειρισμό...", author: "Günter H." },
-    { text: "Καλησπέρα, Ήθελα να σας ευχαριστήσω για την υψηλού επιπέδου εξυπηρέτηση...", author: "Γιώργος Κ." },
-    { text: "Μπορώ να πω μονο σουπερ, σουπερ. Ολα τελεια. Ευχαριστώ πολύ.", author: "Eva N." },
-    { text: "Με εξυπηρέτησαν με πολλές φορές με πολύ καλά αυτοκίνητα...", author: "Θεοφιλος Κ." },
-    { text: "Αψογη εξυπηρέτηση και πολύ καλο αυτοκινητο!!!", author: "Pon N." },
-    { text: "Άψογη εξυπηρέτηση, πολύ καλή τιμή...", author: "Wagelis A." },
-    { text: "Άριστη εξυπηρέτηση!!! Ευχαρίστως ξανα", author: "Lazaros M." },
-    { text: "Αψωγη εταιρια. Φιλοικο πρωσοπικο πολυ καλες τιμες.", author: "Giorgos K." },
-    { text: "Άριστη εξυπηρέτηση και άψογη συμπεριφορά των υπαλλήλων.", author: "ΓΕΩΡΓΙΟΣ Κ." },
-    { text: "Οι καλύτεροι 5 Αστέρια", author: "Grigorios T." },
-    { text: "Να είμαι ειλικρινής καλύτερη εξυπηρέτηση...", author: "Tom Seon" },
-    { text: "Η καλύτερη επιλογή για ενοικίαση αυτοκινήτου από το αεροδρόμιο...", author: "Nikos S." },
-    { text: "Η εταιρεία ενοικίασης αυτοκινήτων 4rent συνιστάται πραγματικά...", author: "Sonja L." },
-];
-
-// Tiny inline SVGs for Trustpilot & HolidayCheck
-const TrustpilotIcon = () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden focusable="false">
-        <path fill="#00b67a" d="M12 2l2.472 7.604h7.992l-6.463 4.696 2.472 7.6L12 17.205 5.527 21.9l2.472-7.6L1.536 9.604h7.992z"/>
-    </svg>
-);
-const HolidayCheckIcon = () => (
-    <svg width="20" height="20" viewBox="0 0 64 64" aria-hidden focusable="false">
-        <rect x="4" y="14" width="56" height="36" rx="6" fill="#1b75bb"/>
-        <circle cx="50" cy="32" r="6" fill="#ffd200"/>
-    </svg>
-);
-
 export default function ReviewsPage() {
+    const { t } = useTranslation("reviews");
     const average = 4.5;
 
     // user rating
     const [rating, setRating] = useState<number>(5);
     const [note, setNote] = useState<string>("");
 
+    const REVIEWS: Review[] = t("list", { returnObjects: true }) as Review[];
+
     const mailtoHref = useMemo(() => {
-        const subject = encodeURIComponent(`Νέα Αξιολόγηση: ${rating}/5`);
-        const body = encodeURIComponent(`Βαθμολογία: ${rating}/5\n\nΣχόλιο:\n${note || "(χωρίς σχόλιο)"}`);
+        const subject = encodeURIComponent(`${t("mailto.subjectPrefix")}: ${rating}/5`);
+        const body = encodeURIComponent(`${t("mailto.bodyRating")}: ${rating}/5\n\n${t("mailto.bodyComment")}\n${note || t("mailto.noComment")}`);
         return `mailto:feedback@4rent-thessaloniki.com?subject=${subject}&body=${body}`;
-    }, [rating, note]);
+    }, [rating, note, t]);
 
     const submitLocal = () => {
         if (!rating) {
-            message.warning("Επιλέξτε μια βαθμολογία (αστέρια).");
+            message.warning(t("submit.warningNoRating"));
             return;
         }
         window.location.href = mailtoHref;
     };
+
+    // ✅ Image path taken from translation file
+    const imageSrc = t("image.src");
+
+    // Tiny inline SVGs for Trustpilot & HolidayCheck
+    const TrustpilotIcon = () => (
+        <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden focusable="false">
+            <path fill="#00b67a" d="M12 2l2.472 7.604h7.992l-6.463 4.696 2.472 7.6L12 17.205 5.527 21.9l2.472-7.6L1.536 9.604h7.992z"/>
+        </svg>
+    );
+    const HolidayCheckIcon = () => (
+        <svg width="20" height="20" viewBox="0 0 64 64" aria-hidden focusable="false">
+            <rect x="4" y="14" width="56" height="36" rx="6" fill="#1b75bb"/>
+            <circle cx="50" cy="32" r="6" fill="#ffd200"/>
+        </svg>
+    );
 
     return (
         <div style={{ width: "100%", margin: "0 auto", padding: "0 16px", maxWidth: 1140 }}>
@@ -96,14 +80,13 @@ export default function ReviewsPage() {
                         padding: "28px 24px",
                         display: "flex",
                         flexDirection: "column",
-                        alignItems: "center",     // <— center everything
+                        alignItems: "center",
                         textAlign: "center",
                     }}
                 >
                     <Title level={2} style={{ color: "white", margin: 0 }}>
-                        Ενοικίαση Αυτοκινήτου Θεσσαλονική — κριτικές & εμπειρίες
+                        {t("hero.title")}
                     </Title>
-                    {/* centered rating */}
                     <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 10 }}>
                         <Rate allowHalf disabled defaultValue={average} style={{ color: "#ffd666" }} />
                         <Text style={{ color: "rgba(255,255,255,0.95)" }}>{average.toFixed(1)}/5</Text>
@@ -115,8 +98,8 @@ export default function ReviewsPage() {
                     <Row gutter={[24, 24]} align="middle">
                         <Col span={24}>
                             <Image
-                                src="https://4rent-thessaloniki.com/images/Deals/bewertung-el.png"
-                                alt="κριτικές ενοικίασεις αυτοκινητου θεσσαλονικη"
+                                src={imageSrc}
+                                alt={t("image.alt")}
                                 style={{ width: "100%", borderRadius: 12 }}
                                 preview={false}
                             />
@@ -134,23 +117,22 @@ export default function ReviewsPage() {
                         }}
                     />
 
-                    {/* Better layout: left = rating sites card, right = your rating card */}
+                    {/* Layout */}
                     <Row gutter={[24, 24]} style={{ marginBottom: 8 }}>
                         <Col xs={24} md={12}>
                             <Card
-                                title="Αξιολογήστε μας σε"
+                                title={t("ratingSites.title")}
                                 headStyle={{ borderBottom: `2px solid ${brandBlue}`, color: brandBlue }}
                                 style={{ borderRadius: 12, border: "1px solid #e6e9f5" }}
                                 bodyStyle={{ padding: 16 }}
                             >
                                 <Space direction="vertical" size={12} style={{ width: "100%" }}>
                                     <Paragraph style={{ margin: 0 }}>
-                                        Διαβάστε γνήσιες κριτικές πελατών και αξιολογήστε μας με ένα κλικ:
+                                        {t("ratingSites.desc")}
                                     </Paragraph>
 
-                                    {/* Icon-only external links, evenly spaced */}
                                     <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                                        <Tooltip title="Google">
+                                        <Tooltip title={t("ratingSites.google")}>
                                             <Button
                                                 href="https://www.google.com"
                                                 target="_blank"
@@ -161,8 +143,7 @@ export default function ReviewsPage() {
                                                 icon={<i className="bi bi-google" style={{ fontSize: 18 }} />}
                                             />
                                         </Tooltip>
-
-                                        <Tooltip title="Trustpilot">
+                                        <Tooltip title={t("ratingSites.trustpilot")}>
                                             <Button
                                                 href="https://www.trustpilot.com"
                                                 target="_blank"
@@ -173,8 +154,7 @@ export default function ReviewsPage() {
                                                 icon={<TrustpilotIcon />}
                                             />
                                         </Tooltip>
-
-                                        <Tooltip title="Facebook">
+                                        <Tooltip title={t("ratingSites.facebook")}>
                                             <Button
                                                 href="https://www.facebook.com/4rent.thessaloniki"
                                                 target="_blank"
@@ -185,8 +165,7 @@ export default function ReviewsPage() {
                                                 icon={<i className="bi bi-facebook" style={{ fontSize: 18 }} />}
                                             />
                                         </Tooltip>
-
-                                        <Tooltip title="HolidayCheck">
+                                        <Tooltip title={t("ratingSites.holidaycheck")}>
                                             <Button
                                                 href="https://www.holidaycheck.de"
                                                 target="_blank"
@@ -199,11 +178,10 @@ export default function ReviewsPage() {
                                         </Tooltip>
                                     </div>
 
-                                    {/* Email line with static stars */}
                                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                                         <Rate disabled value={5} style={{ color: "#ffd666" }} />
                                         <Text>
-                                            Αξιολογήστε μας:{" "}
+                                            {t("ratingSites.emailPrefix")}{" "}
                                             <Link href="mailto:feedback@4rent-thessaloniki.com">
                                                 feedback@4rent-thessaloniki.com
                                             </Link>
@@ -215,7 +193,7 @@ export default function ReviewsPage() {
 
                         <Col xs={24} md={12}>
                             <Card
-                                title="Η δική σας αξιολόγηση"
+                                title={t("yourReview.title")}
                                 headStyle={{ borderBottom: `2px solid ${brandBlue}`, color: brandBlue }}
                                 style={{ borderRadius: 12, border: "1px solid #e6e9f5" }}
                                 bodyStyle={{ padding: 16 }}
@@ -225,18 +203,18 @@ export default function ReviewsPage() {
                                     <TextArea
                                         value={note}
                                         onChange={(e) => setNote(e.target.value)}
-                                        placeholder="Προαιρετικό σχόλιο…"
+                                        placeholder={t("yourReview.placeholder")}
                                         autoSize={{ minRows: 3, maxRows: 5 }}
                                     />
                                     <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
-                                        <Button onClick={() => { setRating(0); setNote(""); }}>Καθαρισμός</Button>
+                                        <Button onClick={() => { setRating(0); setNote(""); }}>{t("yourReview.clear")}</Button>
                                         <Button
                                             type="primary"
                                             icon={<SendOutlined />}
                                             style={{ backgroundColor: brandRed, borderColor: brandRed }}
                                             onClick={submitLocal}
                                         >
-                                            Αποστολή
+                                            {t("yourReview.send")}
                                         </Button>
                                     </div>
                                 </Space>
@@ -246,7 +224,6 @@ export default function ReviewsPage() {
 
                     <Divider />
 
-                    {/* Reviews list */}
                     <Row gutter={[16, 16]}>
                         {REVIEWS.map((r, i) => (
                             <Col xs={24} md={12} key={i}>

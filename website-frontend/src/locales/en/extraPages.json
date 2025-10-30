@@ -1,0 +1,231 @@
+{
+  "hero": {
+    "title": "Offer 2026!"
+  },
+  "image": {
+    "alt": "Car rental offer Thessaloniki"
+  },
+  "discount": {
+    "upTo": "Up to",
+    "thirtyOff": "30% off"
+  },
+  "p1": {
+    "l1": "The offer is valid for a limited time and the discount is applied automatically. ",
+    "l2a": "After your booking, you can request an additional ",
+    "l2bStrong": "5% discount",
+    "l2c": "on the remaining amount, with prepayment and no risk!"
+  },
+  "p2": {
+    "prefix": "Valid for rentals starting on",
+    "date": "15/04/2026",
+    "suffix": "."
+  },
+  "ai": {
+    "title": "The All-inclusive package is included with every booking:",
+    "b1": "Full insurance with zero excess (includes tires, underbody & windows)",
+    "b2": "No deposit & no Credit card",
+    "b3": "Additional driver",
+    "b4": "Unlimited kilometers",
+    "b5": "24/7 delivery & collection service",
+    "b6": "Car cleaning"
+  },
+  "buttons": {
+    "book": "Book now"
+  },
+  "premium": {
+    "hero": "Premium package only €1.00 per day !!",
+    "subhero": "Additionally, by choosing the extra Premium Service, you get access to additional services such as free cancellation and date change.",
+    "checks": [
+      "Free booking change (price adjustment +/- difference with current price list)",
+      "Free cancellation up to 48 hours before pickup.",
+      "Travel insurance for ferry transport of the car (e.g., Thassos)",
+      "Membership card = 10% discount for your next booking"
+    ],
+    "centerLine": "Your benefits as a Premium customer with <br /> only <b>€1.00 per day</b>.",
+    "centerNote": "You also receive the membership card with 10% discount for your next booking.",
+    "regular": "Regular",
+    "vs": "vs",
+    "premium": "Premium",
+    "priceLine": "€1.00 / day",
+    "table": {
+      "header": {
+        "feature": "Feature",
+        "regular": "Regular",
+        "premium": "Premium"
+      }
+    },
+    "features": {
+      "cars": "New Cars",
+      "change": "Booking change",
+      "cancel": "Cancellation up to 2 days before arrival",
+      "card": "Membership card = 10% discount for your next booking",
+      "insurance": "Travel insurance (e.g., ferry to Thassos)",
+      "priority": "Priority service"
+    },
+    "cta": "Book Now"
+  },
+  "insuranceMixed": {
+    "heroTitle": "Full (comprehensive) insurance with no deposit & no credit card",
+    "heroSubtitle": "Car Rental Thessaloniki",
+    "p1": "It can happen even to the best driver 🙂. <br />\n                        Not a problem for us! To ensure you are fully covered\n                        with comprehensive insurance without a deposit and without requiring a credit card,\n                        you should do the following:",
+    "image": "https://4rent-thessaloniki.com/images/Step_En.png",
+    "illustrationAlt": "Comprehensive insurance — steps",
+    "footnote": "* Except of course when terms are violated (alcohol, unauthorized roads, etc.).\n                        In case of damage, regardless of fault, you may be charged <b>€25.00</b> for\n                        handling the related file."
+  },
+  "comparison": {
+    "heroTitle": "4rent vs Competitor — what you gain with us",
+    "ratingValue": "4.8/5",
+    "valueForMoney": "Value for money",
+    "partialTooltip": "Applies with restrictions / extra charge.",
+    "intro": "We compared the most important benefits our customers ask for. With <b>4rent</b> you know exactly what you pay for: <u>no deposit</u>, <u>no hidden costs</u>, full insurance and <u>24/7</u> support.",
+    "table": {
+      "header": {
+        "feature": "Feature",
+        "fourRent": "4rent",
+        "competitor": "Competitor"
+      }
+    },
+    "features": {
+      "fullInsurance": "Full (comprehensive) insurance with zero excess",
+      "noDepositNoCard": "No deposit / no credit card",
+      "secondDriverFree": "2nd driver free",
+      "unlimitedKm": "Unlimited kilometers",
+      "support24h": "24/7 support & Delivery-Collection",
+      "noHiddenCosts": "No hidden costs",
+      "modernFleetCleaning": "Modern fleet & cleaning",
+      "flexibleCancel": "Flexible cancellation"
+    },
+    "infos": {
+      "fullInsurance": "Includes tires, underbody & windows."
+    },
+    "notes": {
+      "cancelPolicy": "Per seasonal policy",
+      "restrictionsPenalty": "Restrictions/penalty"
+    },
+    "priceTransparency": {
+      "title": "Price Transparency",
+      "items": [
+        "✓ Final price in cart — no “extras at checkout”",
+        "✓ Taxes/Fees <b>included</b>",
+        "✓ Free 2nd driver",
+        "✓ 24/7 delivery & collection by arrangement"
+      ]
+    },
+    "hiddenElsewhere": {
+      "title": "Often “hidden” elsewhere",
+      "items": [
+        "• Insurance/damage excesses",
+        "• Airport/night delivery fees",
+        "• 2nd driver fee",
+        "• Limited mileage"
+      ]
+    },
+    "cta": {
+      "call": "Call us: +30 2310 460035",
+      "book": "Book now"
+    },
+    "smallNote": "* The comparison is based on typical market policies/fees. Variations may occur by season, vehicle, and provider. For full terms, consult 4rent’s rental terms."
+  },
+  "cheapTruth": {
+    "heroTitle": "Cheap rental cars",
+    "intro": "You won’t find cheap rental cars with us! We don’t rent cars for €1.00, €2.00 or €5.00 per day! A rental car that initially costs e.g. €5.00 per day is NEVER the final price. These “tricks” are used by other rental companies around the world — we’ll show an example in the graphic below.",
+    "priceBlock": {
+      "left": {
+        "title": "4rent Thessaloniki",
+        "price": "€13.00 / per day"
+      },
+      "vs": "vs",
+      "right": "Competitor — €1.00 / per day"
+    },
+    "badges": {
+      "fourRent": "4rent",
+      "competitor": "Competitor"
+    },
+    "s1": {
+      "title": "COMPREHENSIVE INSURANCE",
+      "left": "<div style=\"font-weight:700;margin-bottom:4px\">With excess or comprehensive?</div>\n                                Comprehensive insurance: <b>+€10.00 / day</b><br/>\n                                Tires, underbody & glass area:<br/>\n                                <b>+€5.00 / day</b>",
+      "right": "Comprehensive insurance <br/> with zero excess <br/> <b>+€0.00</b>"
+    },
+    "s2": {
+      "title": "PAYMENT OPTIONS – CREDIT CARD",
+      "left": "Prepay the full amount? With or without a credit card?<br/>\n                                Deposit: <b>Mandatory</b><br/>\n                                No card available or the card belongs to the 2nd driver:<br/>\n                                <b>+€5.00 / day</b>",
+      "right": "With a deposit of only <b>€49.00</b><br/>\n                                No credit card"
+    },
+    "s3": {
+      "title": "AIRPORT SKG",
+      "left": "Directly at the airport?<br/>\n                                Shuttle Service: <b>+€0.00 / day</b><br/>\n                                Meet at the airport: <b>+€7.00 / day</b>",
+      "right": "Free transfer service by <em>“Shuttle bus”</em><br/>\n                                <b>+€0.00</b>"
+    },
+    "s4": {
+      "title": "FREE CANCELLATION",
+      "left": "Change or cancel?<br/>\n                                Free change: <b>+€0.00 / day</b><br/>\n                                Cancellation fee: <b>+€3.00 / day</b>",
+      "right": "Premium Service<br/>\n                                <b>+€1.00 / per day</b>"
+    },
+    "s5": {
+      "title": "NEW CARS",
+      "left": "Older fleet • Limited equipment",
+      "right": "New & well-maintained vehicles<br/>\n                                <b>+€0.00</b>"
+    },
+    "s6": {
+      "title": "RETURN PROTOCOL",
+      "left": "Strict check or not?<br/>\n                                Rental cars are inspected!<br/>\n                                Accurate charge in case of damage!",
+      "right": "Easy return<br/>\n                                <b>+€0.00</b>"
+    },
+    "final": {
+      "title": "FINAL PRICE",
+      "left": "Competitor price without damage: <b>€30.00 / day</b><br/>\n                                    + the damage! (if it occurs)",
+      "right": {
+        "title": "4rent Price",
+        "price": "€13.00 / per day!"
+      }
+    },
+    "honestyTitle": "Honesty makes the difference!",
+    "cta": "Book now"
+  },
+  "contactUs": {
+    "heroTitle": "Contact us",
+    "heroSubtitle": "Need help with a booking or have a question? Our team is here for you.",
+    "sectionTitle": "Contact details",
+    "officePhoneLabel": "Office phone",
+    "officePhoneDisplay": "+30 2310 460035",
+    "officePhoneHref": "+302310460035",
+    "mobileLabel": "Mobile",
+    "mobileDisplay": "+30 6982 211 001",
+    "mobileHref": "+306982211001",
+    "emailLabel": "E-mail",
+    "emailAddress": "info@4rent-thessaloniki.com",
+    "callNow": "Call now",
+    "sendEmail": "Send E-mail",
+    "whatsAppTooltip": "Chat on WhatsApp",
+    "whatsAppButton": "WhatsApp",
+    "whatsAppHref": "https://wa.me/302310460035",
+    "book": "Book",
+    "mapTitle": "Map",
+    "mapIframeTitle": "4rent Thessaloniki – Map",
+    "mapAriaLabel": "Map 4rent Thessaloniki",
+    "mapSrc": "https://www.google.com/maps?q=4rent%20Thessaloniki&output=embed"
+  },
+  "chalkidiki": {
+    "heroTitle": "Car Rentals Chalkidiki",
+    "heroImageAlt": "4rent Chalkidiki",
+    "p1": "With 4rent car rentals in Chalkidiki, you will have a wonderful holiday in Kassandra or Sithonia.",
+    "b1": "Delivery and collection directly at your hotel.",
+    "b2": "You can also pick up your car in Chalkidiki and return it at Thessaloniki Airport.",
+    "b3": "All rental cars are fully insured so you can feel absolutely safe on your holidays.",
+    "mapAlt": "Chalkidiki map",
+    "pointsTitle": "Service areas:",
+    "r50": {
+      "title": "✓ Chalkidiki – Radius 50 km from Thessaloniki Airport",
+      "list": "→ Epanomi, Flogita, Michaniona, Nea Kallikrateia, Nea Moudania, Nea Plagia, Nea Potidea, Paralia Dionysiou"
+    },
+    "r100": {
+      "title": "✓ Chalkidiki – Radius 100 km from Thessaloniki Airport",
+      "list": "→ Afytos, Arnaia, Elia, Gerakini, Chaniotis, Kallithea, Kryopigi, Metamorfosi, Nea Skioni, Nikiti, Paliouri, Pefkochori, Polychrono, Poseidi, Ormos Panagias, Sani, Rizopoulo, Siviri, Vatopedi"
+    },
+    "r120": {
+      "title": "✓ Chalkidiki – Radius 120 km from Thessaloniki Airport",
+      "list": "→ Ouranoupoli, Kalamitsi, Sarti, Vourvourou, Ierissos, Neos Marmaras, Pyrgadikia, Toroni"
+    },
+    "bookNow": "Book Now"
+  }
+}

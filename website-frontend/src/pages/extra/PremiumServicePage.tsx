@@ -1,23 +1,11 @@
 // src/pages/premium/PremiumServicePage.tsx
 import React from "react";
-import {
-    Card,
-    Typography,
-    Row,
-    Col,
-    Space,
-    Divider,
-    Button,
-} from "antd";
-import {
-    CheckCircleFilled,
-    CloseCircleFilled,
-    CarOutlined,
-} from "@ant-design/icons";
-import {useLangRouter} from "../../resources/useLangRouter.ts";
+import { Card, Typography, Row, Col, Space, Divider, Button } from "antd";
+import { CheckCircleFilled, CloseCircleFilled, CarOutlined } from "@ant-design/icons";
+import { useLangRouter } from "../../resources/useLangRouter.ts";
+import { Trans, useTranslation } from "react-i18next";
 
 const { Title, Paragraph, Text } = Typography;
-
 
 const brandRed = "#ce0505";
 const brandBlue = "#075eff";
@@ -26,13 +14,21 @@ const heroGradient = `linear-gradient(135deg, ${brandBlue} 0%, ${brandBlue} 60%,
 type FeatureRow = { key: string; label: string; regular: boolean; premium: boolean };
 
 const FEATURES: FeatureRow[] = [
-    { key: "cars", label: "Καινούργια Αυτοκίνητα", regular: true, premium: true },
-    { key: "change", label: "Αλλαγή κράτησης", regular: false, premium: true },
-    { key: "cancel", label: "Ακύρωση έως 2 ημέρες πριν την άφιξη", regular: false, premium: true },
-    { key: "card", label: "Κάρτα μέλους = 10% έκπτωση για την επόμενη κράτησή σας", regular: false, premium: true },
-    { key: "insurance", label: "Ασφάλιση ταξιδιού (π.χ. πλοίο για Θάσο)", regular: false, premium: true },
-    { key: "priority", label: "Προτεραιότητα στην εξυπηρέτηση", regular: false, premium: true },
+    { key: "cars",      label: "", regular: true,  premium: true },
+    { key: "change",    label: "", regular: false, premium: true },
+    { key: "cancel",    label: "", regular: false, premium: true },
+    { key: "card",      label: "", regular: false, premium: true },
+    { key: "insurance", label: "", regular: false, premium: true },
+    { key: "priority",  label: "", regular: false, premium: true },
 ];
+
+// ---- helper: always return an array for list keys ----
+function useList(t: (k: string, o?: any) => any, key: string) {
+    const v = t(key, { returnObjects: true });
+    if (Array.isArray(v)) return v as string[];
+    if (v == null || v === "") return [] as string[];
+    return [String(v)];
+}
 
 function Cell({ active }: { active: boolean }) {
     return active ? (
@@ -43,32 +39,19 @@ function Cell({ active }: { active: boolean }) {
 }
 
 export default function PremiumServicePage() {
-    const { go } = useLangRouter(); // <<-- lang-aware helpers
+    const { go } = useLangRouter();
+    const { t } = useTranslation("extraPages"); // <-- correct namespace
+
+    const checks = useList(t, "premium.checks"); // <-- always an array
 
     return (
         <div style={{ width: "100%", margin: "0 auto", padding: "0 16px", maxWidth: 1140 }}>
-            <Card
-                bordered={false}
-                style={{
-                    marginTop: 16, // same as ReviewsPage
-                    borderRadius: 16,
-                    overflow: "hidden",
-                    boxShadow: "0 8px 28px rgba(0,0,0,0.08)",
-                }}
-                bodyStyle={{ padding: 0 }}
-            >
+            <Card bordered={false} style={{ marginTop: 16, borderRadius: 16, overflow: "hidden", boxShadow: "0 8px 28px rgba(0,0,0,0.08)" }} bodyStyle={{ padding: 0 }}>
                 {/* HERO */}
-                <div
-                    style={{
-                        background: heroGradient,
-                        color: "white",
-                        padding: "28px 24px",
-                        textAlign: "center",
-                    }}
-                >
+                <div style={{ background: heroGradient, color: "white", padding: "28px 24px", textAlign: "center" }}>
                     <Space direction="vertical" size={8} style={{ width: "100%" }}>
                         <Title level={2} style={{ color: "white", margin: 0 }}>
-                            Premium πακέτο μόνο με 1,00 € ανά ημέρα !!
+                            {t("premium.hero")}
                         </Title>
                     </Space>
                 </div>
@@ -76,19 +59,14 @@ export default function PremiumServicePage() {
                 {/* CONTENT */}
                 <div style={{ padding: 20 }}>
                     <Title level={5} style={{ maxWidth: 800, margin: "auto", textAlign: "center" }}>
-                        Επιπλέον, επιλέγοντας την έξτρα Υπηρεσία Premium, αποκτάτε πρόσβαση σε πρόσθετες υπηρεσίες όπως δωρεάν ακύρωση, αλλαγή ημερομηνίας.
+                        {t("premium.subhero")}
                     </Title>
 
-                    {/* Checks + center text on same row */}
+                    {/* Checks + center text */}
                     <Row gutter={[24, 24]} align="middle" style={{ marginTop: 40, marginBottom: 12 }}>
                         <Col xs={24} md={12}>
                             <ul style={{ listStyle: "none", paddingLeft: 0, margin: 0 }}>
-                                {[
-                                    "Δωρεάν αλλαγή κράτησης (αναπροσαρμογή τιμής +/- διαφορά τιμής με τρέχον τιμοκατάλογο)",
-                                    "Δωρεάν ακύρωση έως 48 ώρες πριν την παραλαβή.",
-                                    "Ασφάλιση ταξιδιού Πλοίου για το αυτοκίνητο (π.χ. Θάσος)",
-                                    "Κάρτα μέλους = 10% έκπτωση για την επόμενη κράτησή σας",
-                                ].map((text, i) => (
+                                {checks.map((text, i) => (
                                     <li
                                         key={i}
                                         style={{
@@ -110,24 +88,16 @@ export default function PremiumServicePage() {
 
                         {/* Vertical divider */}
                         <Col flex="none">
-                            <div
-                                style={{
-                                    height: "100%",
-                                    width: 2,
-                                    background: "rgba(0,0,0,0.08)",
-                                    minHeight: 120,
-                                }}
-                            />
+                            <div style={{ height: "100%", width: 2, background: "rgba(0,0,0,0.08)", minHeight: 120 }} />
                         </Col>
 
                         {/* Center text */}
                         <Col xs={24} md={10} style={{ textAlign: "center" }}>
                             <Paragraph style={{ marginBottom: 0 }}>
-                                Τα οφέλη σας ως Premium πελάτης με <br />
-                                μόλις <Text strong>1,00 € την ημέρα</Text>.
+                                <Trans i18nKey="premium.centerLine" ns="extraPages" components={{ b: <Text strong /> }} />
                             </Paragraph>
                             <Paragraph type="secondary" style={{ marginTop: 4 }}>
-                                Λαμβάνετε επίσης την κάρτα μέλους 10% έκπτωση για την επόμενη κράτησή σας.
+                                {t("premium.centerNote")}
                             </Paragraph>
                         </Col>
                     </Row>
@@ -136,27 +106,18 @@ export default function PremiumServicePage() {
                     <Row justify="center" style={{ textAlign: "center", marginTop: 24, marginBottom: 16 }}>
                         <Col>
                             <Title level={2} style={{ margin: 0 }}>
-                                <Text style={{ color: "#9ca3af", fontWeight: 700 }}>Regular</Text>{" "}
-                                <Text style={{ color: "#9ca3af", fontWeight: 700 }}>vs</Text>{" "}
-                                <Text style={{ color: "#f59e0b", fontWeight: 800 }}>Premium</Text>
+                                <Text style={{ color: "#9ca3af", fontWeight: 700 }}>{t("premium.regular")}</Text>{" "}
+                                <Text style={{ color: "#9ca3af", fontWeight: 700 }}>{t("premium.vs")}</Text>{" "}
+                                <Text style={{ color: "#f59e0b", fontWeight: 800 }}>{t("premium.premium")}</Text>
                             </Title>
-                            <Title level={2} style={{ margin: 0, color: "#22c55e" }}>
-                                1,00€ / ημέρα
-                            </Title>
+                            <Title level={2} style={{ margin: 0, color: "#22c55e" }}>{t("premium.priceLine")}</Title>
                         </Col>
                     </Row>
 
                     <Divider />
 
                     {/* Feature Table */}
-                    <Card
-                        style={{
-                            borderRadius: 12,
-                            border: "1px solid #e6e9f5",
-                            boxShadow: "0 4px 18px rgba(0,0,0,0.04)",
-                        }}
-                        bodyStyle={{ padding: 0 }}
-                    >
+                    <Card style={{ borderRadius: 12, border: "1px solid #e6e9f5", boxShadow: "0 4px 18px rgba(0,0,0,0.04)" }} bodyStyle={{ padding: 0 }}>
                         <Row
                             style={{
                                 background: "#f7fbfc",
@@ -166,26 +127,15 @@ export default function PremiumServicePage() {
                                 padding: "12px 16px",
                             }}
                         >
-                            <Col xs={12}>Παροχή</Col>
-                            <Col xs={6} style={{ textAlign: "center" }}>
-                                Regular
-                            </Col>
-                            <Col xs={6} style={{ textAlign: "center" }}>
-                                Premium
-                            </Col>
+                            <Col xs={12}>{t("premium.table.header.feature")}</Col>
+                            <Col xs={6} style={{ textAlign: "center" }}>{t("premium.table.header.regular")}</Col>
+                            <Col xs={6} style={{ textAlign: "center" }}>{t("premium.table.header.premium")}</Col>
                         </Row>
 
                         {FEATURES.map((f, i) => (
-                            <Row
-                                key={f.key}
-                                align="middle"
-                                style={{
-                                    borderBottom: i === FEATURES.length - 1 ? "none" : "1px solid #f0f2f6",
-                                    padding: "12px 16px",
-                                }}
-                            >
+                            <Row key={f.key} align="middle" style={{ borderBottom: i === FEATURES.length - 1 ? "none" : "1px solid #f0f2f6", padding: "12px 16px" }}>
                                 <Col xs={12}>
-                                    <Text strong>{f.label}</Text>
+                                    <Text strong>{t(`premium.features.${f.key}`)}</Text>
                                 </Col>
                                 <Col xs={6} style={{ textAlign: "center" }}>
                                     <Cell active={f.regular} />
@@ -197,21 +147,16 @@ export default function PremiumServicePage() {
                         ))}
                     </Card>
 
-                    {/* CTA button */}
+                    {/* CTA */}
                     <div style={{ textAlign: "center", marginTop: 24, marginBottom: 8 }}>
                         <Button
                             type="primary"
                             size="large"
                             icon={<CarOutlined />}
                             onClick={() => go("/search")}
-                            style={{
-                                backgroundColor: brandRed,
-                                borderColor: brandRed,
-                                paddingInline: 20,
-                                borderRadius: 8,
-                            }}
+                            style={{ backgroundColor: brandRed, borderColor: brandRed, paddingInline: 20, borderRadius: 8 }}
                         >
-                            Κάντε Κράτηση Τώρα
+                            {t("premium.cta")}
                         </Button>
                     </div>
                 </div>

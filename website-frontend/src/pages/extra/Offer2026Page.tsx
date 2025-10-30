@@ -2,6 +2,7 @@ import React from "react";
 import { Button, Card, Col, Row, Space, Typography, Image, Divider } from "antd";
 import { useNavigate } from "react-router-dom";
 import {useLangRouter} from "../../resources/useLangRouter.ts";
+import { useTranslation } from "react-i18next";
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -18,6 +19,7 @@ const bullet = (text: React.ReactNode) => (
 export default function Offer2026Page() {
     const navigate = useNavigate();
     const { go } = useLangRouter(); // <<-- lang-aware helpers
+    const { t } = useTranslation("extraPages");
 
     return (
         <div style={{ width: "100%", margin: "0 auto", padding: "0 16px", maxWidth: 1140 }}>
@@ -41,7 +43,7 @@ export default function Offer2026Page() {
                 >
                     <Space direction="vertical" size={6} style={{ width: "100%" }}>
                         <Title level={2} style={{ color: "white", margin: 0 }}>
-                            Προσφορά 2026!
+                            {t("hero.title")}
                         </Title>
                         <div
                             style={{
@@ -59,7 +61,7 @@ export default function Offer2026Page() {
                     <Col span={24}>
                         <Image
                             src="https://4rent-thessaloniki.com/images/de_2024.png"
-                            alt="Προσφορά ενοικίασης αυτοκινήτου Θεσσαλονίκη"
+                            alt={t("image.alt")}
                             style={{
                                 borderRadius: 12,
                                 width: "100%",
@@ -77,24 +79,24 @@ export default function Offer2026Page() {
                         <Col xs={24} md={12}>
                             <Space direction="vertical" size={12} style={{ width: "100%" }}>
                                 <Title level={4} style={{ margin: 0, color: brandBlue }}>
-                                    Έως και <Text style={{ color: brandRed }}>30% έκπτωση</Text>!
+                                    {t("discount.upTo")} <Text style={{ color: brandRed }}>{t("discount.thirtyOff")}</Text>!
                                 </Title>
 
                                 <Paragraph style={{ margin: 0 }}>
-                                    Η προσφορά ισχύει για περιορισμένο χρόνο και η έκπτωση υπολογίζεται αυτόματα.
-                                    Μετά την κράτησή σας, μπορείτε να ζητήσετε επιπλέον{" "}
+                                    {t("p1.l1")}
+                                    {t("p1.l2a")}
                                     <Text strong>
-                                        5% έκπτωση
+                                        {t("p1.l2bStrong")}
                                     </Text>{" "}
-                                    στο υπόλοιπο ποσό, με προπληρωμή και χωρίς κανένα ρίσκο!
+                                    {t("p1.l2c")}
                                 </Paragraph>
 
                                 <Paragraph style={{ margin: 0 }}>
                                     <Text type="secondary">
-                                        Ισχύει για κρατήσεις με έναρξη μίσθωσης στις{" "}
+                                        {t("p2.prefix")}{" "}
                                         <Text strong>
-                                            15/04/2026
-                                        </Text>.
+                                            {t("p2.date")}
+                                        </Text>{t("p2.suffix")}
                                     </Text>
                                 </Paragraph>
                             </Space>
@@ -103,16 +105,16 @@ export default function Offer2026Page() {
                         <Col xs={24} md={12}>
                             <Space direction="vertical" size={10} style={{ width: "100%" }}>
                                 <Title level={5} style={{ margin: 0, color: brandBlue }}>
-                                    To All-inclusive πακέτο περιλαμβάνεται σε κάθε κράτηση:
+                                    {t("ai.title")}
                                 </Title>
 
                                 <ul style={{ paddingLeft: 0, listStyle: "none", margin: 0 }}>
-                                    {bullet("Μικτή ασφάλεια χωρίς συμμετοχή (περιλαμβάνει ελαστικά, κάτω μέρος & τζάμια)")}
-                                    {bullet("Χωρίς εγγύηση & χωρίς Πιστωτική κάρτα")}
-                                    {bullet("Επιπλέον οδηγός")}
-                                    {bullet("Απεριόριστα χιλιόμετρα")}
-                                    {bullet("24ωρη εξυπηρέτηση Παράδοση - Παραλαβή")}
-                                    {bullet("Καθαρισμός αυτοκινήτου")}
+                                    {bullet(t("ai.b1"))}
+                                    {bullet(t("ai.b2"))}
+                                    {bullet(t("ai.b3"))}
+                                    {bullet(t("ai.b4"))}
+                                    {bullet(t("ai.b5"))}
+                                    {bullet(t("ai.b6"))}
                                 </ul>
                             </Space>
                         </Col>
@@ -138,7 +140,7 @@ export default function Offer2026Page() {
                             }}
                             onClick={() => go("/search")}
                         >
-                            Κάντε κράτηση
+                            {t("buttons.book")}
                         </Button>
                     </Space>
                 </div>

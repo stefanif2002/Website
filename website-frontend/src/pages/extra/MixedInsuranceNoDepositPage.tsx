@@ -1,6 +1,7 @@
 // src/pages/insurance/MixedInsuranceNoDepositPage.tsx
 import React from "react";
 import { Card, Typography, Space, Image } from "antd";
+import { Trans, useTranslation } from "react-i18next";
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -21,6 +22,8 @@ const Bar = () => (
 );
 
 export default function MixedInsuranceNoDepositPage() {
+    const { t } = useTranslation("extraPages");
+
     return (
         <div style={{ width: "100%", margin: "0 auto", padding: "0 16px", maxWidth: 1140 }}>
             <Card
@@ -44,10 +47,10 @@ export default function MixedInsuranceNoDepositPage() {
                 >
                     <Space direction="vertical" size={6} style={{ width: "100%" }}>
                         <Title level={2} style={{ color: "white", margin: 0 }}>
-                            Μικτή ασφάλεια χωρίς εγγύηση & χωρίς πιστωτική κάρτα
+                            {t("insuranceMixed.heroTitle")}
                         </Title>
                         <Text style={{ color: "rgba(255,255,255,0.95)", fontWeight: 500 }}>
-                            Ενοικίαση Αυτοκινήτου Θεσσαλονίκη
+                            {t("insuranceMixed.heroSubtitle")}
                         </Text>
                     </Space>
                 </div>
@@ -55,29 +58,27 @@ export default function MixedInsuranceNoDepositPage() {
                 {/* BODY */}
                 <div style={{ padding: 20 }}>
                     <Paragraph style={{ maxWidth: 920, margin: "0 auto 8px", textAlign: "center" }}>
-                        Μπορεί να τύχει και στον καλύτερο οδηγό 🙂. <br />
-                        Δεν είναι πρόβλημα για εμάς! Για να διασφαλιστείτε ότι είστε πλήρως προστατευμένοι
-                        με μικτή ασφάλεια χωρίς εγγύηση και χωρίς να απαιτείται πιστωτική κάρτα,
-                        πρέπει να πράτετε τα εξής:
+                        <Trans i18nKey="insuranceMixed.p1" ns="extraPages" components={{ br: <br /> }} />
                     </Paragraph>
 
                     <Bar />
 
-                    {/* Illustration */}
+                    {/* Illustration (from translations) */}
                     <div style={{ maxWidth: 980, margin: "0 auto" }}>
                         <Image
-                            src="https://4rent-thessaloniki.com/images/Step_El.png"
-                            alt="Μικτή ασφάλεια — βήματα"
+                            src={t("insuranceMixed.image")}
+                            alt={t("insuranceMixed.illustrationAlt")}
                             style={{ width: "100%", borderRadius: 12 }}
                             preview={false}
                         />
                     </div>
 
-                    {/* Footnote / small print exactly as on the page (kept concise) */}
-                    <Paragraph type="secondary" style={{ maxWidth: 980, margin: "14px auto 0", fontSize: 13, lineHeight: 1.7 }}>
-                        * Εκτός βέβαια όταν παραβιάζετε τους όρους (αλκοόλ, μη εξουσιοδοτημένοι δρόμοι κτλ.).
-                        Σε περίπτωση ζημιάς, ανεξαρτήτως ευθύνης, ενδέχεται να χρεωθείτε <Text strong>25,00€</Text> για
-                        τη διαχείριση του σχετικού φακέλου.
+                    {/* Footnote / small print */}
+                    <Paragraph
+                        type="secondary"
+                        style={{ maxWidth: 980, margin: "14px auto 0", fontSize: 13, lineHeight: 1.7 }}
+                    >
+                        <Trans i18nKey="insuranceMixed.footnote" ns="extraPages" components={{ b: <Text strong /> }} />
                     </Paragraph>
                 </div>
             </Card>

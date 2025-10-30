@@ -1,0 +1,49 @@
+{
+  "hero": { "title": "Car Rental Thessaloniki — reviews & experiences" },
+  "image": {
+    "src": "https://4rent-thessaloniki.com/images/Deals/bewertung-en.png",
+    "alt": "car rental reviews thessaloniki"
+  },
+  "ratingSites": {
+    "title": "Rate us on",
+    "desc": "Read genuine customer reviews and rate us with one click:",
+    "google": "Google",
+    "trustpilot": "Trustpilot",
+    "facebook": "Facebook",
+    "holidaycheck": "HolidayCheck",
+    "emailPrefix": "Rate us:"
+  },
+  "yourReview": {
+    "title": "Your rating",
+    "placeholder": "Optional comment…",
+    "clear": "Clear",
+    "send": "Send"
+  },
+  "submit": { "warningNoRating": "Please select a rating (stars)." },
+  "mailto": {
+    "subjectPrefix": "New Rating",
+    "bodyRating": "Rating",
+    "bodyComment": "Comment:",
+    "noComment": "(no comment)"
+  },
+  "list": [
+    { "text": "Hello 4rent team, we rented a car for 3 weeks. Everything was wonderful! The car was great, contact was very friendly and easy, and the price/performance ratio was very good! We can only recommend this company and will book again and again! Best wishes" },
+    { "text": "Ruth and Charles" },
+    { "text": "Dear 4rent staff, I rented a mid-size car from you for the first time! Great car, excellent service, pickup & return were outstanding. Have a great holiday everyone!", "author": "Susanna M." },
+    { "text": "The best car rental I’ve ever had in Thessaloniki. Impeccable service, flawless communication! Recommended!", "author": "Michalis K." },
+    { "text": "Very good service with a smile and kindness. The team was punctual and the car very good.", "author": "Eirini Th." },
+    { "text": "Compared to other large car rental companies, this company impresses with absolutely professional, straightforward handling...", "author": "Günter H." },
+    { "text": "Good evening, I wanted to thank you for the high-level service...", "author": "Giorgos K." },
+    { "text": "I can only say super, super. Everything perfect. Thank you very much.", "author": "Eva N." },
+    { "text": "They have helped me many times with very good cars...", "author": "Theofilos K." },
+    { "text": "Perfect service and a very good car!!!", "author": "Pon N." },
+    { "text": "Impeccable service, very good price...", "author": "Wagelis A." },
+    { "text": "Excellent service!!! Gladly again", "author": "Lazaros M." },
+    { "text": "Excellent company. Friendly staff, very good prices.", "author": "Giorgos K." },
+    { "text": "Excellent service and impeccable behavior of the staff.", "author": "Georgios K." },
+    { "text": "The best, 5 stars", "author": "Grigorios T." },
+    { "text": "To be honest, the best service...", "author": "Tom Seon" },
+    { "text": "The best choice for car rental from the airport...", "author": "Nikos S." },
+    { "text": "The 4rent car rental company is truly recommended...", "author": "Sonja L." }
+  ]
+}
