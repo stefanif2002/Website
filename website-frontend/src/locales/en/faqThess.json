@@ -1,0 +1,198 @@
+{
+  "hero": {
+    "title": "Frequently Asked Questions about Car Rental in Thessaloniki"
+  },
+  "cta": {
+    "bookNow": "BOOK NOW"
+  },
+  "faq": {
+    "q1": {
+      "q": "How can I make a reservation?",
+      "p1": "The ways to book a car are the following:",
+      "list": [
+        "Fill in the online booking form (https://www.4rent-thessaloniki.com/el/kratisi)",
+        "By phone call +30 2310 460035",
+        "Contact us via e-mail info@4rent-thessaloniki.com"
+      ],
+      "note": "All bookings are made by category and not by specific model. In case a confirmed reservation is not available, 4rent reserves the right to provide a higher-category car at no extra cost to the customer."
+    },
+    "q2": {
+      "q": "What documents do I need to rent a car?",
+      "list": [
+        "Driving license (original – photocopies are not accepted).",
+        "ID card or passport."
+      ],
+      "p": "EU, United States of America (USA), Australia, Canada and Russia licenses are accepted; all other longer stays require an international driving permit to rent a vehicle. The renter is responsible for carrying valid identification. If documents or permits are missing, we are under no obligation to issue anything and no refund will be made for payments already completed."
+    },
+    "q3": {
+      "q": "How can I pay?",
+      "p": "Payment methods are as follows:",
+      "list": [
+        "Prepay the total amount by Card (Credit, Debit, Apple Pay or Google Pay)",
+        "Prepay the total amount via PayPal",
+        "Pay a deposit by Card (Credit, Debit, Apple Pay or Google Pay)",
+        "Pay a deposit via PayPal",
+        "Pay the remaining amount upon pickup in cash or by card (credit or debit)"
+      ]
+    },
+    "q4": {
+      "q": "Cancellation or modification of a reservation?",
+      "p1": "With the Premium option (€1.00 per day):",
+      "list1": [
+        "Free change of reservation (price readjustment +/- price difference per current price list), valid only for date or rental category changes",
+        "Free cancellation up to 48 hours before pickup."
+      ],
+      "p2": "Without the Premium option (€1.00 per day):",
+      "list2": [
+        "Free change of reservation (price readjustment +/- price difference per current price list).",
+        "In case of cancellation, the payment will not be refunded."
+      ]
+    },
+    "q5": {
+      "q": "What type of insurance coverage is included in the price?",
+      "list": [
+        "We provide full (comprehensive) insurance with zero excess and no deposit.",
+        "Damage to tires, underbody, glass and mirrors is included.",
+        "Third-party liability insurance.",
+        "Theft insurance.",
+        "Passenger Accident Insurance."
+      ]
+    },
+    "q6": {
+      "q": "When does the full insurance with zero excess not apply?",
+      "p0": "In short, only in extreme situations! You can also see an example here.",
+      "p1t": "Not Covered by Insurance",
+      "p1": "Insurance does not cover damages due to malicious use of the car, driving on unauthorized roads, violations of the traffic code, intoxication and influence of drugs and other substances.",
+      "p2": "There is also no insurance coverage if the following steps are not followed:",
+      "list1": [
+        "In case of damage or accident, the driver must call our company so that accident care (insurance company) can attend, and immediately call the police (100).",
+        "If rules are not followed, the customer is charged the entire damage amount. You must also wait for the arrival of the insurance company and the police so an accident report can be created; a copy must be delivered upon vehicle return.",
+        "If car rentals refrain from calling the police and do not comply with state laws, the insurance does not cover damages and the renter is responsible for all resulting costs.",
+        "The car rental must be informed IMMEDIATELY, otherwise there will be a charge. Even in other damage cases to the rented vehicle, the car rental service must be informed IMMEDIATELY.",
+        "In case of damage to a parked vehicle, the car rental must be informed before moving the vehicle.",
+        "In case of damage, you are obliged to report the damage directly at the location where it occurred; otherwise there will be a damage charge."
+      ],
+      "p3t": "The customer is responsible for the following damages:",
+      "list2": [
+        "Loss or damage of keys and spare keys.",
+        "Damage to seats or extreme dirt in the car.",
+        "Fuel issues caused by wrong or defective fuel (e.g., unleaded in a diesel car or vice versa); the renter fully bears the cost.",
+        "Destroying child seats.",
+        "Car battery drained due to leaving electrical equipment on.",
+        "Personal items stolen from the car or damaged in an accident."
+      ],
+      "p4": "4rent Thessaloniki has no obligation to replace a car due to a flat tire (PUNCTURE) or damage to the radio or lighter. (We can, of course, assist via our 24-hour Roadside Assistance service).",
+      "p5": "We are not responsible for damages or accidents occurring due to driver impairment from alcohol, medication and/or drugs. The same applies to damages or accidents caused intentionally by the customer on- or off-road. In such cases, the customer is solely responsible.",
+      "p6": "The police report must also state whether any driver involved was under the influence of alcohol and/or drugs.",
+      "p7": "In case of theft, the customer must immediately inform the car rental and deliver the vehicle key and the police report as soon as possible. Generally, the customer must report any vehicle damage to the car rental company.",
+      "p8": "If this does not happen, the customer is responsible for all costs. Compliance with the traffic code lies solely with the renter and is NOT covered by insurance. All rental cars are insured for the maximum number of passengers; for safety reasons, this cannot be exceeded, otherwise insurance is void.",
+      "p9": "If the vehicle is damaged, regardless of fault, a one-off fee of €25.00 will be charged for handling the related file.",
+      "p10": "If additional damages occur under the same rental agreement, these are not covered by the comprehensive insurance and responsibility—including paying the deposit/excess amount—lies solely with the renter. The first damage is covered by comprehensive insurance with zero excess and at no extra cost to the renter. It is considered “first damage” only if the renter is at fault or if the culprit is not found. If the renter is not at fault, then it is not considered first damage.",
+      "p11": "In case of a second or subsequent damage, insurance coverage remains in force, with all benefits still valid. However, collision damages to the rental vehicle and related repair costs are not covered. If the renter is at fault or the culprit cannot be identified, collision repairs are charged to the renter up to the amount of the resulting deposit. A refundable deposit is required, the amount of which depends on the vehicle category.",
+      "p12": "Whether due to the renter’s fault or unknown fault, and if a replacement or continuation with the same vehicle is needed, the renter must pay or provide written acceptance for the activation of the excess, the amount corresponding to the vehicle category, as an excess guarantee.",
+      "p13": "Pickup of the new vehicle will take place at our headquarters. Alternatively, by arrangement, delivery can be made elsewhere for an additional transfer fee. If not accepted, the rental is automatically terminated and no claim can be made against the company."
+    },
+    "q7": {
+      "q": "What actions should I take if I or a third party causes damage or an accident with the car?",
+      "list": [
+        "Obligation of immediate reporting",
+        "Do not leave the scene of the accident",
+        "Contact the police (100)",
+        "The insurance company will complete the accident report"
+      ],
+      "note": "In case of damage, regardless of fault, you will be charged a one-off amount of €25.00 for handling the related file."
+    },
+    "q8": {
+      "q": "Fines?",
+      "p": "Fines and damages resulting from failure to comply with traffic rules are borne solely by the renter and are not covered by insurance. If the customer does not pay a fine immediately, we charge a processing fee of 20% of the fine amount. License plate removal issues incur a specific handling cost of €150.00 (fine, tow truck, storage not included)."
+    },
+    "q9": {
+      "q": "Can an additional driver use the vehicle?",
+      "p": "Yes, additional drivers can use the car at no extra charge. They only need to meet the rental requirements and be declared at the start of the rental to be covered by insurance."
+    },
+    "q10": {
+      "q": "Are child seats available and what is the charge?",
+      "p1": "Yes, the charge is €10.00 per reservation (no daily fee).",
+      "p2": "Size categories: No.1 (0–15 months / 1–13kg) | No.2 (9 months–2 years / 9–18kg) | No.3 (2–5 years / 15–25kg) | No.4 (5–8 years / 25–36kg)",
+      "imgAlt": "Child seat categories",
+      "note": "Please enter the child’s age at the next booking step."
+    },
+    "q11": {
+      "q": "Can I use the ferry with the rental car?",
+      "p": "Transporting the vehicle to an island (Thassos, Skiathos, etc.) is allowed and free. You only need to inform our company."
+    },
+    "q12": {
+      "q": "Age limit insurance",
+      "p": "The minimum driver age is 23 and in some cases at least 2 years license is required. The maximum age is 72. Minimum age can be set to 21 and over 72 can be increased with extra insurance €5.00/day. A maximum per category can be set up to 80 years."
+    },
+    "q13": {
+      "q": "Fuel – Tank",
+      "p1": "Return as received: the vehicle is delivered with a certain level and returned at the same level.",
+      "img1Alt": "Return as received",
+      "img2Alt": "Full-Empty",
+      "p2": "Full–Empty: delivered full & returned empty. Prices: Categories A,B €79.00 | C,D €89.00 | STW €109.00 | L,M €139.00. (If not selected, “return as received” applies.)"
+    },
+    "q14": {
+      "q": "Last-minute booking?",
+      "p": "Yes, as long as the rental starts within 24 hours, we recommend booking by phone or email. We will inform you as soon as possible about your booking status."
+    },
+    "q15": {
+      "q": "Can I drive to another country with a rental car? “Schengen Area”?",
+      "p": "No, it is not allowed. Crossing borders is strictly prohibited, regardless of Schengen participation. Violation incurs a €200 + VAT charge and all insurance coverage is canceled. In addition, the vehicle is not covered by comprehensive insurance, theft insurance, or any other insurance. All insurance terms are void and the renter bears full responsibility for any damage or loss."
+    },
+    "q16": {
+      "q": "WHERE and HOW can I find 4rent Thessaloniki at the Airport?",
+      "list": [
+        "At Thessaloniki Airport (SKG) our team awaits you at parking No. 5. The free “shuttle-bus” will take you to our nearby office.",
+        "Vehicle pickup also takes place at our office 4rent Thessaloniki (Google Maps)."
+      ]
+    },
+    "q17": {
+      "q": "Can I pick up and/or drop off the rental car outside office hours?",
+      "p1": "Yes, we offer this additional service.",
+      "p2": "Pickup & return outside normal operating hours (included in the online price):",
+      "list": [
+        "For vehicle pickups between 21:45 and 01:30 an extra fee of €19.00 applies.",
+        "For vehicle pickups between 05:45 and 08:00 an extra fee of €35.00 applies.",
+        "Any vehicle return outside normal hours (21:45 to 06:45) is charged an extra fee of €13.00."
+      ]
+    },
+    "q18": {
+      "q": "I would like to pick up the rental car at a hotel or Airbnb—possible?",
+      "p": "Yes, this is possible.",
+      "steps": [
+        "Open the booking form",
+        "Select pickup/return location",
+        "At the final step, enter the hotel/Airbnb address in the “Hotel/Airbnb delivery” field"
+      ]
+    },
+    "q19": {
+      "q": "What happens if our flight is delayed?",
+      "p": "We monitor your flight via Flightradar and see precisely when you land. We wait for you at no extra charge, unless arrival is after 23:00 — then only the usual out-of-hours fee applies."
+    },
+    "q20": {
+      "q": "From which countries are driving licenses accepted?",
+      "p1": "Austria, Belgium, Bulgaria, France, Germany, Denmark, Greece, Estonia, United Kingdom, Ireland, Spain, Italy, Cyprus, Latvia, Lithuania, Luxembourg, Malta, Netherlands, Hungary, Poland, Portugal, Romania, Slovakia, Slovenia, Sweden, Czech Republic, Finland, Croatia, United States of America, Canada*  Australia, United Kingdom, Gibraltar, Switzerland, Serbia, Norway, Iceland, Liechtenstein, Moldova, Israel (details must be in Latin characters), Ukraine, Russia (details must be in Latin characters), Turkey (details must be in Latin characters), United Arab Emirates (details must be in Latin characters).",
+      "p2": "*If the Canadian National driving license is in French, it must be accompanied by an official government translation into English or Greek, certified by a competent authority.",
+      "p3": "For all other countries, an International Driving Permit is strictly required."
+    },
+    "q21": {
+      "q": "Smoking in the car?",
+      "p": "Smoking is strictly prohibited in all vehicles. In case of violation, a minimum charge of €150 applies for cleaning/odor restoration/damages."
+    }
+  },
+  "images": {
+    "kidsSeats": {
+      "src": "https://4rent-thessaloniki.com/images/Logos/kindersitzn.png",
+      "alt": "Child seat categories"
+    },
+    "fuelReturn": {
+      "src": "https://4rent-thessaloniki.com/images/Logos/full2.jpg",
+      "alt": "Return as received"
+    },
+    "fuelFullEmpty": {
+      "src": "https://4rent-thessaloniki.com/images/Logos/full.jpg",
+      "alt": "Full-Empty"
+    }
+  }
+}

@@ -14,37 +14,31 @@ import {
 import { CarOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 
-const { Title, Paragraph, Text, Link } = Typography;
+const { Title, Paragraph, Text } = Typography;
 const { Panel } = Collapse;
 
 const brandRed = "#ce0505";
 const brandBlue = "#075eff";
 const heroGradient = `linear-gradient(135deg, ${brandBlue} 0%, ${brandBlue} 60%, ${brandRed} 100%)`;
 
-type FaqPanel = {
-    key: string;                // e.g. "q1"
-    header: string;             // panel title
-    bodyHtml?: string;          // optional pre-formatted HTML (string)
-    bullets?: string[];         // optional list of <li> items
-    ordered?: string[];         // optional ordered list
-    images?: Array<{ src: string; alt: string; maxWidth?: number }>;
-};
-
 export default function FaqThessalonikiPage() {
     const { t } = useTranslation(["faqThess"]);
 
-    // Pull all copy from translations
     const heroTitle = t("hero.title", { ns: "faqThess" });
-    const cta = {
-        text: t("cta.text", { ns: "faqThess" }),
-        href: t("cta.href", { ns: "faqThess" }),
-    };
-
-    // Panels: stored as an array in locales/.../faqThess.json
-    const panels = t("panels", {
+    const ctaText = t("cta.bookNow", {
         ns: "faqThess",
-        returnObjects: true,
-    }) as FaqPanel[];
+        defaultValue: "ΚΑΝΤΕ ΚΡΑΤΗΣΗ ΤΩΡΑ",
+    });
+    const ctaHref = t("cta.href", { ns: "faqThess", defaultValue: "/book/search" });
+
+    const faqObj = t("faq", { ns: "faqThess", returnObjects: true }) as Record<string, any>;
+    const images = t("images", { ns: "faqThess", returnObjects: true }) as any;
+
+    const panels = Object.entries(faqObj || {}).map(([key, v]) => ({
+        key,
+        header: v.q as string,
+        data: v,
+    }));
 
     return (
         <div style={{ width: "100%", margin: "0 auto", padding: "0 16px", maxWidth: 1140 }}>
@@ -64,9 +58,6 @@ export default function FaqThessalonikiPage() {
                         background: heroGradient,
                         color: "white",
                         padding: "28px 24px",
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
                         textAlign: "center",
                     }}
                 >
@@ -77,63 +68,89 @@ export default function FaqThessalonikiPage() {
 
                 {/* CONTENT */}
                 <div style={{ padding: 20, textAlign: "left" }}>
-                    <Collapse
-                        accordion
-                        bordered={false}
-                        style={{ background: "transparent" }}
-                        expandIconPosition="end"
-                    >
-                        {(panels || []).map((p) => (
-                            <Panel header={<strong>{p.header}</strong>} key={p.key}>
-                                <Space direction="vertical" size={10} style={{ width: "100%" }}>
-                                    {/* Optional HTML block (kept verbatim) */}
-                                    {p.bodyHtml ? (
-                                        <div
-                                            dangerouslySetInnerHTML={{ __html: p.bodyHtml }}
-                                            // NOTE: bodyHtml comes from your own locale files
-                                        />
-                                    ) : null}
+                    <Collapse accordion bordered={false} style={{ background: "transparent" }} expandIconPosition="end">
+                        {panels.map(({ key, header, data }) => {
+                            // dynamic list of content preserving order
+                            const orderedKeys = Object.keys(data);
+                            const imgs: Array<{ src: string; alt: string }> = [];
+                            if (key === "q10" && images?.kidsSeats?.src)
+                                imgs.push({ src: images.kidsSeats.src, alt: images.kidsSeats.alt || "" });
+                            if (key === "q13") {
+                                if (images?.fuelReturn?.src)
+                                    imgs.push({ src: images.fuelReturn.src, alt: images.fuelReturn.alt || "" });
+                                if (images?.fuelFullEmpty?.src)
+                                    imgs.push({ src: images.fuelFullEmpty.src, alt: images.fuelFullEmpty.alt || "" });
+                            }
 
-                                    {/* Optional unordered bullets */}
-                                    {p.bullets && p.bullets.length > 0 ? (
-                                        <ul style={{ marginTop: 0 }}>
-                                            {p.bullets.map((li, i) => (
-                                                <li key={i}>{li}</li>
-                                            ))}
-                                        </ul>
-                                    ) : null}
+                            return (
+                                <Panel header={<strong>{header}</strong>} key={key}>
+                                    <Space direction="vertical" size={10} style={{ width: "100%" }}>
+                                        {orderedKeys.map((k) => {
+                                            const val = data[k];
+                                            if (!val) return null;
 
-                                    {/* Optional ordered list */}
-                                    {p.ordered && p.ordered.length > 0 ? (
-                                        <ol>
-                                            {p.ordered.map((li, i) => (
-                                                <li key={i}>{li}</li>
-                                            ))}
-                                        </ol>
-                                    ) : null}
+                                            // paragraph
+                                            if (typeof val === "string" && k.startsWith("p")) {
+                                                return (
+                                                    <Paragraph key={k}>
+                                                        {k === "p1" || k === "p2" ? <Text strong>{val}</Text> : val}
+                                                    </Paragraph>
+                                                );
+                                            }
 
-                                    {/* Optional images */}
-                                    {p.images && p.images.length > 0 ? (
-                                        <Row gutter={[16, 16]} align="middle">
-                                            {p.images.map((im, i) => (
-                                                <Col key={i} xs={24} md={12} style={{ textAlign: "center" }}>
-                                                    <Image
-                                                        src={im.src}
-                                                        alt={im.alt}
-                                                        style={{
-                                                            borderRadius: 12,
-                                                            width: "100%",
-                                                            maxWidth: im.maxWidth ?? 460,
-                                                        }}
-                                                        preview={false}
-                                                    />
-                                                </Col>
-                                            ))}
-                                        </Row>
-                                    ) : null}
-                                </Space>
-                            </Panel>
-                        ))}
+                                            // unordered lists
+                                            if (Array.isArray(val) && (k.startsWith("list") || k === "list")) {
+                                                return (
+                                                    <ul key={k} style={{ marginTop: 0 }}>
+                                                        {val.map((li, i) => (
+                                                            <li key={i}>{li}</li>
+                                                        ))}
+                                                    </ul>
+                                                );
+                                            }
+
+                                            // ordered steps
+                                            if (Array.isArray(val) && k === "steps") {
+                                                return (
+                                                    <ol key={k}>
+                                                        {val.map((li, i) => (
+                                                            <li key={i}>{li}</li>
+                                                        ))}
+                                                    </ol>
+                                                );
+                                            }
+
+                                            // note
+                                            if (k === "note" && typeof val === "string") {
+                                                return (
+                                                    <Paragraph key={k} type="secondary">
+                                                        {val}
+                                                    </Paragraph>
+                                                );
+                                            }
+
+                                            return null;
+                                        })}
+
+                                        {/* images */}
+                                        {imgs.length > 0 && (
+                                            <Row gutter={[16, 16]} align="middle">
+                                                {imgs.map((im, i) => (
+                                                    <Col key={i} xs={24} md={12} style={{ textAlign: "center" }}>
+                                                        <Image
+                                                            src={im.src}
+                                                            alt={im.alt}
+                                                            style={{ borderRadius: 12, width: "100%", maxWidth: 460 }}
+                                                            preview={false}
+                                                        />
+                                                    </Col>
+                                                ))}
+                                            </Row>
+                                        )}
+                                    </Space>
+                                </Panel>
+                            );
+                        })}
                     </Collapse>
 
                     <Divider />
@@ -145,10 +162,14 @@ export default function FaqThessalonikiPage() {
                                 type="primary"
                                 size="large"
                                 icon={<CarOutlined />}
-                                href={cta.href}
-                                style={{ backgroundColor: brandRed, borderColor: brandRed, borderRadius: 8 }}
+                                href={ctaHref}
+                                style={{
+                                    backgroundColor: brandRed,
+                                    borderColor: brandRed,
+                                    borderRadius: 8,
+                                }}
                             >
-                                {cta.text}
+                                {ctaText}
                             </Button>
                         </Col>
                     </Row>
@@ -157,3 +178,4 @@ export default function FaqThessalonikiPage() {
         </div>
     );
 }
+    

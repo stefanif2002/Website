@@ -26,29 +26,6 @@ public class UserService {
     private final ModelMapper modelMapper;
     private final UserClient userClient;
 
-    /**
-     * Dispatches incoming update events for user data on the website side.
-     */
-    @Transactional
-    public void alterUser(UserWebsiteUpdateDto dto) {
-        String event = dto.getEventType();
-        switch (event) {
-            case "UserAddedWebsite"   -> createUser(dto);
-            case "UserUpdatedWebsite" -> updateUser(dto);
-            case "UserDeletedWebsite" -> deleteUser(dto.getTelephone());
-            default -> log.warn("Unknown user event type: {}", event);
-        }
-    }
-
-    @Transactional
-    protected void createUser(UserWebsiteUpdateDto dto) {
-        // Map only phone, email, and presence flags into the User entity
-        User user = new User();
-        modelMapper.map(dto, user);
-        userRepository.save(user);
-        log.info("Created user {} from CRM.", user.getTelephone());
-    }
-
     public void createUserInternal(UserDto dto) {
         String fullTelephone = dto.getCc() + dto.getTelephone();
         User user = userRepository.findById(dto.getTelephone()).orElse(userRepository.findById(fullTelephone).orElse(userRepository.findById("+" + fullTelephone).orElse(null)));
@@ -101,30 +78,6 @@ public class UserService {
         return s != null && !s.isBlank();
     }
 
-    @Transactional
-    protected void updateUser(UserWebsiteUpdateDto dto) {
-        Optional<User> opt = userRepository.findById(dto.getTelephone());
-        if (opt.isEmpty()) {
-            log.warn("User {} not found for update, creating new.", dto.getTelephone());
-            createUser(dto);
-            return;
-        }
-        User user = opt.get();
-        modelMapper.map(dto, user);
-        userRepository.save(user);
-        log.info("Updated user {} on website side.", user.getTelephone());
-    }
-
-    @Transactional
-    protected void deleteUser(String telephone) {
-        if (userRepository.existsById(telephone)) {
-            userRepository.deleteById(telephone);
-            log.info("Deleted user {} from website side.", telephone);
-        } else {
-            log.warn("User {} not found for deletion.", telephone);
-        }
-    }
-
     public UserWebsiteUpdateDto checkUser(String cc, String telephone, String email) {
         String fullTelephone = cc + telephone;
         User existing = userRepository.findById(telephone).orElse(userRepository.findById(fullTelephone).orElse(userRepository.findById("+" + fullTelephone).orElse(null)));
@@ -174,5 +127,54 @@ public class UserService {
         }
 
         return true;
+    }
+
+
+
+    /**
+     * Dispatches incoming update events for user data on the website side.
+     */
+    @Transactional
+    public void alterUser(UserWebsiteUpdateDto dto) {
+        String event = dto.getEventType();
+        switch (event) {
+            case "UserAddedWebsite"   -> createUser(dto);
+            case "UserUpdatedWebsite" -> updateUser(dto);
+            case "UserDeletedWebsite" -> deleteUser(dto.getTelephone());
+            default -> log.warn("Unknown user event type: {}", event);
+        }
+    }
+
+    @Transactional
+    protected void createUser(UserWebsiteUpdateDto dto) {
+        // Map only phone, email, and presence flags into the User entity
+        User user = new User();
+        modelMapper.map(dto, user);
+        userRepository.save(user);
+        log.info("Created user {} from CRM.", user.getTelephone());
+    }
+
+    @Transactional
+    protected void updateUser(UserWebsiteUpdateDto dto) {
+        Optional<User> opt = userRepository.findById(dto.getTelephone());
+        if (opt.isEmpty()) {
+            log.warn("User {} not found for update, creating new.", dto.getTelephone());
+            createUser(dto);
+            return;
+        }
+        User user = opt.get();
+        modelMapper.map(dto, user);
+        userRepository.save(user);
+        log.info("Updated user {} on website side.", user.getTelephone());
+    }
+
+    @Transactional
+    protected void deleteUser(String telephone) {
+        if (userRepository.existsById(telephone)) {
+            userRepository.deleteById(telephone);
+            log.info("Deleted user {} from website side.", telephone);
+        } else {
+            log.warn("User {} not found for deletion.", telephone);
+        }
     }
 }
