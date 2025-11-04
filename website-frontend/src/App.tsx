@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 function App() {
     const { t } = useTranslation('common');
     return (
-        <Router>
+        <Router basename="/website">
             <div style={{ textAlign: 'center' }}>
                 <Routes>
                     <Route path="/*" element={<Dashboard />} />

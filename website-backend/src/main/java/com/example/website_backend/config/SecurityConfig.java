@@ -21,7 +21,7 @@ public class SecurityConfig {
 
                 // allow anonymous access to all availability endpoints
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/**").permitAll()
+                        .requestMatchers("/api/website/v1/**").permitAll()
                         // everything else must be authenticated
                         .anyRequest().authenticated()
                 );

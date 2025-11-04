@@ -12,9 +12,20 @@ import {
     CheckCircleTwoTone, GiftTwoTone, ArrowLeftOutlined, CreditCardOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
-import { getLangFromPath } from "../../resources/useLangRouter";
-import { useTranslation } from "react-i18next"; // ✅ add
+import { useTranslation } from "react-i18next";
+
 const { Title, Text } = Typography;
+
+// ✅ Always serve under this base path
+const BASE_PATH = "/website";
+
+// ✅ language detector aware of /website/<lang>/...
+const LANG_RE = /^[a-z]{2}(?:-[A-Z]{2})?$/;
+function getLangFromPathWithBase(pathname: string, fallback: string = "el-GR"): string {
+    const parts = pathname.split("/").filter(Boolean); // ["website","el-GR","book",...]
+    const maybe = parts[1]; // index 0 = "website", index 1 = "<lang>"
+    return maybe && LANG_RE.test(maybe) ? maybe : fallback;
+}
 
 type Props = {
     form: FormInstance;
@@ -32,7 +43,7 @@ const Payment: React.FC<Props> = ({
                                       onPrev,
                                       stripePublishableKey = "pk_test_51S2UY3KnXECMMeszL1gKAaoSrvN4uu6v0YKMkQ4GdKIIaJA8gvjuVO0Z0oOhuWzMRH3sxcLKC89AL6h9pJASNUbX00Rsq57BV4",
                                   }) => {
-    const { t } = useTranslation("booking"); // ✅ translation hook
+    const { t } = useTranslation("booking");
 
     const [loading, setLoading] = useState(false);
     const [coupon, setCoupon] = useState("");
@@ -49,28 +60,37 @@ const Payment: React.FC<Props> = ({
     const { pathname } = useLocation();
     const [sp, setSp] = useSearchParams();
 
-    const lang = useMemo(() => getLangFromPath(pathname), [pathname]);
-    const langPrefix = `/${lang}`;
+    // ✅ lang & base url parts
+    const lang = useMemo(() => getLangFromPathWithBase(pathname), [pathname]);
+    const baseOrigin = window.location.origin;                         // e.g. http://localhost:5173
+    const baseUrl = `${baseOrigin}${BASE_PATH}`;                       // e.g. http://localhost:5173/website
+    const langPrefix = `${BASE_PATH}/${lang}`;                         // e.g. /website/el-GR
 
+    // path parts
     const parts = pathname.replace(/\/+$/, "").split("/");
     const bookIdx = parts.indexOf("book");
     const categoryId = bookIdx >= 0 ? Number(parts[bookIdx + 1]) : undefined;
     const bookingId = sp.get("bid") || undefined;
 
+    // dates for coupon validation
     const startIso = sp.get("start");
     const endIso = sp.get("end");
     const startDate = startIso ? dayjs(startIso).format("YYYY-MM-DD") : undefined;
     const endDate = endIso ? dayjs(endIso).format("YYYY-MM-DD") : undefined;
 
+    // ✅ success/cancel URLs include /website and preserve query params
     const successParams = new URLSearchParams(sp);
     if (bookingId && !successParams.get("bid")) successParams.set("bid", bookingId);
     successParams.delete("session_id");
-    const baseSuccess = `${window.location.origin}${langPrefix}/book/${categoryId}/payment/success`;
-    const successUrl = successParams.toString() ? `${baseSuccess}?${successParams.toString()}` : baseSuccess;
+
+    const baseSuccess = `${baseUrl}/${lang}/book/${categoryId}/payment/success`;
+    const successUrl = successParams.toString()
+        ? `${baseSuccess}?${successParams.toString()}`
+        : baseSuccess;
 
     const retryParams = new URLSearchParams(sp);
     retryParams.set("session_id", "{CHECKOUT_SESSION_ID}");
-    const baseRetry = `${window.location.origin}${langPrefix}/book/${categoryId}/payment/retry`;
+    const baseRetry = `${baseUrl}/${lang}/book/${categoryId}/payment/retry`;
     const cancelUrl = `${baseRetry}?${retryParams.toString()}`;
 
     const buildMetadata = () => {
@@ -94,6 +114,7 @@ const Payment: React.FC<Props> = ({
             setCoupon(couponFromUrl);
             applyCoupon(couponFromUrl, { silent: true }).catch(() => {});
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const applyCoupon = async (codeArg?: string, opts?: { silent?: boolean }) => {
@@ -203,7 +224,6 @@ const Payment: React.FC<Props> = ({
 
     return (
         <Card bordered={false} style={{ borderRadius: 16, boxShadow: "0 8px 30px rgba(0,0,0,0.06)" }} bodyStyle={{ padding: 0 }}>
-            {/* Header */}
             <div style={{ background: headerGradient, padding: "14px 18px", display: "flex", justifyContent: "space-between", borderBottom: "1px solid rgba(47,90,255,0.12)" }}>
                 <Space align="center">
                     <CreditCardOutlined style={{ color: "#2F5AFF" }} />
@@ -213,9 +233,7 @@ const Payment: React.FC<Props> = ({
                 <Space size={6}><LockOutlined style={{ color: "#2F5AFF" }} /><Text type="secondary">{t("payment.secureLabel")}</Text></Space>
             </div>
 
-            {/* Content */}
             <div style={{ padding: 18 }}>
-                {/* Total */}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                     <Text type="secondary">{t("payment.totalLabel")}</Text>
                     <div style={{ textAlign: "right" }}>
@@ -225,7 +243,9 @@ const Payment: React.FC<Props> = ({
                                     <Text delete type="secondary">{amount.toFixed(2)} {currency}</Text>
                                     <Statistic value={effectiveAmount} precision={2} suffix={<Text type="secondary" style={{ fontSize: 12 }}>{currency}</Text>} valueStyle={{ fontWeight: 700, fontSize: 22 }} />
                                 </div>
-                                <Text type="success" style={{ fontSize: 12 }}>{t("payment.discountApplied", { pct: discountPct, diff: (amount - effectiveAmount).toFixed(2), currency })}</Text>
+                                <Text type="success" style={{ fontSize: 12 }}>
+                                    {t("payment.discountApplied", { pct: discountPct, diff: (amount - effectiveAmount).toFixed(2), currency })}
+                                </Text>
                             </>
                         ) : (
                             <Statistic value={amount} precision={2} suffix={<Text type="secondary" style={{ fontSize: 12 }}>{currency}</Text>} valueStyle={{ fontWeight: 700, fontSize: 22 }} />
@@ -233,7 +253,6 @@ const Payment: React.FC<Props> = ({
                     </div>
                 </div>
 
-                {/* Coupon */}
                 <div style={couponBoxStyle}>
                     <Space style={{ width: "100%", justifyContent: "space-between" }} wrap>
                         <Space><GiftTwoTone twoToneColor={["#FAAD14", "#FFD666"]} /><Text strong>{t("payment.couponTitle")}</Text></Space>
