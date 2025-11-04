@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/availability")
+@RequestMapping("/api/website/v1/availability")
 @Slf4j
 public class AvailabilityController {
 

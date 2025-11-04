@@ -8,8 +8,8 @@ public class WebMvcCorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry
-                .addMapping("/api/**")                    // all your API paths
-                .allowedOrigins("http://localhost:5173")  // your frontend origin
+                .addMapping("/api/website/**")                    // all your API paths
+                .allowedOrigins("*")  // your frontend origin
                 .allowedMethods("GET","POST","PUT","DELETE","OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true)

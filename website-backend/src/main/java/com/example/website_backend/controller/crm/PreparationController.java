@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/preparation")
+@RequestMapping("/api/website/v1/preparation")
 @Slf4j
 public class PreparationController {
 

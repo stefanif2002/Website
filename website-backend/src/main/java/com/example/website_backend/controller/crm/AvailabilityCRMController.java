@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/availability")
+@RequestMapping("/api/website/v1/availability")
 @Slf4j
 public class AvailabilityCRMController {
 

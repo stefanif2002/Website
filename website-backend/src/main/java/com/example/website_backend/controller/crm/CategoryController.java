@@ -13,7 +13,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/v1/category")
+@RequestMapping("/api/website/v1/category")
 @Slf4j
 public class CategoryController {
 

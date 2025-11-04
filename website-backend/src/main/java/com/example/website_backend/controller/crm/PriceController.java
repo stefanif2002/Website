@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.service.annotation.PostExchange;
 
 @RestController
-@RequestMapping("/api/v1/price")
+@RequestMapping("/api/website/v1/price")
 @Slf4j
 public class PriceController {
 
