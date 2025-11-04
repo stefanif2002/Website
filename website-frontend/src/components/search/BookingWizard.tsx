@@ -120,10 +120,11 @@ export default function BookingWizard({
     // Create booking BEFORE payment to acquire a bookingId
     const saveDraftAndGoToPayment = async () => {
         try {
-            await form.validateFields(["telephone", "email", "name", "last_name", "number_of_people"]);
+            await form.validateFields([ "cc", "telephone", "email", "name", "last_name", "number_of_people"]);
 
             const values = form.getFieldsValue(true);
             const {
+                cc,
                 telephone,
                 email,
                 name,
@@ -135,6 +136,7 @@ export default function BookingWizard({
                 checklist = {},
                 checklistQty = {},
             } = values as {
+                cc: string;
                 telephone: string;
                 email: string;
                 name: string;
@@ -184,8 +186,10 @@ export default function BookingWizard({
             const startLdt = dayjs(startIso).format("YYYY-MM-DDTHH:mm:ss");
             const endLdt = dayjs(endIso).format("YYYY-MM-DDTHH:mm:ss");
 
+            const fullTelephone = "+" + cc + telephone;
+
             const payload = {
-                telephone,
+                fullTelephone,
                 category_id: categoryId,
                 drivers: driverList,
                 start: startLdt,
